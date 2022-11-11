@@ -1,0 +1,1099 @@
+메서드 호출(=사용)
+
+클래스에 있는 메서드는 그냥 사용 불가.
+메서드: 객체의 능력, 기술...
+
+최소한 어떤 캐릭터에게 공격 명령을 하달할 건지에 대해서 설정...
+
+객체명? 참조자료형의 변수명..
+객체명.공격( );
+
+<MainEx 클래스>
+		// 무반환 무파람 메서드 호출 방법
+		// 자바에서는 메서드를 호출하려면, 클래스를 이용해서 객체를 만들고
+		// 그 객체가 갖고 있는 메서드를 호출해야 합니다
+		// 객체가 갖고 있는 메서드에 접근할 때, .(닷연산자)를 이용해서 접근합니다.
+		Dog dog1 = new Dog();
+		Dog dog2 = new Dog();
+		Dog dog3 = new Dog();
+		Dog dog4 = dog3;
+		
+		dog1.sleep();
+		
+		// dog3한테 달리라고 명령해 보세요
+		dog3.run();
+		
+		// dog2한테 먹으라고 명령해 보세요
+		dog2.eat();
+		
+		dog4.id = 111;
+		// 에러메시지 The field Dog.id is not visible
+		// 접근제한자 때문에 보이지 않습니다라는 의미
+		
+		int id = dog4.getId();
+		System.out.println("수정전: "+id);     출력 수정전: 0
+		dog4.setId(111);
+		System.out.println("비정상: "+id);     출력 비정상: 0
+		id = dog4.getId();
+		System.out.println("정상: "+id);        출력 정상: 111
+
+
+<Dog 클래스>
+	private int id;
+	private String name;
+	
+	public void sleep() {
+		System.out.println("잔다");
+	}
+
+	public void run() {
+		System.out.println("뛴다");
+	}
+
+	public void eat() {
+		System.out.println("먹는다");
+	}
+
+// id와 name 멤버변수의 getters/setters를 만들어 주세요
+	public int getId() {
+		return id;
+	}
+
+	public void setId(int id) {
+		this.id = id;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+########################
+<MainEx2 클래스>
+import net.daum.Person;
+
+public class MainEx2 {
+	
+	public static void main(String[] args) {
+		// 유반환 무파람 메서드 호출
+		
+		// 개 1마리 만듦
+		// 고양이 1마리 만듦
+		// 계산기 1대 만듦
+		// 사람 1명 만듦
+		Dog dog1 = new Dog();
+		Cat cat1 = new Cat();
+		Calculator c1 = new Calculator();
+		Person p1 = new Person();
+		
+		// 개가 가지고 있는 id 값을 출력해보세요
+		int id = dog1.getId();		
+		System.out.println(id);
+		
+		// 고양이의 이름을 가져와서 출력하세요
+		String name= cat1.getName();		
+		cat1.setName("고양이");
+		name = cat1.getName(); 
+		// 만약 String name = cat1.getName(); 보존해야 한다면..
+		// name = cat1.getName(); 을 다시 String name2 = cat1.getName(); 새로 만들어 준다
+		System.out.println(name);
+
+		// 계산기에 있는 더하기 기능을 호출해 보세요
+		double result = c1.plus();
+
+		// 계산기에 있는 callDog() 메서드를 호출하세요
+		Dog dog2 = c1.callDog();  // 개가 1마리 더 만들어짐
+		Dog dog3 = c1.callDog();  // 개가 또 1마리 더 만들어짐
+		
+		System.out.println(dog1);    //com.naver.Dog@2a139a55 주소값이 다 다르다
+		System.out.println(dog2);    //com.naver.Dog@15db9742
+		System.out.println(dog3);    //com.naver.Dog@6d06d69c
+		// 총 3개의 객체가 만들어진 것이다
+
+		String name2 = dog2.getName();
+		
+		
+		// p1이 갖고 있는 cat1의 이름을 출력하시오
+		String catName = p1.getCat1().getName();
+		System.out.println(catName);
+		
+		// 교수님이 작성해주신거
+		Cat cat2 = p1.getCat1();
+		String name3 = cat2.getName();
+		System.out.println(name3);
+		
+		// p1이 갖고 있는 cal의 plus()메서드를 호출하세요
+		Calculator c2 = p1.getCal();
+		double result2 = c2.plus();
+
+		// dog1이 갖고 있는 getId() 메서드를 호출하세요
+		id = dog1.getId();
+
+	}
+
+}
+
+###################
+< MainEx3 클래스> 
+package kr.co.dwitt;
+
+import net.daum.Person;
+
+public class MainEx3 {
+	
+	public static void main(String[] args) {
+		// 무반환 유파람
+		
+		// Person클래스를 이용해서
+		// kim이라는 객체, lee라는 객체를 생성해주세요
+		Person kim = new Person();
+		Person lee = new Person();
+
+		// kim이 갖고 있는 id를 1111로 수정하세요				
+		System.out.println(kim.getId());  출력 0
+		
+		kim.setId(1111);
+		int id = kim.getId();	
+		System.out.println(id);    출력 1111
+
+		// lee가 갖고 있는 name을 이순신으로 수정하세요
+		lee.setName("이순신");
+		System.out.println(lee.getName());
+		
+		// lee가 갖고 있는 cat1을 가져와서
+		// 그 cat1의 이름을 "야옹이"로 수정하세요
+		Cat cat1 = lee.getCat1();
+		cat1.setName("야옹이");
+		
+		// kim이라고 하는 사람이 갖고 있는 고양이를
+		// lee가 갖고 있는 고양이로 변경하세요
+		System.out.println(kim.getCat1().getName()); // 바꾸기전 이름이 없음
+		
+		kim.setCat1(cat1);
+		System.out.println(kim.getCat1().getName()); // 바꾸고 이름이 야옹이 됨
+		
+		// cal을 넣어 주겠습니다
+		// kim, lee든 cal는 없는 상태입니다
+		// cal를 저장할 수 있는 주머니는 있어요.
+		// 하지만 그 주머니에 계산기는 없습니다
+		// lee 객체가 갖고 있는 cal에 
+		// Calculator 객체를 넣어 주세요
+		lee.setCal(new Calculator());
+		
+		// kim가 갖고 있는 dog1에 새로운 개를 넣어 주세요
+		kim.setDog1(new Dog());
+
+		// kim이 갖고 있는 개의 이름을 "땡구"로 수정하세요
+		kim.getDog1().setName("땡구");
+		System.out.println(kim.getDog1().getName());
+		
+		
+	}
+
+}
+
+#################
+< MainEx4 >
+package kr.co.dwitt;
+
+import net.daum.Person;
+
+public class MainEx4 {
+
+	public static void main(String[] args) {
+		// 유반환 유파람
+		
+		Person p1 = new Person();
+		Person p2 = new Person();
+		
+		// p1객체가 갖고 있는 plus(int)메서드를 호출하세요
+		// 인수가 필요한 메서드에는 변수 선언 공식의
+		// = 의 우측에 들어가는 자료형에 맞는 값을 넣어 줌
+		int result = p1.plus(111);
+		
+		// 메서드 호출할 때, ()에 넣는 값은
+		// 변수 선언 공식의 우측의 자료형에 맞는 값이다.
+		
+		int a = 2100000000;
+		int b = 2100000000;
+		// p2 객체가 갖고 있는 plus(int, int)메서드를
+		// 호출하세요. 단, 변수 a,b를 반드시 사용하세요
+		int result2 = p2.plus(a, b);
+		System.out.println(result2);
+		// 오버플로우가 발생함
+		
+		int result3 = p2.plus(a, p1.plus(111));
+		// 변수 선언할 떄, 자료형에 맞는 값
+		// 값을 직접(literal), 변수명, 메서드를 넣어도 됨
+		
+		// p1 객체가 갖고 있는 say() 메서드를 호출하세요
+		String str1 = p1.say("홍길동");
+		System.out.println(str1);
+		
+		// p2 객체가 갖고 있는 catSetIdNName()메서드를 호출하세요
+		Cat cat1 = p2.catSetIdNName(111, "홍길동");
+		System.out.println(cat1.getName());
+		System.out.println(cat1.getId());
+		
+		String msg = "vip#kim#200#서울";
+		// msg객체가 갖고 있는 charAt()메서드를 호출하세요
+		char c1 = msg.charAt(6);  // v->0, i->1, p->2, #->3, k->4, i->5, m->6....
+		System.out.println(c1);  // 출력 m 나옴
+		// 자바의 인덱스는 모두 몇부터 시작한다? 0
+		// 단, stack과 오라클은 1부터 시작한다.
+
+		// msg 객체가 갖고 있는 length()메서드를 호출하세요
+		int size = msg.length();
+		System.out.println(size);  출력 14 나옴
+		
+		// msg가 갖고 있는 substring(int)메서드 호출
+		String s1 = msg.substring(3); 
+		// 값을 넣은 인덱스 숫자를 기준으로 vip는 잘라내고 #부터 출력을한다
+		// substring 잘라내다 라는 의미가 잇다
+		System.out.println(s1);  // 출력 #kim#200#서울
+		
+		// msg 객체가 갖고 있는 split()메서드가 있음
+		String[] arr =  msg.split("#");
+		System.out.println(arr);
+		// 배열이다. 배열이라 출력값은 주소값만 나옴
+
+	}
+
+}
+
+메서드 생성할 때, 매개변수 선언은 
+[자료형 변수명] 형태로 합니다.
+
+public void me1(int a, String b, Cat c){
+}
+
+메서드 호출할 때, 인수를 입력하는 방식은
+[매개변수의 자료형에 맞는 값]
+
+me1(33, "kim", new Cat());
+
+####################
+형변환(type casting)
+
+< Test4 > 프로젝트 생성
+
+패키지 dwitt 생성 그 안에 < MainEx 클래스> 생성
+package kr.co.dwitt;
+
+import com.naver.Test;
+
+public class MainEx {
+	
+	public static void main(String[] args) {
+		
+		// 큰 자료형에서 작은 자료형으로 형변환
+		Test t = new Test();
+		// 강제 형변환
+		t.me1((byte)0); // 방법1 --- 일반적으로 이 방법을 사용함
+		
+		// 정수형의 기본자료형은 int
+		// 3의 자료형은? int
+		// int형의 3이 자동으로 byte의 3으로 형변환 됐음.
+		byte a = 3;
+		t.me1(a);  //방법2
+		
+		// 작은 자료형에서 큰 자료형으로 형변환
+		// int형인 44가 long형인 44로 자동 형변환
+		long b = 44;
+		// long 을 쓰면 뒤에 L을 써야되는데 자동 형변환되서 L을 안쓴다
+		t.me2(44);
+		
+		t.me3((float)3.4); // --> 요방법은 큰 자료형을 작은 자료형으로 강제형변환하는 것으로 어쩔수 없을 때 사용한다
+		t.me3(3.4F);
+		
+		t.plus(Integer.MAX_VALUE);  출력 -2147483646
+		
+		t.plus2(Integer.MAX_VALUE);  출력 -2147483646
+		
+		t.plus3(Integer.MAX_VALUE);  출력 -2147483646
+		
+		t.plus4(Integer.MAX_VALUE);  출력 2147483650
+
+		
+	}
+
+}
+
+
+############
+패키지 com.naver 생성 그안에 Test 클래스 생성
+
+package com.naver;
+
+public class Test {
+	
+	public void me1(byte a) {
+		System.out.println(a);
+	}
+	
+	public void me2(long a) {
+		System.out.println(a);
+	}
+
+	public void me3(float a) {
+		System.out.println(a);
+	}
+	
+	public void plus(int a) {
+		int result = a + 3;
+		System.out.println(result);
+	}
+	
+	public void plus2(int a) {
+		long result = a + 3;
+		System.out.println(result);
+	}
+	
+	public void plus3(int a) {
+		long result = (long)(a + 3); // a+3 계산을 하고나서 형변환를 하기때문에 결국 형변환이 안된다
+		System.out.println(result);
+	}
+	
+	public void plus4(int a) {
+		long result = (long)a + 3;    // a+3이 계산되기전에 먼저 a를 형변환을 시켜준다
+		System.out.println(result);
+	}
+	
+	// BigInteger: 엄청 큰/작은 정수
+	// BigDecimal: 엄청 큰/작은 실수
+
+}
+
+###################
+<MainEx2 클래스> 생성
+
+package kr.co.dwitt;
+
+public class MainEx2 {
+
+	public static void main(String[] args) {
+		
+		// Wrapper 클래스
+		// 기본자료형으로 객체를 못 만듦.
+		// 객체에게만 유용한 기능을 제공해주는 클래스들이 있음.
+		// java collection framework..
+		// 기본자료형은 jcf에 집어 넣을 수 없습니다.
+		// Wrapper 클래스가 만들어 집니다.
+		// 기본자료형을 이용해서 객체를 만들 수 있게 하기 위해서 Wrapper 클래스가 만들어짐.
+		// boolean -> Boolean
+		// char -> Character----
+		// byte -> Byte
+		// short -> Short
+		// int -> Integer----
+		// long -> Long
+		// float -> Float
+		// double -> Double
+		
+		String msg1 = "true";
+		boolean a = Boolean.parseBoolean(msg1);
+		System.out.println(a);  출력 true
+		
+		String msg2 = "-128";
+		byte b = Byte.parseByte(msg2);  
+		System.out.println(b);     출력 -128
+		
+		String msg3 = "-129";
+		short c = Short.parseShort(msg3);
+		System.out.println(c);     출력 -129
+		
+		String msg4 = "2100000000";
+		int d = Integer.parseInt(msg4);
+		System.out.println(d);     출력 2100000000
+		
+		String msg5 = "3000000000";
+		long e = Long.parseLong(msg5);
+		System.out.println(e);      출력 3000000000
+		
+		String msg6 = "3.14F";
+		float f = Float.parseFloat(msg5);
+		System.out.println(f);       출력 3.0E9
+		
+		String msg7 = "9.8";
+		double g = Double.parseDouble(msg7);
+		System.out.println(g);      출력 9.8
+		
+		String msg8 = "c";
+		char h = msg8.charAt(0);  // char만 조심하면 된다
+		System.out.println(h);        출력 c
+
+	}
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
