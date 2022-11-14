@@ -1,0 +1,1372 @@
+static 키워드가 붙은 변수, 메서드는
+다른 변수나 메서드와 다른 개념입니다.
+이들은 프로그램이 시작되자마자 
+메모리에 로딩되어 사용 가능한 상태가 됩니다.
+그러나 멤버변수나 메서드는 객체가 생성될 때만
+사용 가능한 상태가 됩니다.
+
+package kr.co.dwitt;
+
+import com.naver.Cat;
+import com.naver.Dog;
+
+public class MainEx5 {
+	
+	public static void main(String[] args) {
+		
+		MainEx5 obj1 = new MainEx5();
+		// 무반환 무파람
+		// obj1이 갖고 있는 k1()메서드를 호출하세요
+		// 객체명.메서드명();
+		obj1.k1();
+		
+		// 유반환 무파람
+		// obj1이 갖고 있는 k2()메서드를 호풀하세요
+		// 반환형과같은자료형 변수명 = 객체명.메서드명();
+		// 변수명 = 객체명.메서드(); // 변수명이 반환형과 같은 자료형을 갖고 있다면..
+		int result1 = obj1.k2();
+		
+		// 무반환 유파람
+		// obj1이 갖고 있는 k3() 메서드를 호출하세요
+		// int형 변수 a를 선언하세요
+		// int a = 3;
+		// String 변수 b를 선언하세요
+		// String b = new String("hello");
+		// 또는 "hello";
+		// Dog형 변수 c를 선언하세요
+		// Dog c = new Dog();
+		obj1.k3(3, "hello", new Dog());
+		
+		// 유반환 유파람
+		// obj1이 갖고 있는 k4()메서드를 호출하세요
+		Cat result2 = obj1.k4(10, "야옹이", new Cat());
+		System.out.println(result2.getName());
+		
+	}
+	
+	public void k1() {
+		System.out.println("k1()메서드입니다.");		
+	}
+	
+	public int k2() {
+		int a =30;
+		
+		return a;
+	}
+	
+	public void k3(int a, String b, Dog c) {
+		System.out.println(a);
+		System.out.println(b);
+		System.out.println(c);
+		System.out.println(c.getName());
+	}
+	
+	public Cat k4(int a, String b, Cat c) {
+		c.setId(a);
+		c.setName(b);
+		
+		return c;
+		
+	}
+}
+
+====================
+클래스의 구성 요소
+1. 멤버변수 
+2. 메서드
+3. 생성자
+
+접근제한자 = 접근제어지시자
+===
+멤버들의 스코프를 결정하는 요소..
+접근제한자 자료형 변수명;
+접근제한자 public 반환형 메서드명(자료형1 변수명1) {
+}
+
+접근제한자 종류
+- public      : 프로젝트 어디에서든지간에 다 접근 가능
+해당 클래스 + @(프로젝트 전체)
+
+- protected : 같은 패키지에서는 접근 가능 + 상속관계가 성립하면 타 패키지 접근 가능
+해당 클래스 + @(같은 패키지 전체, 상속관계가 성립한다면 타 패키지)
+
+-              : 디폴트 또는 프렌들리라고 읽음. 같은 패키지에서는 접근 가능
+해당 클래스 + @(같은 패키지 전체)
+
+- private     : 멤버변수의 접근제한자로 99.999% 사용
+해당 클래스
+
+클래스는 public 과 디폴트 접근제한자만 사용 가능하다.
+
+<Dog 클래스>
+package com.naver;
+
+public class Dog {
+	
+	public    int a = 10;
+	protected int b = 20;
+	          int c = 30;
+	private   int d = 40;  // 보기 편하게 일부러 열 맞춘거임
+
+}
+======
+<Cat 클래스>
+package kr.co.dwitt;
+
+public class Cat {
+	
+	public    int a = 10;
+	protected int b = 20;
+	          int c = 30;
+	private   int d = 40;
+	
+	public int getD() {
+		return d;
+	}
+	public void setD(int d) {
+		this.d = d;
+	}
+
+}
+======
+< MainEx 클래스>
+package kr.co.dwitt;
+
+import com.naver.Dog;
+
+public class MainEx {
+
+	public static void main(String[] args) {
+		
+		Dog dog1 = new Dog();		
+		dog1.a = 100;
+		//dog1.b = 200;
+		// protected : 같은 패키지에서는 접근 가능 + 상속관계가 성립하면 타 패키지 접근 가능
+		//dog1.c = 300;
+		//dog1.d = 400;
+		
+		Cat cat1 = new Cat();
+		cat1.a = 1000;
+		cat1.b = 2000;
+		cat1.c = 3000;
+		//cat1.d = 4000; // 깉은클래스가 아니라서 오류뜸
+
+	}
+
+}
+
+
+================
+클래스:
+구조적으로 
+
+main클래스와 sub클래스는 뭘로 구분하는가?
+클래스를 담고 있는 파일명을 결정..
+파일명과 같은 이름의 클래스가 메인클래스
+파일명과 다른 이름의 클래스들이 서브클래스
+
+메인 클래스는 public과 디폴트 접근제한자만 사용 가능합니다
+서브클래스는 디폴트 접근제한자만 사용 가능합니다
+내부 클래스는 4개의 접근제한자를 모두 사용할 수 있습니다
+
+package net.daum;
+
+public class Turtle {
+
+}
+
+class Duck{ // 서브클래스(subclass): 디폴트 접근제한자만 가능합니다
+
+}
+
+
+==========================
+method overloading(메서드 오버로딩)
+=  overloading
+
+어떤 클래스 내에서
+이름이 같은 메서드가 존재할 수 있게 하는 문법
+
+전제조건:
+- 같은 클래스
+- 메서드의 이름이 같아야 한다.
+
+필수조건(or)
+- 매개변수의 자료형의 수가 다르면, 메서드 오버로딩이 성립
+- 매개변수의 자료형의 종류가 다르면, 메서드 오버로딩이 성립
+- 매개변수의 자료형의 배치순서가 다르면, 메서드 오버로딩이 성립 
+
+언제 사용할까요?
+기능은 같은데, 입력하는 값의 자료형이 다를 때 사용.
+
+TestEx5 프로젝트 생성
+<Dog 클래스>
+package com.naver;
+
+public class Dog {
+	
+	public void h1() {
+		System.out.println("h1()메서드 입니다.");
+	}
+	
+	public void h1(int a) {
+		System.out.println("h1()메서드 입니다.");
+	}
+	
+	public void h1(long b) {
+		System.out.println("h1()메서드 입니다.");
+	}
+	
+	public void h1(int a, String b) {
+		System.out.println("h1()메서드 입니다.");
+	}
+	
+	public void h1(String a, int b) {
+		System.out.println("h1()메서드 입니다.");
+	}
+	
+	// Dog 클래스에 plus()메서드를 생성하세요
+	// 두 개의 정수값을 받아서 더하기를 한 결과를 출력
+	public void plus(byte a, byte b) {
+		short result = (short) ((short)a + b);
+		System.out.println(result);
+	}
+	
+	public void plus(short a, short b) {
+		int result = (int)a + b;
+		System.out.println(result);
+	}
+	
+	public void plus(int a, int b) {
+		long result = (long)a + b;
+		System.out.println(result);
+	}	
+}
+=============
+<MainEx 클래스>
+package kr.co.dwitt;
+
+public class MainEx {
+
+	public static void main(String[] args) {
+		
+		System.out.println(111);
+		System.out.println(true);
+		System.out.println('a');
+		System.out.println(2.1F);
+		// 출력하는 기능인데 다 자료형이 다르다.			
+	}
+}
+
+=============
+생성자
+- 어떤 사람들은 생서자는 메서드의 특별한 형태라고 주장하기도 함
+- 생성자에도 메서드 오버로딩이 적용됨
+- 이론적으로 클래스의 구성 요소에 생성자가 포함되지 않는다.
+
+특별한 형태?
+- 반환형이 없다.
+- 생성자의 이름이 클래스의 이름과 같다.
+
+생성자의 역할
+- 참조자료의 자료형의 맞는 값을 제공해준다.
+-> 참조자료형의 변수를 만들 수 있게 해준다
+-> 객체를 만들어 준다.
+
+- 멤버변수 초기화해준다.
+
+생성자 종류 : 매개변수 존재 여부로만 결정(생성자의 본문 코드와는 상관 없음)
+- 디폴트 생성자
+ - 매개변수가 없는 생성자
+ - 개발자가 생성자를 타이핑한 적이 없으면, 디폴트 생성자는 안 보여도 존재한다
+ - 개발자가 사용자 생성자를 생성한 적이 있으면, 디폴트 생성자가 안 보이면 존재하지 않는다
+   -> 디폴트 생성자가 필요하면, 직접 타이핑해서 디폴트 생성자를 생성해야 함
+
+- 사용자 생성자
+ - 매개변수가 있는 생성자
+
+class의 명명법:
+첫글자는 대문자, 띄어쓰기 하지 않고 띄어쓰는 단어의 첫 글자를 대문자로..
+
+1. 생성자인가 메서드인가? 
+- 메서드가 아닙니다
+2. 왜 생성자인가? 
+- 반환형이 없으니까 생성자다..
+3. 이 생성자를 갖고 있는 클래스의 이름은? 
+- test
+4. 생성자를 크게 두 가지로 분류하면?(생성자의 종류를 적어 주세요)
+- 디폴트 생성자, 사용자 생성자
+5. 생성자를 분류하는 기준은 무엇인가?
+- 매개변수 존재여부, 매개변수 유무
+6. 아래 코드는 test 클래스의 어떤 생성자인가? 
+- 디폴트 생성자
+public test( ){
+}
+
+======
+public class Test1{
+}
+1. 위 클래스에는 생성자가 몇 개 있습니까?
+개발자가 생성자를 직접 타이핑하지 않으면, 디폴트 생성자가 눈에 보이지 않아도 존재한다.
+- 1개, 디폴트 생성자
+
+public class Test2{
+	
+	public Test2(int a){
+		sysout(a);
+	}
+}
+위 코드에는 생성자가 몇 개 있습니까?
+개발자가 생성자를 직접 타이핑하지 않으면, 디폴트 생성자가 보이지 않아도 디폴트 생성자는 존재한다.
+개발자가 생성자를 직접 타이핑하면, 디폴트 생성자가 보이지 않으면 디폴트 생성자는 존재하지 않는다 
+- 1개
+
+
+< Cat 클래스>
+package net.daum;
+
+public class Cat {
+	private int id;
+	
+	public Cat() { // 디폴트 생성자
+		id = 0;		
+	}
+	
+	public Cat(int a) { // 사용자 생성자
+		id = a;
+	}
+	
+
+	public int getId() {
+		return id;
+	}
+
+	public void setId(int id) {
+		this.id = id;
+	}
+}
+=========
+< Person 클래스 >
+package net.daum;
+
+public class Person {
+	
+	private String id;
+	private String name;
+	private Cat cat;
+	
+	public Person() {
+		id = "m001";
+		name = "홍길동";
+		cat = new Cat();
+	}
+	
+	public Person(String a, String b, Cat c) {
+		id = a;
+		name = b;
+		cat = c;
+		
+	}
+	
+	public String getId() {
+		return id;
+	}
+	public void setId(String id) {
+		this.id = id;
+	}
+	public String getName() {
+		return name;
+	}
+	public void setName(String name) {
+		this.name = name;
+	}
+	public Cat getCat() {
+		return cat;
+	}
+	public void setCat(Cat cat) {
+		this.cat = cat;
+	}
+
+}
+========
+<MainEx 클래스>
+		Cat cat1 = new Cat();
+		cat1.setId(100);
+		
+		Cat cat2 = new Cat(200);
+		
+		//int a = 300;
+		//Cat cat3 = new Cat(a);
+		Cat cat3 = new Cat(300);
+		
+		//String a = new String("m001");
+		//String b = new String("김유신");
+		//Cat cat = new Cat(5);
+		Person p1 = new Person("m001", "김유신", new Cat(5));
+
+		// MemberDTO의 사용자 생성자를 이용해서  dto1 객체를 만들어 주세요
+		//String a = new String("m001");
+		//String b = new String("이순신");
+		//String c = new String("서울");
+		//Date d = new Date(111L);
+		
+		MemberDTO dto1 = new MemberDTO("m001", "이순신", "서울", new Date(111L));
+		
+		// Person 클래스의 사용자 생성자를 이용해서 p2 객체를 만들어 보세요
+		Person p2 = new Person("m002", "야옹이", new Cat(3));
+
+		ItemDTO idto1 = new ItemDTO(3, "배", false);
+		System.out.println(idto1);  // return에 name만 되어 있어서 배만 출력됨
+		
+		ItemDTO idto2 = new ItemDTO(3, "파인애플", true);
+		System.out.println(idto1 == idto2); // 힙메모리 주소값이 같냐 라는 뜻
+		System.out.println(idto1.equals(idto2));
+
+		TestDTO t1 = new TestDTO(1, "테스트");
+		System.out.println(t1);
+	}
+
+}
+
+=================
+<MemberDTO 클래스>
+package com.naver;
+
+import java.util.Date;
+
+public class MemberDTO {
+	
+	private String id;
+	private String name;
+	private String address;
+	private Date birthday;
+	
+	// 디폴트 생성자와 사용자 생성자를 만들어 주세요
+	public MemberDTO() {
+		id = "";
+		name = "";
+		address = "";
+		birthday = new Date(1111L);
+		
+	}
+	
+	public MemberDTO(String id, String name, String address, Date birthday) {
+		this.id = id;
+		this.name = name;
+		this.address = address;
+		this.birthday = birthday;
+				
+	}
+	
+	public String getId() {
+		return id;
+	}
+	public void setId(String id) {
+		this.id = id;
+	}
+	public String getName() {
+		return name;
+	}
+	public void setName(String name) {
+		this.name = name;
+	}
+	public String getAddress() {
+		return address;
+	}
+	public void setAddress(String address) {
+		this.address = address;
+	}
+	public Date getBirthday() {
+		return birthday;
+	}
+	public void setBirthday(Date birthday) {
+		this.birthday = birthday;
+	}
+	
+}
+=========
+< ItemDTO 클래스>
+package com.naver;
+
+import java.io.Serializable;
+import java.util.Objects;
+
+public class ItemDTO implements Serializable{
+
+	private static final long serialVersionUID = 5L;
+	
+	private int id;
+	private String name;
+	private boolean isSoldout;
+	
+	
+	
+	public ItemDTO() {
+		id = 10000;
+		name = "사과";
+		isSoldout = true;
+	}
+	
+	public ItemDTO(int id, String name, boolean isSoldout) {
+		super();
+		this.id = id;
+		this.name = name;
+		this.isSoldout = isSoldout;
+	}
+	
+	public boolean isSoldout() {
+		return isSoldout;
+	}
+	public void setSoldout(boolean isSoldout) { //is를 사용할경우 get이 아닌 set으로 나온다는거 알아두기
+		this.isSoldout = isSoldout;
+	}
+	public int getId() {
+		return id;
+	}
+	public void setId(int id) {
+		this.id = id;
+	}
+	public String getName() {
+		return name;
+	}
+	public void setName(String name) {
+		this.name = name;
+	}
+	public static long getSerialversionuid() {
+		return serialVersionUID;
+	}
+
+	@Override    
+	public int hashCode() {
+		return Objects.hash(id);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		ItemDTO other = (ItemDTO) obj;
+		return id == other.id;
+	}
+
+	@Override
+	public String toString() {
+		return name;    // sysout 햇을때 이상한 값 나오지않게 해주세요..
+	}
+	
+	
+}
+===============
+지역변수(매개변수)와 멤버변수가 이름이 같을 때에는
+compiler가 알아서 서열 정리를 합니다.
+컴파일러는 이런 상황에서는 지역변수를 우선적으로 인식합니다.
+=> 지역변수가 멤버변수보다 우선적으로 인식된다.
+
+따라서
+지역변수와 멤버변수가 섞여 있는 생성자나 메서드에서
+멤버변수를 가리키고 싶다면,
+멤버변수 앞에 this.을 붙여야 합니다.
+
+1. 클래스명은 ~DTO, ~TO, ~VO로 정함.
+2. Serializable 인터페이스를 구현한다.
+3. uid 상수를 기록하고
+4. 멤버변수를 선언하고
+5. getters/setters를 생성하고
+6. 디폴트 생성자와 사용자 생성자를 생성하고
+7. hashcode( )/ equals( )를 같은 조건으로 오버라이딩(메서드의 본문{ }을 재정의함)
+8. toString( )를 오버라이딩(메서드의 본문{ }을 재정의함)
+
+TestDTO( )클래스를 만듦
+tid
+tname
+package com.naver;
+
+import java.io.Serializable;
+import java.util.Objects;
+
+public class TestDTO implements Serializable {
+	
+	private static final long serialVersionUID = 10L;
+	
+	private int tid;
+	private String tname;
+		
+	public TestDTO() {        // 디폴트 생성자 만듬
+		tid = 0;
+		tname = "";
+	}
+		
+	public TestDTO(int tid, String tname) {  // 사용자 생성자만듬 
+		super();                           // 알트 + 쉬프트 + s -> Generate Constructor using Fields(밑에서 3번째)
+		this.tid = tid;
+		this.tname = tname;
+	}
+
+	public int getTid() {
+		return tid;
+	}
+
+	public void setTid(int tid) {
+		this.tid = tid;
+	}
+
+	public String getTname() {
+		return tname;
+	}
+
+	public void setTname(String tname) {
+		this.tname = tname;
+	}
+
+	public static long getSerialversionuid() {
+		return serialVersionUID;
+	}
+
+	@Override
+	public int hashCode() {                        // 알트 + 쉬프트 + s -> Generate hashCode( ) and equals( ) 선택
+		return Objects.hash(tid, tname);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		TestDTO other = (TestDTO) obj;
+		return Objects.equals(tid, other.tid) && Objects.equals(tname, other.tname);
+	}
+
+	@Override                             // 알트 + 쉬프트 + s -> Generate toString( )  선택
+	public String toString() {
+		return tid + tname;
+	}	
+}
+
+======================
+1. 접근제한자(=접근제어지시자)의 종류를 스코프가 큰 것부터 작은 것 순으로 적으시오
+- public - protected - 디폴트(프렌들리) - private
+
+2. 멤버변수에 가장 많이 사용하는 접근제한자는?
+- private
+
+3. 클래스에 사용할 수 있는 접근제한자는?
+- public, 디폴트
+
+4. public의 스코프는?
+- 해당 클래스 + 프로젝트 전체
+
+5. protected의 스코프는?
+- 해당 클래스 + 같은 패키지 전체, 상속관계가 성립한다면 타 패키지
+
+6. 디폴트의 스코프는?
+- 해당 클래스 + 같은 패키지 전체
+
+7. private의 스코프는?
+- 해당 클래스
+
+8. 메서드 오버로딩에 대해서 적으시오
+- 어떤 클래스 내에서 이름이 같은 메서드가 존재할 수 있게 하는 문법으로 
+  매개변수의 자료형의 수나, 자료형의 종류가 다르거나 자료형의 배치순서가 다르면 메서드 오버로딩이
+  성립한다고 합니다. 메서드 오버로딩은 기능은 같은데, 매개변수의 자료형이 다를 때 사용합니다.
+
+9. 클래스의 구성 요소를 적으시오
+- 멤버변수, 생성자, 메서드
+
+10. 객체의 구성 요소를 표현하는 클래스의 구성 요소는?
+- 멤버변수
+
+11. 객체의 기능을 표현하는 클래스의 구성 요소는?
+- 메서드 
+
+12. 객체를 만들 수 있게 하는 클래스의 구성 요소는?
+- 생성자
+
+13. 멤버변수를 초기화하는 클래스의 구성 요소는?
+- 생성자
+
+14. 생성자의 종류는?
+- 디폴트 생성자, 사용자 생성자
+
+15. 생성자를 분류하는 기준은?
+- 매개변수의 유무
+
+16. 생성자의 이름은 무엇으로 결정하는가?
+- 클래스명
+
+17. 생성자와 메서드의 가장 큰 차이점은?
+- 반환형의 유무
+
+18. 개발자가 생성자를 타이핑하지 않으면, 디폴트 생성자가 안 보여도 존재한다. 
+- O
+
+19. 개발자가 사용자 생성자를 생성하면, 디폴트 생성자가 안 보이면 디폴트 생성자는 존재하지 않는다.
+- O
+
+20. 19번의 상황에서 디폴트 생성자가 필요하면 어떻게 해야 합니까?
+- 직접 타이핑 친다
+
+21. ~DTO = ~VO = ~TO : 데이터 저장을 목적으로하는 클래스
+
+22. DTO 클래스가 반드시 구현해야 할 인터페이스를 적어 주세요.
+- Serializable 
+
+23. 매개변수(지역변수)와 멤버변수가 섞여 있는 코드에서, 두 변수들의 이름이 같을 때 컴파일러는
+누구를 우선적으로 인식하는가?
+- 매개변수(지역변수)
+
+24.
+public class Test {
+	private int id;
+
+	public Test(int id) {
+		id = id; ------ 문장으로 해석해 주세요 : 매개변수 id가 갖고 있는 값을 매개변수 id에 대입하세요
+	}                    ------ 매개변수 id가 갖고 있는 값을 멤버변수 id의 초깃값으로 설정: this.id = id;
+}
+ex) int a = 3; // 3을 변수 a의 초깃값으로 설정하세요
+        a = 4; // 4를 변수 a에 대입하세요
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
