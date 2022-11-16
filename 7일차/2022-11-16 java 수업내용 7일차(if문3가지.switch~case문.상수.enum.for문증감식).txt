@@ -1,0 +1,1129 @@
+연산자 학습 : 30개...
+
++ - * / %
+= 
++=  -=  *=  /=  %=
+++  -- 
+>  >=  <  <=  ==  !=
+&&  ||  !
+& |  (^ ~) 2개
+<<  >>  >>>
+자료형 변수명 = 자료형에 맞는값 true : false;
+
+-200 이진수 표현해 보세요
+Integer.toBinaryString(200);
+
+부호
+0     1 1 0 0 1 0 0 0        200 이진수
+1     0 0 1 1 0 1 1 1        1의 보수
+1     0 0 1 1 0 1 1 1+1     2의 보수
+1     0 0 1 1 1 0 0 0       -200 이진수
+      
+static 변수, 상수, 메서드
+
+static 변수, static 메서드 = 클래스 변수, 클래스 메서드
+static : 키워드를 붙이니까..
+        static 메모리 영역에 저장되니까..
+        class명.변수명 형태로 사용되니까..
+        class당 하나만 생성되니까..
+        class 메모리 영역에 저장되니까..
+        프로그램이 실행이 되면 process가 되는데, 이 때 static 변수나 메서드, 상수는 바로 실행가능한 메모리에 로딩
+
+인스턴스 변수/메서드
+  객체 = object = 인스턴스 = entity = bean
+  참조자료형으로 변수를 생성하면서 참조자료형에 맞는 값으로 초기화할 때, 그때 인스턴스 변수가 만들어 짐
+  객체 생성할 때, 인스턴스 변수(멤버변수)가 생성됨
+
+===============
+제어문
+- 코드를 제어하는 문법
+- 조건문   |   반복문
+
+- 조건문
+if문 ------------------ switch~case문
+
+if문
+단순 if문
+if ~ else문
+다중 if문: if ~ else if ~else
+
+반복문
+for문: ++, -- 몇 번 반복할지 알고 있다면,
+while문: 언제까지 반복할지 알고 있다면,
+do ~ while문: 조건에 상관없이 1번이상 반복하고 싶다면,
+
+for( ) {
+	for( ) {
+		for( ){
+		}
+	}
+}  이렇게 코드 짜면 회사에서 싫어함
+
+=========================
+< TestEx7 프로젝트생성 >
+< com.naver 패키지에 Dog 클래스 생성 >
+package com.naver;
+
+public class Dog {
+	
+	private int id;
+	private String name;
+	
+	public Dog() { //디폴트 생성자	
+	}
+		
+	public Dog(int id, String name) {  // 사용자 생성자
+		super();
+		this.id = id;
+		this.name = name;
+	}
+
+	public int t1(boolean a) {
+		if(a) {// a == true와 같은 의미
+			return 100;  // a가 true면 100을 반환
+		}
+		
+		System.out.println("hello");
+		
+		return -1;  // a가 true가 아니면 -1을 반환
+	}
+	
+	public void t2(int a) {
+		if(a % 5 == 0) {
+			System.out.println(a);
+		}
+		
+		System.out.println("t2()메서드 호출");
+	}
+
+	public void t3() {
+		if(true) {
+			System.out.println(1);
+			int a = 3;
+			int b = 4;
+			int temp = a;
+			a = b;
+			b = temp;
+		}
+	}
+		
+	public int getId() {
+		return id;
+	}
+
+	public void setId(int id) {
+		this.id = id;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+	
+}
+
+==============================
+< dwitt 패키지에 MainEx 클래스 생성 >
+package kr.co.dwitt;
+
+import com.naver.Dog;
+
+public class MainEx {
+
+	public static void main(String[] args) {
+		// Dog클래스르 이용해서 dog1 객체를 생성하고
+		// dog1이 갖고 있는 t1()메서드를 호출하세요
+		Dog dog1 = new Dog();
+		//dog1.t1(false);
+		int result = dog1.t1(false);
+		System.out.println(result);
+		
+		// Dog클래스의 사용자 생성자를 이용해서
+		// dog2 객체를 생성하고
+		// dog2가 갖고 있는 t2()메서드를 호출
+		Dog dog2 = new Dog(10, "멍멍");		
+		dog2.t2(10);
+				
+	}
+
+}
+
+==================
+if(a % 5 == 0) {
+	System.out.println(a);
+}   해석: a를 5로 나누었을 때, 나머지가 0이냐?
+          맞으면 sysout(a)
+          즉, 만약 a가 5의배수이면 a를 출력하세요
+
+======
+a는 boolean형 변수임
+if(a) {
+	return 100;  
+}  해석: a가 true면 100을 반환하세요
+
+=============
+단순 if문의 공식을 적어 주세요
+if(조건식) {
+	조건식이 참일 때, 실행할 코드
+}
+
+========================
+ <<net.daum>>
+ Cat
+
+ - id : String      ----- -(빼기)는 private을 뜻함 멤버변수
+ - name : String
+ - dog : Dog
+                                ---- 디폴트,사용자 생성자도 넣어야 한다  
+ <<getters/setters>>
+ + sleep( ) : void    --------- sleep 이라는 메서드
+이렇게 자료를 주워진다면..
+
+< net.daum 패키지에 Cat 클래스 생성 >
+package net.daum;
+
+import com.naver.Dog;
+
+public class Cat {
+	
+	private String id;
+	private String name;
+	private Dog dog;
+	
+	public Cat() {		
+	}
+	
+	public Cat(String id, String name, Dog dog) {
+		super();
+		this.id = id;
+		this.name = name;
+		this.dog = dog;
+	}
+
+	public void sleep() {
+		if(id == null) {
+			id = "m001";
+		}else {
+			System.out.println(id);
+		}			
+	}
+
+	public void w1(int score) {
+		// score가 60 이상이면, "합격"
+		// 그렇지 않으면 "불합격" 출력
+		if(score >= 60) {
+			System.out.println("합격");
+		}else {
+			System.out.println("불합격");
+		}
+	}
+	
+	public void w2(int score) {   // 이렇게 코드짜는게 깔끔하다.
+		
+		String msg = null;
+		
+		if(score >= 60) {
+			msg = "합격";
+		}else {
+			msg = "불합격";
+		}
+		
+		System.out.println(msg);
+	}	
+	
+
+	public String getId() {
+		return id;
+	}
+
+	public void setId(String id) {
+		this.id = id;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public Dog getDog() {
+		return dog;
+	}
+
+	public void setDog(Dog dog) {
+		this.dog = dog;
+	}
+
+}
+
+==========================
+< dwitt 패키지에 MainEx2 클래스 생성 >
+package kr.co.dwitt;
+
+import net.daum.Cat;
+
+public class MainEx2 {
+
+	public static void main(String[] args) {
+		// Cat클래스의 디폴트 생성자를 이용해서
+		// cat1을 생성하고
+		// cat1이 갖고 있는 sleep()메서드 호출
+		Cat cat1 = new Cat();
+		cat1.sleep();
+		System.out.println(cat1);
+
+		// Cat클래스의 사용자 생성자를 이용해서
+		// cat2를 생성하고
+		// cat2가 갖고 있는 sleep()메서드 호출
+		Cat cat2 = new Cat("c111", "야옹이", new Dog(111, "해피"));
+		cat2.sleep();
+		System.out.println(cat2);		
+	}
+}
+
+==============
+if(id == null) {
+	id = "m001";
+}else {
+	System.out.println(id);
+}
+해석
+id가 null이면, id에 "m001"을 대입하고
+그렇지 않으면 id를 출력하라.
+
+================
+if ~ else문 공식을 만드세요
+if(조건식) {
+	조건식이 참일 때, 실행할 코드
+} else {
+ 	조건식이 거짓일 때, 실행할 코드
+}
+
+=====================
+< dwitt 패키지에 Member 클래스 생성 >
+package kr.co.dwitt;
+
+import com.naver.Dog;
+
+import net.daum.Cat;
+
+public class Member {
+	
+	private Dog dog1;
+	private Dog dog2;
+	
+	private Cat cat1;
+	
+	private int id;
+	private int name;
+	
+	public Member() {		
+	}
+	
+	public Member(Dog dog1, Dog dog2, Cat cat1, int id, int name) {
+		super();
+		this.dog1 = dog1;
+		this.dog2 = dog2;
+		this.cat1 = cat1;
+		this.id = id;
+		this.name = name;
+	}
+
+	public void f1() {
+		if(id > 10) {
+			System.out.println("id가 10보다 큼");
+		}else  if(id < 10) {
+			System.out.println("id가 10보다 작음");
+		}else {
+			System.out.println("id가 10입니다");
+		}
+	}
+	
+	public void f2(int month) {
+		// month가 1, 3, 5, 7, 8, 10, 12일 때는 31 출력
+		// month가 2, 4, 6, 9, 11일 때는 30 출력
+		// month가 2이면 28 출력..
+		if(month == 1 || month == 3 || month == 5 || month == 7 || 
+				month == 8 || month == 10 || month == 12) {
+			System.out.println("31");
+		}else if(month == 2 || month == 4 || month == 6 || month == 9 || month == 11) {
+			System.out.println("30");
+		}else {
+			System.out.println("28");
+		}
+	}
+
+	public Dog getDog1() {
+		return dog1;
+	}
+	public void setDog1(Dog dog1) {
+		this.dog1 = dog1;
+	}
+	public Dog getDog2() {
+		return dog2;
+	}
+	public void setDog2(Dog dog2) {
+		this.dog2 = dog2;
+	}
+	public Cat getCat1() {
+		return cat1;
+	}
+	public void setCat1(Cat cat1) {
+		this.cat1 = cat1;
+	}
+	public int getId() {
+		return id;
+	}
+	public void setId(int id) {
+		this.id = id;
+	}
+	public int getName() {
+		return name;
+	}
+	public void setName(int name) {
+		this.name = name;
+	}
+	
+}
+
+================================
+< dwitt 패키지에 MainEx3 클래스 생성 >
+package kr.co.dwitt;
+
+import com.naver.Dog;
+
+import net.daum.Cat;
+
+public class MainEx3 {
+
+	public static void main(String[] args) {
+		// Member클래스의 사용자 생성자를 이용해서
+		// kim이라는 객체를 만들고
+		// kim이 갖고 있는 f1()메서드 호출
+		// Dog dog1, Dog dog2, Cat cat1, int id, int name
+		Dog dog1 = new Dog();
+		Dog dog2 = new Dog(1, "해피");
+		Cat cat1 = new Cat("c001", "양", new Dog());
+		
+		Member kim = new Member(dog1 , dog2, cat1, 1, 1004);
+		kim.f1();
+	}
+
+}
+
+======================
+if(id > 10) {
+	System.out.println("id가 10보다 큼");
+}else  if(id < 10) {
+	System.out.println("id가 10보다 작음");
+}else {
+	System.out.println("id가 10입니다");
+}
+해석
+만약 id가 10보가 크면 sysout("id가 10보다 큼") 실행하고
+그렇지 않고 만약 id가 10보다 작으면 sysout("id가 10보다 작음") 실행하고
+그것도 아니면 sysout("id가 10입니다")를 실행해라
+
+======================
+if(month == 1 || month == 3 || month == 5 || month == 7 || 
+		month == 8 || month == 10 || month == 12) {
+	System.out.println("31");
+}else if(month == 2 || month == 4 || month == 6 || month == 9 || month == 11) {
+	System.out.println("30");
+}else {
+	System.out.println("28");
+}
+해석
+만약 month가 1 이거나 3 이거나 5 이거나 7 이거나 8 이거나 10 이거나 12 이면 sysout("31")을 실행하고,
+그렇지 않고 만약 month가 2 이거나 4 이거나 6 이거나 9 이거나 11 이면 sysout("30")을 실행하고,
+그것도 아니면 sysout("28")을 실행해라
+
+=====================
+if ~ else if ~ else에 대한 공식은?
+if(조건식1) {
+	조건식1이 참일 때, 실행할 코드
+} else if(조건식2) {
+ 	조건식2가 참일 때, 실행할 코드
+} else {
+	조건식1 과 조건식2가 모두 거짓일 때, 실행할 코드
+}
+
+
+==========================
+객체가 null이라는 것은 어떤 의미?
+데이터도 없고, 데이터가 저장 될 메모리도 할당받지 못한 상태
+Dog dog1 = null;
+
+객체가 null이 아니다.
+데이터도 있고, 데이타가 저장될 메모리도 할당받은 상태
+Dog dog2 = new Dog( );
+
+private Cat cat1;  ----> null 상태임
+
+
+< dwitt 패키지에 MainEx4 클래스 생성 >
+package kr.co.dwitt;
+
+public class MainEx4 {
+
+	public static void main(String[] args) {
+		
+		String msg = null;
+		
+		if(msg == null) {
+			System.out.println(111);			
+		}
+		
+		if(msg != null) {
+			System.out.println(222);
+		}
+		
+	}
+}
+
+===========================
+< dwitt 패키지에 MainEx5 클래스 생성 >
+package kr.co.dwitt;
+
+public class MainEx5 {
+
+	public static void main(String[] args) {
+		
+		boolean isTrue = true;
+		
+		if(isTrue) {
+			isTrue = false;
+		}
+		
+		// if(isTrue == false) {
+		// 	isTrue = true;
+		// }
+		
+		if(!isTrue) {
+			isTrue = true;  // 위 코드보다 이 코드가 더 좋다
+		}
+	}
+}
+
+===========================
+switch ~ case문의 break는 어떤 의미일까요?
+- switch ~ case문을 빠져나가라는 의미
+break문 사용 여부는 상황에 따라 달라짐
+
+if(a == 0){
+}else if(a == 1){
+}
+
+switch ~ case문의 switch에 들어가는 값과
+case의 값은 정수에 대해서는 == 비교연산(동일성비교)을 함.
+String에 대해서는 equals( )메서드를 통한 동등성비교(퀄리티가 같냐?)를 함
+switch ~ case문은 눈에 안 보이지만 어떤 연산을 하고 있다?
+- == 비교연산 밖에 사용할 수 없다
+
+switch ~ case문에 사용할 수 있는 자료형은?
+int, String, enum
+
+
+======================
+< TestEx8 프로젝트 생성 >
+< com.naver 패키지에 Dog 클래스 생성 >
+package com.naver;
+
+public class Dog {
+	
+	private int id;
+	private String name;
+	
+	public Dog() {}
+		
+	public Dog(int id, String name) {
+		this.id = id;
+		this.name = name;
+	}
+	
+	public void me1() {
+		int a = 2;
+		
+		System.out.println("start");
+		switch (a) {
+		case 0:
+			System.out.println("0입니다.");
+			break;
+		case 1:
+			System.out.println("1입니다.");
+			break;
+		case 2:
+			System.out.println("2입니다.");
+		case 3:
+			System.out.println("3입니다.");
+			break;			
+
+		default:
+			System.out.println("default입니다.");
+		}
+		
+		System.out.println("end");
+	}
+	
+	public void me2() {
+		String msg = new String("hello");
+		
+		switch (msg) {
+		case "good":
+			System.out.println("good");			
+			break;
+		case "hello":
+			System.out.println("hello");
+			break;
+		default:
+			System.out.println("없음");			
+		}
+	}
+	
+	public void me3() {
+		long a = 30L;
+		
+		//switch (a) {
+		//case value:
+			
+		//	break;
+
+		//default:
+		//	break;
+		//}         switch ~case문에 사용할 수 있는 자료형은 
+		         // int, String, enum 3개만 된다
+	}
+	
+	public void me4(int score) {
+		// switch ~ case문을 이용해서
+		// 성적을 분류해주세요
+		// 수우미양가
+		int result = score / 10;
+		
+		switch (result) {
+		case 10 :
+			
+		case 9 :
+			System.out.println("수");
+			break;
+		case 8 :
+			System.out.println("우");
+			break;
+		case 7 :
+			System.out.println("미");
+			break;
+		case 6 :
+			System.out.println("양");
+			break;		
+		default:
+			System.out.println("가");
+			
+		}
+	}
+	
+	public void me5(int month) {
+		// switch ~ case문을 이용해서
+		// 각 월별 마지막 일자를 출력하세요
+		
+		switch (month) {
+		case 2:
+			System.out.println(28);
+			break;
+		case 4:
+		case 6:
+		case 9:
+		case 11:	
+			System.out.println(30);
+			break;
+		default:
+			System.out.println(31);		
+		}
+	}
+		
+
+	public int getId() {
+		return id;
+	}
+	public void setId(int id) {
+		this.id = id;
+	}
+	public String getName() {
+		return name;
+	}
+	public void setName(String name) {
+		this.name = name;
+	}
+}
+
+===================================
+< dwitt 패키지에 MainEx 클래스 생성 >
+package kr.co.dwitt;
+
+import com.naver.Dog;
+
+public class MainEx {
+
+	public static void main(String[] args) {
+		// Dog클래스의 사용자 생성자를 이용해서
+		// dog1 객체를 만들고
+		// dog1이 갖고 잇는 me1()메소드 호출
+		Dog dog1 = new Dog(1, "멍멍");
+		dog1.me1();
+		
+		dog1.me2();
+		
+		dog1.me4(100);
+		
+		dog1.me5(2);
+	}
+
+}
+
+===================
+< net.daum 패키지에 Cat 클래스 생성 >
+package net.daum;
+
+public class Cat {
+	
+	public int a = 10;
+	public final int HELLO_WORLD = 10; 
+	// 상수는 다 대문자로 쓰며 띄어쓰기해야 할 곳을 _(언더바)를 사용한다.
+	
+	public void me() {
+		// 변수: 값이 변하는 데이터 메모리
+		// 상수: 값이 항상 같은 데이터 메모리
+		
+		a = 100;
+		// HELLO_WORLD = 100; -> 오류뜸. 상수니깐 바꾸면 안된다.
+		
+		if(HELLO_WORLD == a) {
+			System.out.println("실행");
+		}
+		
+		if(HELLO_WORLD == 10) {
+			System.out.println("실행");
+		}
+	}
+
+}
+
+==========================
+< net.daum 패키지에 enum Fruit 생성 >
+package net.daum;
+
+public enum Fruit {
+	
+	APPLE, BANANA, MELON
+
+}
+
+=======================
+< MainEx 이어서 >
+		Fruit a = Fruit.APPLE;
+		System.out.println(a);  // 출력 APPLE 나옴
+		
+		System.out.println(a.equals("APPLE"));  //출력 false 자료형이 달라 false로 나옴
+		
+		System.out.println(a.ordinal()); // 출력 0 나옴 순서가 0은 애플, 1은 바나나, 2는 멜론 이다
+		
+		Fruit b = Fruit.valueOf("APPLE");
+		System.out.println(b);  //출력 APPLE 나옴
+		
+		System.out.println(a == b);  // 출력 true
+
+		//Fruit c = Fruit.valueOf("CHERRY");
+		//System.out.println(c);    체리가 없다고 오류가 뜬다.
+		
+		switch (a) {
+		case MELON:
+			System.out.println("멜론");
+			break;
+		case APPLE:
+			System.out.println("사과");
+			break;
+		case BANANA:
+			System.out.println("바나나");
+			break;	
+
+		default:
+			break;    // 출력 사과 나옴
+		}
+		
+		
+=====================
+POWER_OF_TANK_1 = 10
+POWER_OF_TANK_2 = 20
+POWER_OF_TANK_3 = 30
+
+int a = POWER_OF_TANK_1
+a = 40;
+
+enum: 범주형 데이터..
+
+===========================
+for문 증감식은  ++ 이나 -- 둘중 한가지만 무조건 들어간다
+증감식이 
+++: 조건식에 사용되는 연산자는 < 
+-- : 조건식에 사용되는 연산자는 >=
+관습적으로 사용됨.
+
+=================
+< TestEx9 프로젝트 생성 >
+< com.naver 패키지에 MemberDTO 클래스 생성 >
+package com.naver;
+
+import java.io.Serializable;
+import java.util.Objects;
+
+public class MemberDTO implements Serializable{
+	
+	private static final long serialVersionUID = 1L;
+	
+	private int id;
+	private String name;
+	
+	public MemberDTO() {
+		// TODO Auto-generated constructor stub
+	}
+		
+	public MemberDTO(int id, String name) {
+		super();
+		this.id = id;
+		this.name = name;
+	}
+
+	public int getId() {
+		return id;
+	}
+	public void setId(int id) {
+		this.id = id;
+	}
+	public String getName() {
+		return name;
+	}
+	public void setName(String name) {
+		this.name = name;
+	}
+	public static long getSerialversionuid() {
+		return serialVersionUID;
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(id, name);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		MemberDTO other = (MemberDTO) obj;
+		return id == other.id && Objects.equals(name, other.name);
+	}
+
+	@Override
+	public String toString() {
+		return name;
+	}
+}
+
+==============================
+< net.daum 패키지에 Dog 클래스 생성 >
+package net.daum;
+
+public class Dog {
+	
+	public void k1() {
+		
+		for(int i = 0; i < 10; i++) {
+			
+			System.out.println(i);
+		}
+	}
+	
+	public void k2() {
+		// 9 8 7 6 5 4 3 2 1 0 이 출력되게 
+		// for문을 구현하세요
+		
+		for(int i = 9; i >= 0; i--) {
+			System.out.println(i);
+		}
+	}
+	
+	public void k3() {
+		// 홍길동1, 홍길동2, 홍길동3...홍길동100
+		// for문을 이용해서
+		for(int i = 0; i < 100; i++) {
+			System.out.println("홍길동"+(i+1));
+		}
+	}
+}
+
+============================
+< dwitt 패키지에 MainEx 클래스 생성 >
+package kr.co.dwitt;
+
+import net.daum.Dog;
+
+public class MainEx {
+
+	public static void main(String[] args) {
+		
+		Dog dog1 = new Dog();
+		dog1.k1();
+		
+		dog1.k2();
+		
+		dog1.k3();
+	}
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
