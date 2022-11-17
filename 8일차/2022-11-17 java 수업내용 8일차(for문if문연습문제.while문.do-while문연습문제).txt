@@ -1,0 +1,1092 @@
+제어문
+- 조건문
+ - if문:
+   - 단순if문: 조건식이 거짓일 때는 아무일도 발생하지 않음.
+	if(조건식){
+		조건식이 참일 때, 실행할 코드들;
+	}   
+
+   - if ~ else문:
+	if(조건식){
+		조건식이 참일 때, 실행할 코드들;
+	} else {
+		조건식이 거짓일 때, 실행할 코드들;
+	}
+
+    - if ~ else if ~ else:
+	if(조건식1){
+		조건식1이 참일 때, 실행할 코드들;
+	} else if(조건식2){
+		조건식2가 참일 때, 실행할 코드들;
+	} else {
+		조건식1도 거짓, 조건식2도 거짓일 때, 실행할 코드들;
+	}
+
+	int a = 10;
+	int b = 20;
+	if(a > 10){
+	} else if(b == 20){
+	}  꼭 같은 변수가 아니여도 짤 수 있다는거..
+
+ - switch ~ case문: 가독성이 좋기 때문에, 사용할 수 있는 자료형이 int, String, enum, 내부적으로는 ==, equals( )
+                        break는 switch ~ case문을 빠져나가게 한다.
+		  break는 상황에 따라 넣고 빼고를 결정해야 한다.
+   switch(변수){
+	case 값1:
+		변수 == 값1일 때, 실행할 코드
+		break;
+	case 값2:
+		변수 == 값2
+   }
+
+- 반복문
+for: 반복 횟수를 알고 있을 때, 증감식이 ++, --
+while: 반복을 그만둬야 할 조건을 알고 있을 때... 증감식이 다양함.
+do ~ while: 조건식이 거짓이어도 반드시 한번은 실행하고 싶은 코드가 있을 때
+
+for(초기화1; 조건식258; 증감식470){            // 숫자들은 실행순서를 나타냄
+	조건식이 참일 때 실행할 코드들369
+}
+
+for(int i = 0; i < 10; i++){
+}
+
+for(int i = 9; i >= 0; i--){
+}  
+
+=====================
+< TestEx9 에 Dog클래스 이어서 >
+	public void k4(int n) {
+		// k4()메서드를 생성함.
+		// 0부터 n까지의 숫자를 1씩 증가하면서 n+1개의 숫자를 출력합니다.
+		// n은 k4()메서드를 호출할 떄, 외부에 입력합니다
+		for(int i = 0; i < n+1; i++){
+			System.out.println(i);
+		}		
+	} 
+
+	public void k5(int n, int m) {
+		// k5()메서드를 생성함
+		// n부터 m까지의 숫자를 1씩 증가하면서 m-n+1개의 숫자를 출력합니다
+		// n과 m은 k5()메서드를 호출할 때, 외부에서 입력합니다
+		for(int i = n; i < m-n+1; i++) {
+			System.out.println(i);
+		}			
+	}
+
+	public void k6() {
+		// k6()메서드르르 생성함
+		// 0~10에 있는 숫자 중에서 2의 배수만 출력합니다
+		for(int i = 0; i < 11; i++) {
+			
+			if(i % 2 == 0) {
+				System.out.println(i);
+			}
+		}
+	}
+
+	public void k7() {
+		// k7()메서드를 생성함
+		// 0~100에 있는 숫자 중에서 5의 배수가 아닌 것만 출력합니다
+		for(int i = 0; i < 101; i++) {
+			
+			if(i % 5 != 0) {
+				System.out.println(i);
+			}
+		}
+	}
+	
+	// k8()메서드를 생성함
+	// 0~100에 있는 숫자 출력합니다.
+	// k8()메소드를 호출할 떄, MemberDTO 객체를 입력받도록 수정하세요.
+	// 외부에서 넘겨받은 MemberDTO 객체가 null이면, 0~100에 있는 숫자를 출력함
+	public void k8(MemberDTO dto) {
+		
+		if(dto == null) {
+			
+			for(int i = 0; i < 101; i++) {
+				System.out.println(i);			
+			}			
+		}
+	}
+	
+	// k9()메서드를 생성함	
+	// 외부에서 넘겨받은 MemberDTO 객체가 null 아니면, 0~100에 있는 숫자를 출력함
+	public void k9(MemberDTO dto) {
+		
+		if(dto != null) {
+
+			for(int i = 0; i < 101; i++) {
+				System.out.println(i);
+			}
+		}
+	}
+	
+	// k10()메서드는 구구단 중 5단을 출력하는 기능을 갖고 있음
+	// 5 x 1 = 5, 5 x 2 = 10... 5 x 9 = 45
+	public void k10() {
+		
+		for(int i = 1; i < 10; i++) {
+			String msg = 5+" x "+i+" = "+(5*i);
+			System.out.println(msg);
+			//System.out.println("5 x " + i + " = " + 5*i);
+		}
+	}
+	
+	// k11()메서드는 구구단 중 3단을 출력하는 기능을 갖고 있음
+	// 3 x 1 = 3, 3 x 2 = 6... 3 x 9 = 27
+	public void k11() {
+		
+		for(int i = 1; i < 10; i++) {
+			String msg = 3+" x "+i+" = "+(3*i);
+			System.out.println(msg);
+		}
+	}
+	
+	// k12()메서드는 구구단 중 특정단을 출력하는 기능을 갖고 있음
+	// 특정 단에 대한 정보는 k12()메서드 호출될 때 입력됨
+	public void k12(int n) {
+		
+		for(int i = 1; i < 10; i++) {
+			String msg = n+" x "+i+" = "+(n*i);
+			System.out.println(msg);
+		}
+	}
+
+	// k13()메서드는 구구단 전체를 출력하는 기능을 갖고 있음
+	// 구현할때, 반드시 k12()를 활용하세요
+	public void k13() {
+				
+		for(int dan = 2; dan < 10; dan++) {
+			k12(dan);
+		}
+	}
+	
+	public void k14() {
+		
+		for(int dan = 2; dan < 10; dan++) {
+			
+			for(int i = 1; i < 10; i++) {
+				String msg = dan+" x "+i+" = "+(dan*i);
+				System.out.println(msg);   // 이렇게 코드를 짜면 안된다 
+			}			
+		}
+	}
+	
+	// k15()메서드는 23이 소수[소쑤]인지 여부를
+	// 알려주는 기능을 갖고 있습니다.
+	// 소수[소쑤]는 1과 자기자신 외에는 약수가 없는 수
+	// 1이나 자기자신으로 나누었을 때만 나머지가 0...
+	public void k15() {
+		for(int i = 2; i < 23; i++) {
+			
+			if(23 / i == 0) {
+				System.out.println(23+"은 소수가 아닙니다");
+			}
+		}
+	}
+	
+	public void k16() {
+		for(int i = 2; i < 22; i++) {
+			
+			if(22 / i == 0) {
+				System.out.println(22+"은 소수가 아닙니다");
+			}
+		}
+	}
+
+	// k17()메서드는 n이 소수[소쑤]인지 여부를 판결해주는 기능을 갖고 있습니다.
+	// n은 k17()메서드 호출할 때, 외부로부터 입력받습니다.
+	public void k17(int n) {
+		for(int i = 2; i < n; i++) {
+			
+			if(n % i == 0) {
+				System.out.println(n+"은 소수가 아닙니다.");
+			}
+		}
+	}
+	
+	// k18()메서드는 n이 소수[소쑤]인지 여부를 판결해주는 기능을 갖고 있습니다.
+	// n은 k18()메서드 호출할 때, 외부로부터 입력받습니다.
+	// 소수일 때, "n은 소수입니다"가 출력 되게 하세요 
+	public void k18(int n) {    // 교수님 답
+		String msg = n+"은 소수입니다.";
+		
+		for(int i = 2; i < n; i++) {
+			if(n % i == 0) {
+				System.out.println(i);
+				msg = n +"은 소수가 아닙니다.";
+			}
+		}
+		
+		System.out.println(msg);
+	}
+	
+	public void k188(int n) {    // 내가한 답
+		for(int i = 2; i < n; i++) {
+			
+			if(n % i == 0) {
+				System.out.println(n+"은 소수가 아닙니다.");
+				break;
+			}else {
+				System.out.println(n+"은 소수입니다");
+				break;
+			}
+		}
+	}
+	
+	public void k19(int n) {    
+		String msg = n+"은 소수입니다.";
+		
+		for(int i = 2; i < n; i++) {
+			if(n % i == 0) {
+				System.out.println(i);
+				msg = n +"은 소수가 아닙니다.";
+				break;   // break는 if문만 빠져나온다
+			}
+		}
+		
+		System.out.println(msg);
+	}
+
+	// k20()메서드는 2~50의 숫자를 소수인지 아닌지 판별하는 기능을 갖고 있음
+	// 구현할 때, k19()메서드를 활용하세요
+	public void k20() {
+		for(int i = 2; i < 51; i++) {
+			k19(i);
+		}
+	}
+	
+	// k21()메서드는 n~m의 숫자를 소수인지 아닌지 판별하는 기능을 갖고 있음
+	// 구현시, k19()메서드를 활용하세요
+	public void k21(int n, int m) {
+		for(int i = n; i < m+1; i++) {
+			k19(i);
+		}
+	}
+
+	// k22()메서드는 구구단 중에서 특정단을 제외하고 찍기
+	// 구현시, k12()메서드를 활용하세요	
+	public void k22() {
+		int a = 5;
+		
+		for(int dan = 2; dan < 10; dan++) {
+			if(dan != a) {
+				k12(dan);
+			}
+		}
+	}
+	
+	public void k23() {
+		int a = 5;
+		
+		for(int dan = 2; dan < 10; dan++) {
+			if(dan == a) {
+				continue; // 그 밑에 있는 것은 실행하지 않고 다시 위로 올라간다
+			}
+			
+			k12(dan);
+		}
+	}
+
+	// k24()메서드는 구구단 중에서 특정단을 제외하고 찍기
+	// 5, 9, 13, 17, 21, 25, 29...? 20개의 숫자 출력하기
+	// 왜 0부터 시작하지 않을까 생각을 한다. 0+5
+	// 0, 4 ,8, 12, 16, 20, 24... 4의배수 하고 마지막에 5를 더해준다
+	public void k24() {
+				
+		for(int i = 0; i < 20; i++) {
+			int num = i * 4 + 5;
+			System.out.println(num);		
+		}
+	}
+	
+	// k25()메서드
+	// 7, 8, 11, 16, 23, 32, 43...? 20개의 숫자 출력하기
+	// 왜 0부터 시작하지 않을까?
+	// 0, 1, 4, 9, 16, 25, 36, 49, 64, 81.. i*i 에다 +7을 하면 된다
+	
+	public void k25() {
+		for(int i = 0; i < 20; i++) {
+			int num = i*i+7;
+			System.out.println(num);
+		}
+	}
+
+======================
+- while문 연습문제
+
+< com.naver 패키지에  Turtle 클래스생성 >
+package com.naver;
+
+public class Turtle {
+	
+	public void y1() {
+		
+		int i = 0;
+		
+		while(i<10) {
+			
+			System.out.println(i);
+			
+			++i;
+		}
+	}
+	
+	public void y2() {
+	// 9 8 7 6 5 4 3 2 1 0 이 출력되게 
+	// while문을 구현하세요
+		int i = 9;
+		
+		while(i >= 0){
+			
+			System.out.println(i);
+			
+			--i;
+		}		
+	}
+	
+	public void y3() {
+		// 홍길동1, 홍길동2, 홍길동3...홍길동100
+		// while문을 이용해서
+		int i = 0;
+		
+		while(i < 101) {
+			
+			System.out.println("홍길동"+ i);
+			
+			++i;
+		}
+	}
+	
+	public void y4(int n) {
+		int i = 0;
+		while(i < n+1) {
+			
+			System.out.println(i);
+			
+			++i;
+		}
+	}
+	
+	public void y6() {
+		// 10보다 작거나같은 2의 배수 출력하기
+		int i = 0;
+		while(i <= 10) {
+			
+				System.out.println(i);
+				i = i + 2;
+			
+		}
+	}
+	
+	public void y7() {
+		// 0~91보다 작은 5의 배수 출력하기
+		// while문 사용
+		int i = 0;
+		while(i < 91) {
+			
+			System.out.println(i);
+			i = i + 5;
+			
+		}				
+	}
+	
+	// y8()메서드를 호출할 때, 외부로부터 MemberDTO() 객체를 입력받음
+	// dto가 null이면,
+	// 0부터 100까지의 값을 출력한다
+	public void y8(MemberDTO dto) {
+		
+		if(dto == null) {
+			int i = 0;
+			while(i<101) {
+				System.out.println(i);
+				
+				++i;
+			}			
+		}
+	}
+	
+	// y9()메서드를 호출할 때, 외부로부터 MemberDTO() 객체를 입력받음
+	// dto가 null이 아니면,
+	// 0부터 100까지의 값을 출력한다
+	public void y9(MemberDTO dto) {
+		
+		if(dto != null) {
+			
+			int i = 0;
+			while(i<101) {
+				System.out.println(i);
+				
+				++i;
+			}
+		}
+	}
+	
+	// y10()메서드는 구구단 중 5단을 출력함.
+	// while문을 이용
+	public void y10() {
+		int dan = 5;
+		int i = 1;
+		while(i < 10) {
+			
+			System.out.println(dan+" x "+i+" = "+(dan*i));
+			
+			++i;
+		}
+	}
+	
+	// y11()메서드는 구구단 중 3단을 출력함.
+	public void y11() {
+		int dan = 3;
+		int i = 1;
+		while(i < 10) {
+			
+			System.out.println(dan+" x "+i+" = "+(dan*i));
+			
+			++i;
+		}
+	}
+	
+	// y12()메서드는 구구단 중 n단을 출력함.
+	// n은 y12()메서드를 호출할 때, 외부에 입력함
+	public void y12(int n) {
+		int dan = n;
+		int i = 1;
+		while(i < 10) {
+			
+			System.out.println(dan+" x "+i+" = "+(dan*i));
+			
+			++i;
+		}
+	}
+
+	// y13()메서드는 구구단 출력하는 기능
+	// y12()를 이용하고 while문을 이용
+	public void y13() {
+		int i = 2;
+		while(i < 10) {
+			y12(i);
+			
+			++i;
+		}
+	}
+	
+	public void y15() {
+		String msg = "소수입니다.";
+		int num = 23;
+		int i = 2;
+
+		while(i < num) {
+				
+			if(num % i == 0) {
+				msg = "소수가 아닙니다.";
+				System.out.println(msg);
+				
+			}
+			
+			++i;
+		}
+		
+		System.out.println(msg);
+	}
+}
+
+===============================
+< dwitt 패키지에  MainEx3 클래스생성 >
+package kr.co.dwitt;
+
+public class MainEx3 {
+
+	public static void main(String[] args) {
+		// 0~10까지의 합을 구하시오
+		// 가장 적합한 반복문을 사용하시오
+		
+		int sum = 0;
+		int i = 0;
+		while(i < 11) {
+			sum = sum + i;
+			System.out.println(sum);
+			++i;
+		}
+		
+		int sum1 = 0;		
+		for(int j = 0; j < 11; j++) {
+			sum1 = sum1 + j;
+			// sum1 = 0 + 0, sum1 = 0+1, sum1 = 0+1+2, sum1 = 0+1+2+3...
+		}
+		System.out.println(sum1);
+
+	}
+
+}
+
+=========================
+< dwitt 패키지에  MainEx4 클래스생성 >
+package kr.co.dwitt;
+
+public class MainEx4 {
+
+	public static void main(String[] args) {
+		// 1~10까지의 곱의 결과는?
+		int result = 1;
+		
+		for(int i = 1; i < 11; i++) {
+			result = result*i;
+		}
+		System.out.println(result);
+
+	}
+
+}
+
+=========================
+< dwitt 패키지에  MainEx5 클래스생성 >
+package kr.co.dwitt;
+
+public class MainEx5 {
+
+	public static void main(String[] args) {
+		// 7, 8, 11, 16, 23, 32, 43...100보다 작은 값이 나올 떄까지
+		// 숫자들을 더하기 하세요..
+		// 0, 1,  4   9  16   i*i +7 
+	
+		int sum = 0;
+		int i = 0;
+		int num = 0;
+	
+		while(num < 100) {
+			num = i*i + 7;
+			sum = sum + num; // sum += num;
+		
+			++i;
+		}
+		System.out.println(num);
+		System.out.println(sum);
+	
+	}
+}
+
+=======================
+< dwitt 패키지에  MainEx6 클래스생성 >
+package kr.co.dwitt;
+
+public class MainEx6 {
+
+	public static void main(String[] args) {
+		
+		for(int i=0; i<10; i++) {
+			
+		}
+		
+		//System.out.println(i);  오류가 뜨는데 i의 스코프의 범위가 for문까지만 된다 
+		// 파이썬이나 c언어에서는 작동을 한다.
+	}
+
+}
+
+========================
+< dwitt 패키지에  MainEx7 클래스생성 >
+package kr.co.dwitt;
+
+public class MainEx7 {
+
+	public static void main(String[] args) {
+		
+		int i = 0;
+		do {
+			System.out.println(i);
+			++i;
+		}while(i>10);
+		// 조건문이 거짓인데도 불구하고 한번 실행해서 0이 출력됨. 그리고 빠져나옴
+		
+
+	}
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
