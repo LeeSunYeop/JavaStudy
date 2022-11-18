@@ -1,0 +1,1050 @@
+for(int i=0; i<10; i++){
+	sysout(i);
+	sysout(i+2)
+}
+
+변수초기화
+int i=0;
+while(조건식){
+	조건식이 참일 때, 실행할 코드들
+	증감식..
+}
+
+do{
+	조건식이 거짓이어도 반드시 한번은 실행되는 코드..
+}while(조건식);
+
+===================
+배열...
+
+배열은 ArrayList라는 컬렉션 프레임워크가 있음..
+
+배열을 만드는 방법
+배열의 최종요솟값에 인덱싱하는 방법..
+
+배열(array = arr)
+- 같은 자료형의 데이터를 메모리에서 이웃해서 관리하는 기술..=> 반복문을 돌릴 수 있음.
+
+- 배열에는 인덱스가 있음.
+ 배열의 인덱스는 몇부터 시작할까요?...0부터 시작
+ 자바에서는 인덱스가 1인 애들이 딱 2개만...1부터 시작함 --자바 컬렉션프레임워크에 stack, oracle..
+
+- 5개의 요솟값이 들어 있다.
+ 가장 큰 인덱스는 몇일까요? 0 1 2 3 4
+
+- 인덱스는 자동으로 부여됨.
+
+- 변수 안에 들어 있는 값을
+  반복문을 이용해서 접근하고 싶을 때, 배열사용
+
+- 2번째 배열 생성 방법은
+  변수 안에 들어 있는 값을
+  반복문을 이용해서 접근하고 싶을 때, 배열사용        +     배열에 반복문을 이용해서 값을 저장하고 싶을 때..
+
+- 배열의 길이(lenth): n-1차원의 개수를 의미함
+ 1차원 배열의 길이: 최종 요솟값의 수..
+  - arr1.length
+배열의 가장 큰 인덱스 = arrl.length - 1
+
+ 2차원 배열의 길이: 1차원 배열의 수
+ 3차원 배열의 길이: 2차원 배열의 수
+ 4차원 배열의 길이: 3차원 배열의 수
+ 
+==============================
+< TestEx10 프로젝스 생성 >
+< com.naver 패키지에 Dog 클래스 생성 >
+package com.naver;
+
+public class Dog {
+	
+	private int id;
+	private String name;
+	
+	public Dog() {
+		// TODO Auto-generated constructor stub
+	}
+
+	public Dog(int id, String name) {
+		super();
+		this.id = id;
+		this.name = name;
+	}
+	
+	public void me1() {
+		int a = 10;
+		int b = 20;
+		int c = 30;
+		int d = 40;
+		
+		for(int i=0; i<4; i++) {
+			System.out.println(a);
+			System.out.println(b);
+			System.out.println(c);
+			System.out.println(d);
+		}
+	}
+	
+	public void me2() {
+		int a0 = 10;
+		int a1 = 20;
+		int a2 = 30;
+		int a3 = 40;
+		
+		for(int i=0; i<4; i++) {
+			System.out.println("a"+i);
+		}  // a0 a1 a2 a3 나오게 하려면 배열을 사용해야한다
+	}
+	
+	public void me3() {
+		// 배열 생성 방법1
+		int[] arr1 = {10, 20, 30, 40};  
+		System.out.println(arr1);  // 출력 [I@2a139a55 이 모습을 기억해야한다
+	                              // 대괄호가 열려있고 닫혀잇지 않다
+		System.out.println(arr1.length); // 출력 4 나옴, 배열의 크기를 알수 잇다
+		
+		// arr1의 10을 인덱싱해서 a에 초깃값으로 사용하세요
+		int a = arr1[0];
+		
+		// arr1의 40을 인덱싱해서 d에 초깃값으로 사용하세요
+		int d = arr1[3];		
+		
+		// arr1의 40을 인덱싱하는데 length속성을 이용해서
+		int e = arr1[arr1.length-1];
+		
+		//int f = arr1[4];  // 인덱스 번호는 3이 최고인데 4를 입력해서 에러메시지 나온다
+		
+		int c = arr1[2];
+		System.out.println(c); // 30 나옴
+		
+	           	arr1[0] = 100;
+		int a1 = arr1[0];
+		System.out.println(a1); // 100나옴
+		
+		arr1[2] = 300;
+		int d1 = arr1[2];
+		System.out.println(d1); // 300나옴
+		
+		arr1[arr1.length-1] = 400;
+		int e1 = arr1[arr1.length-1];
+		System.out.println(e1);  // 400나옴
+		
+		for(int i=0; i<arr1.length; i++) {
+			int num = arr1[i];
+			System.out.println(num);
+		}                  
+	}
+
+	public void me4() {
+		// 배열 생성 방법2
+		int[] arr1 = new int[4];  // int[]는 대괄호가 들어가서 참조자료형이다, 4는 내가 원하는 크기 넣으면 됨
+		Dog[] arr2 = new Dog[5];  	
+
+		System.out.println(arr2.length); //출력 5 나옴
+		
+		for(int i=0; i<arr1.length; i++) {
+			Dog dog = arr2[i];
+			System.out.println(dog);  // null null null null null 5개 나온다
+ 		}
+		
+		// 100 200 300 400 500
+		// 해피0 해피1 해피2 해피3 해피4		
+		new Dog(100, "해피0");
+		new Dog(200, "해피1");
+		new Dog(300, "해피2");
+		new Dog(400, "해피3");
+		new Dog(500, "해피4");
+		
+		//0           1           2           3           4
+		//(0+1)*100   (1+1)*100   (2+1)*100   (3+1)*100   (4+1)*100
+		
+		for(int i = 0; i < arr2.length; i++) {
+			int id = (i+1)*100;
+			String name = "해피"+i;
+			arr2[i] = new Dog(id, name);
+		}
+		
+		for(int i = 0; i < arr2.length; i++) {
+			Dog dog = arr2[i];
+			System.out.println(dog);
+		}
+	}  	  
+	
+	public void me5() {
+		// 배열 생성 방법3
+		int[] arr1 = new int[] {10, 20, 30, 40};
+
+		System.out.println(arr1.length);  // 출력 4나옴
+		
+		// arr1의 길이를 출력하시오
+		// arr1의 각 요솟값을 인덱싱한 후에 출력
+		// arr1의 각 요솟값을 100, 200, 300, 400으로 수정
+		System.out.println(arr1.length);
+		
+		int a = arr1[0];
+		int b = arr1[1];
+		int c = arr1[2];
+		int d = arr1[arr1.length - 1];
+		System.out.println(a);
+		System.out.println(b);
+		System.out.println(c);
+		System.out.println(d);
+		
+		arr1[0] = 100;
+		arr1[1] = 200;
+		arr1[2] = 300;
+		arr1[arr1.length - 1] = 400;
+		int a1 = arr1[0];
+		int b1 = arr1[1];
+		int c1 = arr1[2];
+		int d1 = arr1[arr1.length - 1];
+		System.out.println(a1);
+		System.out.println(b1);
+		System.out.println(c1);
+		System.out.println(d1);
+		
+		// me5()메서드 안에 있는 arr1의 요솟값들을 for문을 이용해서 출력하시오
+		for(int i = 0; i < arr1.length; i++) {
+			int num = arr1[i];
+			System.out.println(num);
+		}				
+	}
+
+	public void me6() {
+		// true, false, true, false, true, false
+		// 배열 arr1을 생성하시오
+		boolean[] arr1 = {true, false, true, false, true, false};
+		boolean[] arr2 = new boolean[6];
+		boolean[] arr3 = new boolean[] {true, false, true, false, true, false};
+		
+		System.out.println(arr3.length); //출력 6나옴
+	}
+	
+	public void me7() {
+		// 3L  7L  11L  15L  19L  23L...1000개
+		// arr1에 입력하세요
+		// 0   4   8   12  16  20 ....
+		long[] arr = new long[1000];
+		
+		for(int i=0; i<arr.length; i++) {
+			long val = (i*4) + 3;
+			
+			arr[i] = val;
+		}
+		
+		for(int i=0; i<arr.length; i++) {
+			long val = arr[i];
+			
+			System.out.println(val);
+		}
+		
+	}
+
+	public void me8(int[] arr) {
+		// arr의 요솟값을 전부 출력하세요.
+		if(arr == null) {
+			return;
+		}
+		
+		for(int i=0; i<arr.length; i++) {
+			int num = arr[i];
+			System.out.println(num);
+		}
+	}	
+
+	public int getId() {
+		return id;
+	}
+
+	public void setId(int id) {
+		this.id = id;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+	
+	
+}
+
+====================================
+< dwitt 패키지에 MainEx 클래스 생성 >
+package kr.co.dwitt;
+
+import com.naver.Dog;
+
+public class MainEx {
+
+	public static void main(String[] args) {
+		// Dog클래스의 사용자 생성자를 이용해서
+		// dog1 객체를 생성하고
+		// me2()메서드를 호출하세요
+		Dog dog1 = new Dog(10, "멍멍");
+
+		int[] arr = {1, 2, 3};
+		dog1.me8(arr);
+
+		dog1.me3();
+
+	}
+}
+
+
+======================
+1. 배열의 생성 방법 3개
+2. 배열의 인덱스는 0부터
+3. 배열의 길이: length
+4. 배열의 인덱싱 방법
+- arr1[idx]
+5. 배열의 인덱싱을 잘못했을 때, 나오는 메시지
+- ArrayIndexOutOfBound
+6. 배열의 인덱싱을 이용한 요솟값 수정
+- arr1[idx] = 자료형에 맞는 값;
+7. 반복문을 이용한 배열 전체 요솟값에 대한 인덱싱
+
+8. 반복문을 이용한 배열 전체 요솟값에 대한 수정
+
+===================
+1차원 배열: 1-1차원 배열: 0차원 배열..
+
+n차원 배열 안에는 n-1차원 배열이 들어 있음.
+
+
+
+===============
+< net.daum 패키지에 Cat 클래스 생성 >
+package net.daum;
+
+public class Cat {
+	
+	public void w1() {
+		int[][] arr = {
+				{1, 2},
+				{3, 4},
+				{5, 6}
+		};
+		
+		System.out.println(arr.length);
+	}
+	
+	public void w2() {
+		boolean[][][][][][][][][][] arr = new boolean[2][3][2][5][3][2][3][1][3][8];
+		System.out.println(arr.length);
+	}
+	
+	public void w3() {
+		char[][] arr = {
+				{'a', 'b', 'c', 'd'},
+				{'A', 'B', 'C', 'D'}
+		};
+		
+		System.out.println(arr.length);
+		System.out.println(":::::::::::::");
+		
+		for(int i=0; i<arr.length; i++) {
+			
+			char[] arr11 = arr[i];
+			
+			for(int j=0; j<arr[i].length; j++) {
+				//char c = arr[i][j];  // 방법1
+				//System.out.println(c);
+				
+				w4(arr[i]);   // 방법2
+			}
+		}	
+	}
+	
+	public void w4(char[] arr) {
+		
+		//char[] arr11 = arr[i];
+		
+		for(int j=0; j<arr.length; j++) {
+			char c = arr[j];
+			System.out.println(c);
+		}
+	}
+	
+	public void w5() {
+		String msg = "m001#1234#kim#vip#10000000";
+		
+		String[] arr = msg.split("#");  // #을 구분지어서 배열을 짠다
+		
+		for(int i=0; i<arr.length; i++) {
+			String token = arr[i];
+			System.out.println(token); // 출력 m001 1234 kim vip 10000000 나옴
+		}		
+	}
+		
+}
+
+===========================
+< com.naver 패키지에 Person 클래스 생성 >
+package com.naver;
+
+import net.daum.Cat;
+
+public class Person {
+	
+	private int id;
+	private String name;
+	
+	private Dog[] dog1;  //배열을 사용하여 dog100 마리 천마리를 만들수 있다
+	
+	private Cat cat1 = new Cat();
+	
+	public Person() {}
+
+	public Person(int id, String name, Dog[] dog1, Cat cat1) {
+		super();
+		this.id = id;
+		this.name = name;
+		this.dog1 = dog1;
+		this.cat1 = cat1;
+	}
+	
+	
+
+	public int getId() {
+		return id;
+	}
+
+	public void setId(int id) {
+		this.id = id;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public Dog[] getDog1() {
+		return dog1;
+	}
+
+	public void setDog1(Dog[] dog1) {
+		this.dog1 = dog1;
+	}
+
+	public Cat getCat1() {
+		return cat1;
+	}
+
+	public void setCat1(Cat cat1) {
+		this.cat1 = cat1;
+	}
+	
+}
+
+================================
+< com.naver 패키지에 Dog 클래스 이어서 >
+	// varargs(바라그스)
+	public void me9(int... arr) {
+		if(arr == null) {    // 값이 null이면 빠져나와라
+			return;
+		}
+		
+		for(int i=0; i<arr.length; i++) {
+			int num = arr[i];
+			System.out.println(num);
+		}
+	}
+	
+	public void me10(String a, int...arr) {  // int...arr은 맨 마지막에 넣어야한다.
+		
+	}
+	
+	public Cat[][] me11(){
+		Cat[][] arr = new Cat[4][2];
+		
+		return arr;
+	}
+
+===================
+< dwitt 패키지에 MainEx2 클래스 생성 >
+package kr.co.dwitt;
+
+import com.naver.Dog;
+
+public class MainEx2 {
+
+	public static void main(String[] args) {
+		// 배열 얇은복사하는 방법
+		Dog[] arr = { // 1차원 배열임
+			new Dog(), new Dog(1, "해피"), new Dog(2, "메리")
+		};
+		
+		Dog[] arr2 = arr;
+		
+		System.out.println(arr2[0]);
+		
+		Dog dog = arr2[0];
+		dog.setId(100);
+		dog.setName("땡구");
+		
+		System.out.println(dog);
+		
+		Dog dog2 = arr[0];
+		System.out.println(dog2);
+
+	}
+
+}
+
+
+=============================
+< dwitt 패키지에 MainEx3 클래스 생성 >
+package kr.co.dwitt;
+
+public class MainEx3 {
+
+	public static void main(String[] args) {
+		// 배열 깊은 복사하는 방법
+		int[] arr = {1, 2, 3, 4};
+		
+		int[] arr_c1 = arr.clone();  // 별개로 배열객체가 만들어 진다
+					// arr.clone() 꼭 알고 있어야 한다.
+		arr_c1[0] = 100;
+		
+		System.out.println(arr_c1[0]);  // 출력 100
+		
+		System.out.println(arr[0]);     // 출력 1
+		// 서로 다른 객체를 가지고 있다는거..
+
+		System.out.println(":::::::::::");
+		
+		int[] arr_c2 = Arrays.copyOf(arr, arr.length);
+		arr_c2[0] = 200;
+		System.out.println(arr_c2[0]);  // 200나옴
+		System.out.println(arr[0]);    // 1 나옴
+
+		System.out.println(":::::::::::");
+		
+		int[] arr_c3 = Arrays.copyOfRange(arr, 1, 3);  // 일부만 복사하고 싶을 때
+		for(int i=0; i<arr_c3.length; i++) {
+			
+			System.out.println(arr_c3[i]);
+		}
+
+	}
+
+}
+
+=================================
+< dwitt 패키지에 MainEx4 클래스 생성 >
+package kr.co.dwitt;
+
+import com.naver.Dog;
+import com.naver.Person;
+
+public class MainEx4 {
+
+	public static void main(String[] args) {
+		
+		Dog[] dog1 = {
+				new Dog(1, "해피"),
+				new Dog(2, "메리"),
+				new Dog(3, "벡구")
+		};
+		
+		Person kim = new Person(0, "김유신", dog1);
+		
+		// kim이 갖고 있는 개들 중에서 인덱스가 0번인 것을 인덱싱하세요
+		Dog[] dogs = kim.getDog1();
+		Dog dog = dogs[0];
+		
+		// kim이 갖고 있는 개들 중에서 인덱스가 0인 요소의
+		// id를 1000으로 변경하세요.
+		// name은 happy로 변경하세요
+		dog.setId(1000);
+		dog.setName("happy");
+		
+		// kim이 갖고 있는 개들 중에서 인덱스가 가장 큰 것을 인덱싱하세요
+		// dogs를 이용하세요		
+		dog = dogs[dogs.length - 1];
+		
+		// dog 변수에 들어 있는 개의 아이디를 2000으로 변경
+		// dog 변수에 들어 있는 개의 이름을 white dog로 변경하세요
+		dog.setId(2000);
+		dog.setName("white dog");
+		
+	}
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
