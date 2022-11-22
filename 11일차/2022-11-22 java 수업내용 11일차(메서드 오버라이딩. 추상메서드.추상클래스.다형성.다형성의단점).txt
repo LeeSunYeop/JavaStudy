@@ -1,0 +1,1008 @@
+1. 중복되는 데이터는 변수로
+
+2. 중복되는 코드는 메서드로
+ - 메서드: 객체의 기능을 구현한 코드
+
+3. 중복되는 자원(변수/상수/메서드, 생성자는 제외)는 부모클래스로
+
+4. 부모클래스 = super클래스
+
+5. 자식클래스 = sub클래스
+
+6. 상속이란? 부모클래스의 자원(변수/상수/메서드, 생성자는 제외)을 자식클래스에서 사용할 수 있는 기술
+
+7. 상속의 표현 장소는? 자식클래스의 클래스 헤더
+
+8. 상속을 표현할 때 사용하는 키워드(예약드)는? extends
+
+9. 상속을 사용 이유
+   - 클래스간의 공통 기능을 간결하게 표현할 수 있기 때문에...
+   - 자료형을 통일시키는 효과가 있으므로...
+
+10. super?
+    - super: 부모 객체
+    - super( ): 부모 자료형의 디폴트 생성자 호출
+    - super(id, name): 부모 자료형의 사용자 생성자 호출
+
+11. 자바의 최상위 부모클래스는? Object
+
+===============================
+12. 메서드 오버라이딩
+- 부모클래스가 갖고 있는 메서드의 내용({ })을 자식클래스에서 재정의하는 것.
+- 재정의: 수정, 삭제, 추가
+- 상속이라는 것은 구조만 같을 뿐, 그 안에 들어가 코드는 클래스마다 다르다. 특히 메서드의 실행코드는 다른 경우가
+  많은데, 이때 서로 다른 내용의 코드를 오버라이딩해줌으로써 클래스에 맞는 메서드의 기능을 표현할 수 있다.
+
+메서드 오버로딩 vs 메서드 오버라이딩
+
+13. 접근제한자 반환형 메서드명(자료형1 변수명1, 자료형2 변수명2){
+	실행 코드;
+	return 반환값; //반환형이 void가 아닐 때..
+}
+
+13. 추상메서드
+- 자식클래스에서 부모클래스의 메서드를 **반드시 오버라이딩해야 하는 상황**에서는
+ 해당 메서드를 추상메서드로 작성해야 합니다.
+- 추상메서드는 메서드의 본문({ })대신 ;(세미콜론)이 들어간 메서드입니다.
+ 그리고 추상메서드임을 알리기 위해서 abstract 키워드를 넣어 줍니다.
+- 이 때 해당 클래스는 에러가 발생합니다
+ 왜냐하면 추상메서드를 하나라도 갖고 있는 클래스는 반드시 추상클래스로 선언해야 하기 때문..
+
+14. 추상클래스
+- abstract 키워드가 붙은 클래스
+- 추상메서드가 없어도 추상클래스로 선언될 수 있다. 
+- 왜 만들까?  -> 부모클래스로 객체를 못 만들게 하려고..
+- 작성순서: 자식클래스 먼저 작성하고 나중에 부모클래스를 작성해 준다
+  -> 부모클래스는 있어도 되고 없어도 됩니다. 우리가 유지보수를 편리하게 하기 위해서 부모클래스를 만들고
+     상속을 구현하는 것입니다.
+  -> 그래서 부모클래스로는 진짜객체를 생성하지 않습니다.
+     차료형 변수명 = 자료형에 맞는 값;
+     참조자료형 변수명 = new 생성자( );
+
+
+15. 추상화 = 추상메서드 = 추상클래스
+
+16. 다형성: 객체를 만드는 새로운 방법
+- 부모자료형 변수명 = new 자식생성자( );
+
+17. 다형성을 왜 사용하는가?
+- 자료형의 통일을 위해...  ---> 진짜 중요함
+
+18. 다형성의 단점
+- 다형성을 이용해서 객체를 생성하면,
+  자식클래스만이 갖고 있는 자원에 접근할 수 없다.
+- 이를 보완하기 위해서는 형변환을 통해 가능하다.
+  이때 형변환이 잘못될 것에 대비해서
+  if(변수명 instancof 클래스명){
+  }
+  위 코드를 반드시 구현하자.
+
+19. 자식클래스의 멤버변수와 부모클래스의 멤버변수가 같을 때,
+ 자식클래스의 멤버변수가 우선적으로 인식된다.
+ 부모클래스의 멤버변수를 인식하게 하고 싶다면,
+ super.을 붙이면 된다.
+
+
+
+< ExtendsEx2 프로젝트 생성 >
+< com.google 패키지에 Weapon 클래스 생성 > --- 부모클래스
+package com.google;
+
+import java.util.Objects;
+
+public class Weapon {
+	private String id;
+	private String name;
+	private int attackPower;
+	
+	public Weapon() {
+		// TODO Auto-generated constructor stub
+	}
+
+	public Weapon(String id, String name, int attackPower) {
+		super();
+		this.id = id;
+		this.name = name;
+		this.attackPower = attackPower;
+	}
+	
+	public void attack() {
+		System.out.println("공격합니다.");
+	}
+	
+
+	public String getId() {
+		return id;
+	}
+
+	public void setId(String id) {
+		this.id = id;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public int getAttackPower() {
+		return attackPower;
+	}
+
+	public void setAttackPower(int attackPower) {
+		this.attackPower = attackPower;
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(attackPower, id, name);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Weapon other = (Weapon) obj;
+		return attackPower == other.attackPower && Objects.equals(id, other.id) && Objects.equals(name, other.name);
+	}
+
+	@Override
+	public String toString() {
+		return "Weapon [id=" + id + ", name=" + name + ", attackPower=" + attackPower + "]";
+	}
+	
+	
+
+}
+
+================================
+< com.google 패키지에 Bow 클래스 생성 > --- 자식클래스
+package com.google;
+
+public class Bow extends Weapon{
+	
+	public Bow() {
+		// TODO Auto-generated constructor stub
+	}
+
+	public Bow(String id, String name, int attackPower) {
+		super(id, name, attackPower);
+		// TODO Auto-generated constructor stub
+	}
+}
+
+===========================
+< com.google 패키지에 Cannon 클래스 생성 > --- 자식클래스
+package com.google;
+
+public class Cannon extends Weapon{
+	
+	public Cannon() {
+		// TODO Auto-generated constructor stub
+	}
+
+	public Cannon(String id, String name, int attackPower) {
+		super(id, name, attackPower);
+		// TODO Auto-generated constructor stub
+	}
+
+	@Override
+	public void attack() {
+		System.out.println("대포로 공격합니다.");
+	}	
+}
+
+===========================
+< com.google 패키지에 Gun 클래스 생성 > --- 자식클래스
+package com.google;
+
+import java.util.Objects;
+
+public class Gun extends Weapon{
+	
+	public Gun() {
+		// TODO Auto-generated constructor stub
+	}
+
+	public Gun(String id, String name, int attackPower) {
+		super(id, name, attackPower);
+		// TODO Auto-generated constructor stub
+	}
+
+	@Override
+	public void attack() {
+		System.out.println("권총으로 공격합니다.");
+	}		
+}
+
+======================
+< dwitt 패키지에 MainEx 클래스 생성 >
+package kr.co.dwitt;
+
+import com.appl.MemberDTO;
+import com.google.Cannon;
+import com.google.Gun;
+
+public class MainEx {
+
+	public static void main(String[] args) {
+		
+		Cannon daepo = new Cannon("1", "대포", 100);
+		daepo.attack();
+		
+		Gun gun = new Gun("2", "권총", 50);
+		gun.attack();
+		
+		
+		
+//		MemberDTO dto = new MemberDTO();
+//		
+//		System.out.println(dto);
+//		System.out.println(dto.toString());
+//		
+//		MemberDTO dto2 = new MemberDTO(1, "김");
+//		System.out.println(dto2);
+//		System.out.println(dto2.toString());
+		
+
+	}
+
+}
+
+
+=====================
+< net.daum 패키지에 Animal클래스 생성 > --- 부모클래스
+package net.daum;
+
+import java.util.Objects;
+
+public class Animal {
+	
+	private String id;
+	private String name;
+	
+	public Animal() {
+		// TODO Auto-generated constructor stub
+	}
+	
+	
+	public Animal(String id, String name) {
+		super();
+		this.id = id;
+		this.name = name;
+	}
+
+
+	public String getId() {
+		return id;
+	}
+	public void setId(String id) {
+		this.id = id;
+	}
+	public String getName() {
+		return name;
+	}
+	public void setName(String name) {
+		this.name = name;
+	}
+	@Override
+	public int hashCode() {
+		return Objects.hash(id);
+	}
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Animal other = (Animal) obj;
+		return Objects.equals(id, other.id);
+	}
+	@Override
+	public String toString() {
+		return "Animal [id=" + id + ", name=" + name + "]";
+	}
+	
+	public void eat() {
+		System.out.println("먹습니다.");
+	}
+
+}
+
+============================
+< net.daum 패키지에 Cat 클래스 생성 > --- 자식클래스
+package net.daum;
+
+public class Cat extends Animal{
+	
+	public Cat() {
+		// TODO Auto-generated constructor stub
+	}
+	
+	public Cat(String id, String name) {
+		super(id, name);
+			
+	}
+
+	@Override
+	public void eat() {
+		// TODO Auto-generated method stub
+		System.out.println("생선을 ");  // 추가
+		super.eat();
+	}
+}
+
+==============================
+< net.daum 패키지에 Dog 클래스 생성 > --- 자식클래스
+package net.daum;
+
+public class Dog extends Animal{
+	public Dog() {
+		// TODO Auto-generated constructor stub
+	}
+
+	@Override
+	public void eat() {
+					// 삭제
+	}
+
+}
+
+==============================
+< net.daum 패키지에 Frog 클래스 생성 > --- 자식클래스
+package net.daum;
+
+public class Frog extends Animal{
+	private int age;
+	
+	public Frog() {	}
+
+	public Frog(String id, String name) {
+		super(id, name);		
+	}
+
+	public Frog(int age) {
+		// super(); 눈에 보이지는 않지만 생략되어 있다. 
+		this.age = age;		
+	}
+
+	public Frog(String id, String name, int age) {
+		super(id, name);
+		this.age = age;
+	}
+
+	public int getAge() {
+		return age;
+	}
+
+	public void setAge(int age) {
+		this.age = age;
+	}
+
+	@Override                    ---- 쉬프트+알트+s -> Override/Implement Methods 클릭 -> eat 체크 실행
+	public void eat() {
+		int a = 10;  // 수정
+	}
+}
+
+====================================
+< AbstractEx1 프로젝트 생성 >
+< com.naver 패키지에 Animal 클래스 생성 >
+package com.naver;
+
+public abstract class Animal {  // abstract 넣어서 추상클래스가 만들어진다
+	
+	public abstract void test1(); // abstract 추상메서드 에러가 난것처럼 보이지만 에러가 난게 아니다
+	
+	public abstract void test2();
+	
+	public abstract void test3();
+	
+	public abstract void test4();
+	
+	public abstract void test5();
+
+}
+
+================================
+< com.naver 패키지에 Dog 클래스 생성 >
+package com.naver;
+
+public class Dog extends Animal{
+
+	@Override          // @Override 이 표시가 없어도 오버라이딩했다고 알고 있으면 된다.
+	public void test1() {
+		System.out.println("잡니다");
+		
+	}
+
+	@Override
+	public void test2() {
+		System.out.println("먹습니다.");
+		
+	}
+
+	@Override
+	public void test3() {
+		System.out.println("일합니다");
+		
+	}
+
+	@Override
+	public void test4() {
+		System.out.println("뜁니다.");
+		
+	}
+
+	@Override
+	public void test5() {
+		System.out.println("재롱부립니다.");
+		
+	}
+
+}
+
+
+================================
+< com.naver 패키지에 Weapon 클래스 생성 >
+package com.naver;
+
+public abstract class Weapon {
+	
+	public void me1() {	// 추상메서드가 없어도 추상클래스를 선언될 수 있다.
+				// 왜 만들까? 부모클래스로 객체를 못 만들게 하려고..
+	}
+
+}
+
+
+================================
+< dwitt 패키지에 MainEx 클래스 생성 >
+package kr.co.dwitt;
+
+import com.naver.Weapon;
+
+public class MainEx {
+
+	public static void main(String[] args) {
+		Weapon w = new Weapon();  // 에러가 발생한다. 
+		Animal a = new Animal();      // 부모클래스로는 진짜객체를 생성하지 않는다
+
+	}
+}
+
+====================
+다형성...
+
+< net.daum 패키지에 Cat 클래스 생성 >
+package net.daum;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import com.naver.Animal;
+import com.naver.Dog;
+
+public class Cat {
+	
+	public void k1() {
+		// 자료형은 더 큰 자료형, 값은 더 작은 자료형
+		// 형태는 같아야 한다.
+		
+		long a = (byte)3;
+		long b = (short)3;
+		long c = 3;
+		//long d = true; 자료형이 달라 에러남
+		long e = 'a';  // 문자형이지만 아스키코드에서 65라는 숫자를 가지고 있다
+		
+	}
+	
+	public void k2() {
+		// 1. List와 ArrayList 중에서 누가 더 클까요?
+		//    -> 누가 부모클래스(인터페이스)고, 누가 자식 클래스입니까?
+		// 2. List와 ArrayList는 형태가 같을까요?
+		// 다형성: 자료형은 부모, 값은 자식생성자를 이용해서 변수 생성하는 방법
+		// 참조자료형 변수명 = new 참조자료형의 생성자();
+		// 부모자료형 변수명 = new 자식자료형의 생성자();  -> 다형성으로 만들때
+		List<String> a = new ArrayList<String>();
+		
+	}
+	
+	public void k3() {
+		// 다형성을 이용해서 객체를 생성
+		// Animal 클래스의 객체 생성하기
+		// 부모자료형 변수명 = new 자식자료형의 생성자();  -> 다형성으로 만들때
+		Animal a = new Dog();
+		
+	}
+	
+	public void k4() {
+		
+		Animal a = new Dog();
+		Animal b = new Turtle();
+		String c = new String();
+		StringBuffer d = new StringBuffer();
+		// 자료형 변수명 = 자료형에 맞는 값;
+		// 자료형은 Animal Animal 	String 	StringBuffer
+	}
+
+}
+
+=========================
+< net.daum 패키지에 Turtle 클래스 생성 >
+package net.daum;
+
+import com.naver.Animal;
+
+// Animal 클래스를 상속하게 만들어 주세요
+public class Turtle extends Animal{
+
+	@Override
+	public void test1() {
+		System.out.println("눈 감고 잡니다");
+		
+	}
+
+	@Override
+	public void test2() {
+		System.out.println("가즈아");
+		
+	}
+
+	@Override
+	public void test3() {
+		System.out.println("모지모지");
+		
+	}
+
+	@Override
+	public void test4() {
+		System.out.println("달리려고 합니다");
+		
+	}
+
+	@Override
+	public void test5() {
+		System.out.println("몰랑");
+		
+	}
+
+
+}
+
+=====================================
+< net.daum 패키지에 Robert 클래스 생성 >
+package net.daum;
+
+import com.naver.Bow;
+import com.naver.Cannon;
+import com.naver.Gun;
+import com.naver.Missile;
+import com.naver.Weapon;
+
+public class Robert {
+	
+	private Weapon[] ws = {
+			new Bow(),      -> 자식클래스
+			new Cannon(),  -> 자식클래스
+			new Gun(),       -> 자식클래스
+			new Missile()    -> 자식클래스  // Weapon[]이코드가 자료형이고 ws가 변수명이고 
+			                                      // { }안에 들어가는 코드가 자료형의 맞는 값 이다 
+	};
+
+
+}
+
+==========================
+< com.naver 패키지에 Bow 클래스 생성 >
+package com.naver;
+
+public class Bow extends Weapon{
+
+}
+
+==========================
+< com.naver 패키지에 Gun 클래스 생성 >
+package com.naver;
+
+public class Gun extends Weapon{
+
+}
+
+==========================
+< com.naver 패키지에 Cannon 클래스 생성 >
+package com.naver;
+
+public class Cannon extends Weapon{
+
+}
+
+==========================
+< com.naver 패키지에 Missile 클래스 생성 >
+package com.naver;
+
+public class Missile extends Weapon {
+
+}
+
+==================================
+< 정리 >
+1. 자바 최상위 부모클래스는?
+- Object
+
+2. 메서드 오버라이딩이란?
+- 부모클래스가 갖고 있는 메서드의 본문({ })을 자식 클래스에서 재정의(수정, 삭제, 추가)하는 것.
+
+3. 추상화란? 
+- 추상메서드 + 추상메서드
+
+4. 추상메서드란?
+- 메서드의 본문이 없는 메서드..
+- 메서드의 본문 대신에 ;이 있고, 접근제한자 다음에 abstract 키워드가 있는 메서드
+- 부모클래스의 메서드 중에서 ***반드시 자식클래스에 오버라이딩 해야 하는 메서드***
+
+5. 반드시 추상클래스로 선언해야 하는 상황은?
+- 추상메서드를 하나라도 갖고 있는 클래스는 반드시 추상클래스로 선언해야 합니다
+
+6. 추상클래스가 뭔데?
+- abstract 키워드가 붙은 클래스
+
+7. 추상클래스는 왜 사용하는가?
+- 부모클래스를 이용해서 진짜 객체를 만들지 못 하게 하기 위해서
+
+8. 추상클래스를 자료형으로 하는 객체 생성은 좋은가, 하면 안 되는가?
+- 부모추상클래스 변수명 = new 부모추상클래스생성자( ); ---------- X
+- 부모추상클래스 변수명 = new 자식클래스생성자( ); ------------O
+
+9. 8번처럼 객체를 생성하는 것을 뭐라고 하는가?
+- 다형성
+
+10. 다형성의 공식을 적어주세요
+- 부모자료형 변수명 = new 자식클래스의생성자( );
+
+11. 자식클래스와 부모클래스를 각각 1씩 만들어 주세요.
+- 자식클래스 public class Seoul extends City{ }
+- 부모클래스 public abstract class City{ } 
+
+12. Seoul 과 City 클래스를 이용해서 변수를 선언해 주세요
+- City c = new Seoul( );
+
+13. public class FruitSeller {
+	private Banana[ ] bananas;
+	private Apple[ ] apples;
+	private Grapes[ ] grapes;
+	private Melon[ ] melons;
+	private Mango[ ] mangos;
+...
+...
+}
+100만 개의 변수를 한 줄로 바꾸시오
+public class FruitSeller {
+	private Fruit[ ] arr; 
+}
+
+
+==================================
+< ExtendsEx3 프로젝트 생성 >
+< com.naver 패키지에 Dog 클래스 생성 > 
+package com.naver;
+
+public class Dog extends Animal{
+	
+
+	public void sleep() {
+		System.out.println("개가 잡니다.");
+	}
+	
+	public void show() {
+		System.out.println("재주를 부립니다.");
+	}
+
+	
+
+}
+
+===============================
+< com.naver 패키지에 Cat 클래스 생성 > 
+package com.naver;
+
+public class Cat extends Animal{
+	
+	@Override
+	public void sleep() {
+		System.out.println("고양이가 잔다");
+	}
+	
+	public void show() {
+		System.out.println("실을 굴립니다.");
+	}
+
+}
+
+=================================
+< com.naver 패키지에 Animal 클래스 생성 > 
+package com.naver;
+
+public abstract class Animal {
+	
+	private String id;
+	private String name;
+	private int age;
+	
+	public Animal() {
+		// TODO Auto-generated constructor stub
+	}
+
+	public Animal(String id, String name, int age) {
+		super();
+		this.id = id;
+		this.name = name;
+		this.age = age;
+	}
+
+	public String getId() {
+		return id;
+	}
+
+	public void setId(String id) {
+		this.id = id;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public int getAge() {
+		return age;
+	}
+
+	public void setAge(int age) {
+		this.age = age;
+	}
+
+	public void sleep() {
+		// TODO Auto-generated method stub
+		
+	}	
+}
+
+=================================
+< net.daum 패키지에 Person 클래스 생성 >
+package net.daum;
+
+import com.naver.Animal;
+import com.naver.Cat;
+import com.naver.Dog;
+
+public class Person {
+	
+	private Animal animals = new Dog();
+	
+	private Animal animals2 = new Cat();
+	
+	public Person() {
+		animals.sleep();	
+		((Dog)animals).show(); // Animal자료형이 다르기 때문에 형변환으로 바꿔줘야한다.
+				
+	}
+	
+	public void me1() {
+		
+		((Cat)animals2).show();
+		((Dog)animals2).show(); // MainEx가서 실행시키면 오류가 뜬다
+	}
+	
+	public void me2() {
+		Dog dog = null;
+		
+		if(animals2 instanceof Dog) { // animals2가 Dog클래스의 인스턴스냐? 라는 의미
+			                          // animals2가 Dog클래스를 이용해서 만든 객체냐? 라는 의미
+			                          // 객체 = 인스턴스
+			dog = (Dog) animals2; // animals2을 (Dog)로 형변환하고 그 값을 dog에 넣어라 는 의미임
+			dog.show();
+		}else {
+			System.out.println("Dog 클래스로 만든게 아님.");
+		}   // kim.me2();  -> Dog 클래스로 만든게 아님. 나옴
+	}
+	
+	public void me2_1() {   // 개발자라면 이 코드처럼 짜야한다.
+		Cat cat = null;
+		
+		if(animals2 instanceof Cat) {
+			
+			cat = (Cat) animals2; 
+			cat.show();   // kim.me2_1(); -> 실을 굴립니다. 나옴
+		}
+	}
+
+}
+
+=============================
+< dwitt 패키지에 MainEx 클래스 생성 >
+package kr.co.dwitt;
+
+import net.daum.Person;
+
+public class MainEx {
+
+	public static void main(String[] args) {
+		Person kim = new Person();
+		kim.me2();
+		kim.me2_1();
+
+	}
+
+}
+
+===================================
+< ProtectedEx 프로젝트 생성 >
+
+1. Animal 클래스는 멤버변수가 몇개 인가요?
+- 1개
+2. Dog클래스는 멤버변수가 몇개 인가요?
+- 1개
+
+< com.naver 패키지에 Animal 클래스 생성 >
+package com.naver;
+
+public class Animal {
+	
+	private int test = 10;
+
+	public int getTest() {
+		return test;
+	}
+
+	public void setTest(int test) {
+		this.test = test;
+	}
+
+	
+}
+
+==============================
+< net.daum 패키지에 Dog 클래스 생성 >
+package net.daum;
+
+import com.naver.Animal;
+
+public class Dog extends Animal{
+	
+	private int test = 20;
+	
+	public Dog(int test) {
+//		System.out.println(this.test);  // 20 나옴
+//		System.out.println(super.test); // 부모클래스   10 남옴
+//		this.test = test;  // 초기화 시킨다
+//		
+//		System.out.println(this.test);  // 5나옴
+//		System.out.println(super.test);  // 10 나옴
+	}
+
+	public int getTest() {
+		return test;
+	}
+
+	public void setTest(int test) {
+		this.test = test;
+	}
+	
+	public void tt1() {
+		getTest();
+		super.getTest();
+	}
+	
+}
+
+
+==============================
+< dwitt 패키지에 MainEx 클래스 생성 >
+package kr.co.dwitt;
+
+import com.naver.Animal;
+
+import net.daum.Dog;
+
+public class MainEx {
+
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		Animal dog = new Dog(5);
+	}
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
