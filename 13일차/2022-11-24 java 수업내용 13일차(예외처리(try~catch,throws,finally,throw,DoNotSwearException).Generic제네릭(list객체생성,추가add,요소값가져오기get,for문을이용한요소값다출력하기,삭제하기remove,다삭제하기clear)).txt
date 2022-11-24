@@ -1,0 +1,800 @@
+
+예외처리 잘하세요 라는 면접질문을 받는다면?
+예 잘합니다. try~catch, throws, finally, throw 를 사용할 줄 알고 반드시 들어가야할 코드가 있으면 finally에 넣고
+throws을 사용해 예외처리 코드를 넣고 최종적으로 try~catch를 사용하며 개발 단계에서는 예외 에러 코드 확인을 위해 
+e.printStackTrace(); 를 입력하고 예외와 관련된 문서 작업을 위해 DB에 해당 데이터를 저장 합니다
+배포단게에서는 e.printStackTrace(); 를 제거하고 예외 조치를 위해 DB에 해당 데이터를 저장합니다.
+문법적으로는 예외가 아니지만 논리적으로는 예외가 될 수 있는 것들을 throw를 이용해 강제로 예외처리를 할 수 있습니다
+
+
+
+1. 예외처리
+- 프로그램 실행 중 예외가 발생했을 때, 프로그램이 중단되는 상태가 발생하는데,
+ 예외 처리를 통해 프로그램의 중단을 막고, 예외 발생 시의 대책을 구현.
+
+2. try ~ catch구문
+- try{ }
+  - 예외가 발생할 수 있는 코드를 구현함.
+  - 예외가 발생할 수 있는 코드 + 부가적인 코드
+
+- catch{ }
+  - 예외가 발생했을 때 실행할 코드를 구현함
+  - 개발 단계에서는 예외 발생 여부를 확인하기 위해서
+    e.printStackTrace(); 를 입력해야 함
+    예외와 관련된 문서 작업을 위해 DB에 해당 데이터를 저장
+
+  - 배포단계에서는 e.printStackTrace(); 를 제거함.
+        예외 조치를 위해 DB에 해당 데이터를 저장
+
+3. try{ } 구문(영역)에서 예외가 발생하면, 그 이하에 있는 코드는 실행하지 않고,
+   catch{ } 구문(영역)으로 넘어감.
+
+4. java는 예외도 클래스와 객체를 이용해서 처리합니다.
+
+5. 여러 개의 catch{ }구문을 적용할 수 있다.
+  이 때 더 작은 Exception 클래스가 앞에 와야 한다.
+
+6. 예외클래스의 최상위 부모클래스는? Exception
+
+7. 예외처리의 마지막에는 try ~ catch를 합니다.
+
+8.  throws: 예외처리를 해당 메서드를 호출하는 쪽으로 위임하는 기능.
+- 해당 메서드를 호출하는 쪽에서  try ~ catch나 throws를 다시 해야 함.
+  
+9.  try ~ catch와 throws를 구분해서 사용할 수 있어야 한다.
+- catch에 들어가는 코드가 명확하거나 자신에게 권한이 주어졌다면,  try ~ catch
+- 그렇지 않다면 throws를 사용한다.
+
+10. finally: 예외 여부와 상관없이 반드시 실행할 코드는 finally 구문에 작성한다.
+- return보다 더 강력하다.
+
+11. try ~ catch ~ finally 구문의 구조를 만들고 그 안에 코딩을 작성한다.
+
+12. throw: 문법적으로는 예외가 아니지만 논리적으로는 예외가 될 수 있는 것들을
+             강제로 예외처리할 때 사용
+
+- 댓글에 욕설...
+
+13. 사용자 정의 예외 클래스 생성
+
+
+================================
+< TryCatchThrowsThrowFinally1 프로젝트 생성 >
+< com.naver 패키지에 Dog 클래스 생성 >
+package com.naver;
+
+public class Dog {
+	
+	public void me1(int a, int b) {
+		int c = a/b;
+		System.out.println(c);
+	}
+	
+	public void me2(int a, int b) {
+		int c = -1;
+		
+		try {
+			c = a/b;  // try안에 넣는건 오류가 날법한 코드를 넣는다. 즉, 외부에서 값을 입력받을 경우다
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace(); // 에러가 왜뜨는지 알려주는 코드
+		}
+		
+		System.out.println(c);
+	}
+	
+	public void me3(int a, int b) {
+		try {
+			int c = a/b;
+			System.out.println(c);  // 문제가 생겼는데 이코드는 실행하지 않고 넘어간다
+			
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			System.out.println("문제가 생겼군요. 1588-1111으로 연락주세요.");
+			e.printStackTrace();
+		}
+	}
+	
+	public void me4(int a, int b) {
+		try {
+			int c = a/b;
+			System.out.println(c);  
+			
+		} catch (ArithmeticException e) { // ArithmeticException 오류메시지에보면 나옴. 원래가 이코드임
+			// TODO Auto-generated catch block
+			System.out.println("문제가 생겼군요. 1588-1111으로 연락주세요.");
+			e.printStackTrace();
+		}
+	}
+	
+	public void me5(String msg, int idx) {
+		try {
+			char c = msg.charAt(idx);
+			System.out.println(c);
+		} catch (StringIndexOutOfBoundsException e) {  // catch 코드를 넣을 때 자료형이 큰거부터 먼저 입력한다.
+			System.out.println("알맞은 인덱스를 입력하세요.");
+			e.printStackTrace();
+		} catch (Exception e) {
+			System.out.println("모르겠다");
+			e.printStackTrace();
+		}
+	}
+
+}
+
+
+==================
+< dwitt 패키지에 MainEx 클래스 생성>
+package kr.co.dwitt;
+
+import com.naver.Dog;
+
+public class MainEx {
+
+	public static void main(String[] args) {
+		// Dog클래스를 자료형으로 하는 변수 dog1을 생성하세요
+		// dog1 갖고 있는 me1()메서드 호출
+		Dog dog1 = new Dog();
+		//dog1.me1(50, 10);
+		//dog1.me1(50, 0);
+		
+		//dog1.me2(50, 10);
+		//dog1.me2(50, 0);
+		
+		dog1.me3(50, 10);
+		dog1.me3(50, 0);
+		System.out.println("==========");
+
+	}
+
+}
+
+
+==================
+< dwitt 패키지에 MainEx2 클래스 생성>
+package kr.co.dwitt;
+
+import com.naver.Dog;
+
+public class MainEx2 {
+
+	public static void main(String[] args) {
+		// Dog클래스를 이용해서 dog2 변수를 생성
+		// dog2가 갖고 있는 me5()메서드를 호출하세요
+		Dog dog2 = new Dog();
+		dog2.me5("hello", 0);
+		dog2.me5("hello", "hello".length());
+		// 인덱스의 값보다 큰값을 넣어서 오류가 뜸
+
+	}
+
+}
+
+
+========================
+< net.daum 패키지에 Cat 클래스 생성 >
+package net.daum;
+
+public class Cat {
+	// try~catch와 throws를 구분해서 사용할 줄 알아야 합니다.
+	// 1. 내가 최종 사용자인가?
+	// 2. 예외처리에 대한 권한이 내게 있는가?
+	
+	public void me1() {
+		try {
+			String msg1 = "1";
+			int num1 = Integer.parseInt(msg1);
+			
+			String msg2 = "hello";
+			int num2 = Integer.parseInt(msg2);
+			
+			System.out.println(num1);
+			System.out.println(num2);
+			
+		} catch (NumberFormatException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		System.out.println("문제가 없습니다.");
+		
+	}
+	
+	public void me2() throws Exception {  
+		String msg1 = "1";
+		int num1 = Integer.parseInt(msg1);
+		
+		String msg2 = "hello";
+		int num2 = Integer.parseInt(msg2);
+		
+		System.out.println(num1);
+		System.out.println(num2);
+		
+		System.out.println("문제가 없습니다.");		
+	}
+	
+
+}
+
+
+
+==================
+< dwitt 패키지에 MainEx3 클래스 생성>
+package kr.co.dwitt;
+
+import net.daum.Cat;
+
+public class MainEx3 {
+
+	public static void main(String[] args) {
+		Cat cat1 = new Cat();
+		//cat1.me1();
+		//cat1.me2();  //하면 오류메시지가 뜬다.  throws를 없애든지 try~catch를 하던지 방법을 제시한다.
+		try {
+			cat1.me2();
+		} catch (Exception e) {
+			System.out.println("시스템에 문제가 발생했습니다. 빠른 조치를 하겠습니다.");
+			e.printStackTrace();
+		}
+		
+		Thread t = new Thread(new Runnable() {
+			
+			@Override
+			public void run() {
+				// TODO Auto-generated method stub
+				
+			}
+		});
+		
+		t.start();
+		
+		try {
+			t.join();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+	}
+
+}
+
+==================
+< com.naver 패키지에 Turtle 클래스 생성 >
+package com.naver;
+
+public class Turtle {
+	// 예외가 발생하든, 그렇지 않든 무조건 실행해야 하는 코드
+	// 그 코드는 finally 구문에 작성하시면 됨
+		
+	public void me1() {
+		int a = 10;
+		int b = 20;
+		int c = 0;
+		int result = -1;
+		
+		try {
+			result = a/b;
+			System.out.println("작업 끝");
+		} catch (Exception e) {
+			e.printStackTrace();
+			System.out.println("작업 끝");
+		}
+		
+		try {
+			result = a/c;
+			System.out.println("작업 끝2");
+		} catch (Exception e) {
+			e.printStackTrace();
+			System.out.println("작업 끝2");
+		}
+	}
+	
+	public void me2() {
+		int a = 10;
+		int b = 20;
+		int c = 0;
+		int result = -1;
+		
+		try {
+			result = a/b;			
+		} catch (Exception e) {
+			e.printStackTrace();			
+		} finally {
+			System.out.println("작업 끝");
+		}
+		
+		try {
+			result = a/c;			
+		} catch (Exception e) {
+			e.printStackTrace();			
+		}finally {
+			System.out.println("작업 끝2");
+		}
+	}
+	
+	public int me3() {
+		int a = 10;
+		int b = 20;
+		int c = 0;
+		int result = -1;
+		
+		try {
+			result = a/b;	
+			
+			return 300;
+		} catch (Exception e) {
+			e.printStackTrace();	
+			
+			return 500;
+		} finally {
+			System.out.println("작업 끝");
+		}  // finally가 있으면 마지막은 무조건 finally안에 있는 코드가 실행된다
+		   // 예외 여부와 상관없이 반드시 실행할 코드는 finally 구문에 작성한다.
+	}
+	
+	public int me4() {
+		int a = 10;
+		int b = 20;
+		int c = 0;
+		int result = -1;
+		
+		try {
+			result = a/b;
+			return 30;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return 500;
+			
+		} finally {
+			System.out.println("작업 끝");
+		}
+	}
+		
+}
+
+==================
+< dwitt 패키지에 MainEx4 클래스 생성>
+package kr.co.dwitt;
+
+import com.naver.Turtle;
+
+public class MainEx4 {
+
+	public static void main(String[] args) {
+		Turtle turtle1 = new Turtle();
+		
+		//turtle1.me1();
+		//turtle1.me2();
+		int a = turtle1.me3();
+
+	}
+
+}
+
+
+
+
+========================
+< net.daum 패키지에 Frog 클래스 생성 >
+package net.daum;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Scanner;
+
+public class Frog {
+	
+	public void k1(int idx) {
+		int[] arr = {100, 200};
+		
+		int num =  arr[idx];
+		
+		System.out.println(num);
+	}
+	
+	public void k2(String msg) throws Exception {
+		
+		if(msg.equalsIgnoreCase("야이개새야")) {
+			throw new Exception("욕설 금지");
+		}
+		
+		
+		System.out.println(msg);
+	}
+
+	public void k3(String msg) throws DoNotSwearException {
+		
+		if(msg.equalsIgnoreCase("야이개새야")) {
+			throw new DoNotSwearException("욕설 금지");
+		}
+		
+		
+		System.out.println(msg);
+	}
+
+}
+
+==================
+< dwitt 패키지에 MainEx5 클래스 생성>
+package kr.co.dwitt;
+
+import net.daum.Frog;
+
+public class MainEx5 {
+
+	public static void main(String[] args) {
+		Frog frog1 = new Frog();
+		
+		//frog1.k1(1000);
+		//frog1.k2("안녕하세요.");
+		try {
+			frog1.k2("야이개새야");
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		try {
+			frog1.k3("야이개새야");
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
+}
+
+
+========================
+< net.daum 패키지에 DoNotSwearException 클래스 생성 >
+package net.daum;
+
+public class DoNotSwearException extends Exception{
+
+	private static final long serialVersionUID = 1L;
+	
+	public DoNotSwearException() {
+		
+	}
+	
+	public DoNotSwearException(String message) {
+		super(message);
+	}
+
+}
+
+
+================================
+1. Generic: 클래스 안의 있는 멤버들의 자료형을 동적으로 변경하는 문법
+
+2. Generic: 클래스는 일반적으로 Generic Type의 객체를 담는 그릇 역할을 함.
+
+3.  java collection framework: 컴퓨터 공학의 자료구조론을 클래스로 구현한 것
+
+List              Set             Map(java collection framework가 아님
+ArrayList        HashSet       HashMap
+
+java collection framework
+- 컴퓨터공학의 자료구조론을 구현한 class
+- 자료구조론
+ - 같은 크기에 더 많은 데이터를 저장하는 방법
+ - 같은 크기의 데이터를 더 빠르게 처리하는 방법
+
+4. List, Set, Map(jcf는 아님) 학습
+
+5. List를 학습하려면, 어떤 클래스 알고 있어야 하는가? ArratList
+
+6. Generic 타입은 참조자료형
+
+7. 
+
+
+========================
+< ListEx1 프로젝트 생성 >
+< com.naver 패키지에 Box 클래스 생성 >
+package com.naver;
+
+public class Box<T> {
+	private T type;
+	
+	public Box() {
+		// TODO Auto-generated constructor stub
+	}
+
+	public Box(T type) {
+		super();
+		this.type = type;
+	}
+
+	public T getType() {
+		return type;
+	}
+
+	public void setType(T type) {
+		this.type = type;
+	}
+
+}
+
+========================
+< dwitt 패키지에 MainEx 클래스 생성>
+package kr.co.dwitt;
+
+import com.naver.Box;
+import com.naver.Dog;
+
+public class MainEx {
+
+	public static void main(String[] args) {
+		
+		Box<String> dog1 = new Box<String>("hello");
+		// 클래스안에 자료형을 동적으로 바꾸고 싶으면 Dog<String> 이렇게 코드 짜면됨 그리고 Dog<T>클래스를 만든다
+		String type = dog1.getType();
+		System.out.println(type);
+		System.out.println(":::::::::::::::");
+		
+		Dog dog2 = new Dog();
+		dog2.me6();
+		
+		dog2.me7();
+
+		dog2.me8();
+				
+	}
+
+}
+
+
+========================
+< com.naver 패키지에 Dog 클래스 생성 >
+package com.naver;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+
+public class Dog {
+	
+	public void me1() {
+		// ArrayList를 이용해서 list 객체를 생성하세요
+		// ArrayList<int> list = new ArrayList<int>();  오류남
+		ArrayList<Integer> list = new ArrayList<Integer>();
+	}
+	
+	public void me2() {
+		List<String> list = new ArrayList<String>();
+	}
+	
+	public void me3() {
+		List<StringBuffer> list = new ArrayList<StringBuffer>();
+	}
+	
+	public void me4() {
+		List<Box<String>> list = new ArrayList<Box<String>>();
+	}
+	
+	public void me5() {
+		ArrayList<Integer> list = new ArrayList<Integer>();
+		
+		List<String> list2 = new ArrayList<String>();
+		
+		List<StringBuffer> list3 = new ArrayList<StringBuffer>();
+		
+		List<Box<String>> list4 = new ArrayList<Box<String>>();
+		
+		List<Set<Box<Integer>>> list5 = new ArrayList<Set<Box<Integer>>>();
+		
+	}
+	
+	public void me6() {
+		// 자료형: List, 변수명: list 객체생성, 제네릭타입: char
+		List<Character> list = new ArrayList<Character>();
+		
+		list.add('a');
+		list.add('a');
+		list.add((char)97);
+		list.add(new Character('a'));
+		list.add('b');
+		list.add('c');
+		list.add('d');
+		list.add('e');
+		list.add('F');
+		//System.out.println(list);
+		// 출력 [a, a, a, a, b, c, d, e, F] 나옴
+		
+		int size = list.size();  // 갖고있는 요소가 몇개 있는지 알고 싶으면 size 쓴다
+		System.out.println(size);  // 출력 9 나옴
+		
+		char a0 = list.get(0);   // get(인덱스번호)을 사용하여 a를 출력함 
+		System.out.println(a0);  // 자료형은 char 임
+		
+		for(int i=0; i<list.size(); i++) {
+			char c = list.get(i);
+			System.out.println(c);  // list에 있는 모든요소 출력한다
+		}
+		
+		// d, e를 삭제하세요
+		System.out.println(list);
+		list.remove(7);  // 요소하나씩 제거하기 remove(6)
+		list.remove(6);  // list는 삭제를 안하고 저장만 한다.
+		System.out.println(list);
+	}
+	
+	public void me7() {
+		// 제네릭타입: String
+		// list에 5개의 값을 입력하세요
+		List<String> list = new ArrayList<String>();
+		
+		list.add("안녕");
+		list.add("하세");
+		list.add("요.");
+		list.add("^^");
+		list.add("~~");
+		System.out.println(list);
+		
+		int size = list.size();  
+		System.out.println(size);
+		
+		String str3 = list.get(3);  // get를 사용하여 ^^ 요소를 가져온다
+		System.out.println(str3);   // 자료형은 String
+		
+		for(int i=0; i<list.size(); i++) {
+			String msg = list.get(i);
+			System.out.println(msg);
+		}
+		
+		System.out.println(list);  // 삭제하기전
+		list.remove(new String("요."));  // 인덱스번호가 아닌 글자로 삭제하기
+		System.out.println(list);  // 삭제 후
+	}
+	
+	public void me8() {
+		//제네릭타입 MemberDTO
+		// list에 4개의 값을 입력하세요
+		List<MemberDTO> list = new ArrayList<MemberDTO>();
+		
+		list.add(new MemberDTO(1, "hi1"));
+		list.add(new MemberDTO(2, "hi2"));
+		list.add(new MemberDTO(3, "hi3"));
+		list.add(new MemberDTO(4, "hi4"));
+		System.out.println(list);
+		
+		int size = list.size();  // list안에 저장되어있는 요소가 몇개(크기) 가져오기
+		System.out.println(size);
+		
+		MemberDTO a1 = list.get(1);  // list.get(1); 사용하여 저장된 값 "hi2" 를 출력한다
+		System.out.println(a1);      // 자료형은 MemberDTO 임
+		
+		// al이 갖고있는 id 출력
+		int id1 = a1.getId();
+		System.out.println(id1);  // 2 나옴
+		String name1 = a1.getName();
+		System.out.println(name1);  // hi2 나옴
+		
+		for(int i=0; i<list.size(); i++) {
+			MemberDTO dto = list.get(i);
+			System.out.println(dto.getId()+":"+dto.getName());
+			//1:hi1
+			//2:hi2
+			//3:hi3
+			//4:hi4  나옴
+			int id = dto.getId();
+			String name = dto.getName();
+			System.out.println(id+":"+name);
+		
+		}
+		
+		System.out.println(list);
+		list.remove(new MemberDTO(4, null));  // 객체를 이용해서 삭제하기
+		                 // (4, null) hashCode 만들때 id만 같아도 삭제되겠끔 만들어놔서 아이디랑 null값을 넣은거다
+		System.out.println(list);
+		
+		list.clear(); // 한방에 다 삭제하기 삭제만 될뿐 저장된 공간은 그대로 남아 있음
+		
+	}
+}
+
+========================
+< com.naver 패키지에 MemberDTO 클래스 생성 >
+package com.naver;
+
+import java.io.Serializable;
+import java.util.Objects;
+
+public class MemberDTO implements Serializable{
+	// Serializable 객체직렬화 할때 사용한다
+
+	private static final long serialVersionUID = 1L;
+	
+	private int id;
+	private String name;
+	
+	public MemberDTO() {
+		// TODO Auto-generated constructor stub
+	}
+
+	public MemberDTO(int id, String name) {
+		super();
+		this.id = id;
+		this.name = name;
+	}
+
+	public int getId() {
+		return id;
+	}
+
+	public void setId(int id) {
+		this.id = id;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public static long getSerialversionuid() {
+		return serialVersionUID;
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(id);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		MemberDTO other = (MemberDTO) obj;
+		return id == other.id;
+	}
+
+	@Override
+	public String toString() {
+		return name;
+	}
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
