@@ -1,0 +1,779 @@
+< MapEx1 패키지에 TestMap 클래스 이어서 >
+	public void h6(String id, String name, String birth) {
+		// map은 dto클래스 생성하기 싫을 때, 많이 사용함.
+		// 이런 상황에서는 무조건 key의 자료형은 String
+		// Value의 자료형은 상황을 봐야하는데, Value자료형이 다 같으면 해당 자료형 사용
+		// 다르면 Object 사용
+		Map<String, String> map1 = new HashMap<String, String>();
+		
+		map1.put("id", id);
+		map1.put("name", name);
+		map1.put("brith", birth);
+		
+		System.out.println(map1);
+		
+	}
+	
+	public void h7(int id, String name, Date birth) {
+		Map<String, Object> map1 = new HashMap<String, Object>();
+		
+		map1.put("id", id);
+		map1.put("name", name);
+		map1.put("birth", birth);
+		
+		System.out.println(map1);
+	}
+
+=============================
+< dwitt 패키지에 MainEx 클래스 이어서 >
+public class MainEx {
+
+	public static void main(String[] args) {
+		
+		TestMap tm = new TestMap();
+		//tm.h2();
+		//tm.h3();
+		//tm.h4();
+		//tm.h5();
+		tm.h6("m001", "kim", "2010-01-01");
+		tm.h7(7, "kim", dd);
+	}
+
+
+======================================
+< 문제 >
+Person
+<<com.naver>>
+
+- id : String
+- dogs : List<Dog>
+- cats : Cat[ ]
+
+
+<<constructors>>
+<<getters/setters>>
+ + me1(String id) : Map<String, Cat>
+
+
+< Test1 프로젝트 생성 >
+< dwitt 패키지에 MainEx 생성 >
+package kr.co.dwitt;
+
+public class MainEx {
+
+	public static void main(String[] args) {
+		
+
+	}
+
+}
+
+
+==========================
+< com.naver 패키지에 Person 클래스 생성 >
+package com.naver;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+public class Person {
+	private String id;
+	private List<Dog> dogs;
+	private Cat[] cat;
+	
+	public Person() {
+		// TODO Auto-generated constructor stub
+	}
+	
+	public Person(String id, List<Dog> dogs, Cat[] cat) {
+		super();
+		this.id = id;
+		this.dogs = dogs;
+		this.cat = cat;
+	}
+
+	public String getId() {
+		return id;
+	}
+
+	public void setId(String id) {
+		this.id = id;
+	}
+
+	public List<Dog> getDogs() {
+		return dogs;
+	}
+
+	public void setDogs(List<Dog> dogs) {
+		this.dogs = dogs;
+	}
+
+	public Cat[] getCat() {
+		return cat;
+	}
+
+	public void setCat(Cat[] cat) {
+		this.cat = cat;
+	}
+	
+	public Map<String, Cat> {
+		String id;
+		
+		return id;
+	}		
+
+}
+
+
+====================================
+enum
+- 상수 대신에 사용함
+- 범주형 데이터를 자바 코드로 표현하고 싶을 때
+
+< EnumEx1 프로젝트 생성 >
+< dwitt 패키지에 MainEx 생성 >
+package kr.co.dwitt;
+
+import com.naver.Weapon;
+
+public class MainEx {
+
+	public static void main(String[] args) {
+		Weapon w = Weapon.TANK;
+		
+		System.out.println(w); // TANK
+		
+		boolean result = w.equals("TANK");
+		System.out.println(result);  // false
+		String w_name = w.name();  // w.name(); enum의 값을 문자로 변경할 때
+		System.out.println(w_name); // TANK
+		
+		result = w_name.equals("TANK");
+		System.out.println(result);  // true
+		
+		// 문자열을 이용해서 enum 생성
+		Weapon newTest = Weapon.valueOf("GUN");
+		System.out.println(newTest);  // GUN
+		
+		newTest = Weapon.valueOf("TANK");
+		
+		result = w.equals(newTest);
+		System.out.println(result);  // true
+	}
+
+}
+
+
+=================
+< com.naver 패키지에 Weapon enum생성 >
+package com.naver;
+
+public enum Weapon {
+	TANK, CANNON, GUN, MISSILE
+
+}
+
+
+=================
+< dwitt 패키지에 MainEx2 클래스 생성 >
+package kr.co.dwitt;
+
+import net.daum.Animals;
+
+public class MainEx2 {
+	
+	public static void main(String[] args) {
+		Animals a = Animals.PIG;
+		System.out.println(a);  // PIG
+		
+		boolean result = a.equals("PIG");
+		System.out.println(result);  // false
+		
+		String name = a.name();
+		System.out.println(name);  // PIG
+		
+		name = a.getName();
+		System.out.println(name);  // 돼지
+		
+		Animals b = Animals.valueOf("CAT");  
+		System.out.println(b);  // CAT
+		name = b.name();
+		System.out.println(name);  // CAT
+		
+		name = b.getName();
+		System.out.println(name); // 고양이
+	}
+
+}
+
+
+=================
+< net.daum 패키지에 Animals enum생성 >
+package net.daum;
+
+public enum Animals {
+	PIG("돼지"), CAT("고양이"), DOG("개"); // 값을 적어줄 때는 ; 을 넣어준다.
+	
+	private final String name;
+	
+	private Animals(String name) {
+		this.name = name;
+	}
+
+	public String getName() {
+		return name;
+	}
+		
+}
+
+====================================
+스레드 생성 방법
+- 스레드 클래스를 이용해서
+- 스레드 클래스와 Runnable 클래스를 이용해서
+
+스레드 생성 순서
+1. 스레드 클래스를 상속하는 자식클래스를 만들거나
+ Runnable 인터페이스를 상속하는 자식클래스를 만든다.
+
+2. 사용자 스레드가 필요한 곳에서
+ 1번에서  생성한 자식클래스들을 이용해서 스레드 객체를 생성
+
+3. 스레드객체명.start( );를 호출해서 스레드 생성
+
+========
+join( )메서드
+- join( ) 메서드를 호출한 스레드는 
+  join( ) 메서드를 호출한 곳의 스코프를 갖는 스레드보다
+ 항상 먼저 dead가 된다.
+
+========
+스레드 동기화 문제
+- 2개 이상의 스레드가 같은 데이터(같은 객체의 같은 멤버변수)를 공유하고 있을 때 발생.
+
+동기화 문제 해결 방법
+- 동기화 메서드: 메서드 synchronized 키워드를 추가
+- 동기화 블럭: 임계영역(critical section)을 synchronized( ){ }블럭으로 감싸는 것.
+
+
+
+
+< ThreadEx1 프로젝트 생성 >
+< com.naver 패키지에 Dog 클래스 생성 >
+package com.naver;
+// Thread클래스 상속하는 Dog클래스
+public class Dog extends Thread {  // Thread클래스
+	
+	public Dog() {
+		// TODO Auto-generated constructor stub
+	}
+		
+	@Override
+	public void run() {
+		// 사용자 스레드 중에서 Dog 클래스로 만들어진 
+		// 사용자 스레드의 영역
+		System.out.println("도그 사용자 스레드 실행");
+		
+		Thread ct = Thread.currentThread();
+		String name = ct.getName();
+		System.out.println(name); // Thread-0
+	}
+
+}
+
+
+=====================
+< net.daum 패키지에 Cat 클래스 생성 >
+package net.daum;
+
+// Cat클래스가 Runnable 인터페이스를 구현하도록 하세요.
+public class Cat implements Runnable {  // Runnable클래스
+	
+	@Override
+	public void run() {
+		// 사용자 스레드 중에서 Cat클래스로 만들어진
+		// 사용자 스레드의 영역
+		System.out.println("캣 사용자 스레드 실행");
+		
+		Thread ct = Thread.currentThread();
+		String name = ct.getName();
+		System.out.println(name);  // Thread-1
+	}
+
+}
+
+
+
+=====================
+< dwitt 패키지에 MainEx 클래스 생성 >
+package kr.co.dwitt;
+
+import com.naver.Dog;
+
+import net.daum.Cat;
+
+public class MainEx {
+
+	public static void main(String[] args) {
+		// main 스레드의 영역 스코프
+		System.out.println("메인 스레드 시작");
+		
+		Thread dog_t1 = new Dog(); // 스레드객체입니다.
+		
+		Runnable run_cat1 = new Cat(); // Runnable객체입니다.
+		Thread cat_t1 = new Thread(run_cat1); // 스레드객체
+		
+		dog_t1.start();
+		cat_t1.start();
+		
+		try {
+			dog_t1.join();
+			cat_t1.join();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		System.out.println("메인 스레드 종료");
+
+	}
+
+}
+
+
+=====================
+< dwitt 패키지에 MainEx2 클래스 생성 >
+package kr.co.dwitt;
+
+import com.naver.Dog;
+
+import net.daum.Cat;
+
+public class MainEx2 {
+
+	public static void main(String[] args) {
+		System.out.println("메인 스레드 시작");
+		
+		Thread ct = Thread.currentThread();
+		String name = ct.getName();
+		System.out.println(name);  // main
+		
+		// Dog 클래스를 이용해서 dog_t2
+		// Cat 클래스를 이용해서 cat_t2
+		// 스레드를 만들어 주세요
+		Dog dog_t2 = new Dog();
+		
+		Cat run_cat2 = new Cat();   // 이 방법이 실무에서 많이 쓰인다.
+		Thread cat_t2 = new Thread(run_cat2);		
+		
+		dog_t2.start();
+		cat_t2.start();
+		
+		try {
+			dog_t2.join();
+			cat_t2.join();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		System.out.println("메인 스레드 종료");
+
+	}
+
+}
+
+
+=====================
+< dwitt 패키지에 MainEx3 클래스 생성 >
+package kr.co.dwitt;
+
+public class MainEx3 {
+
+	public static void main(String[] args) {
+		long a = System.currentTimeMillis();
+		
+		int sum = 0;
+		
+		for(int i=0; i<100; i++) {
+			sum += i;
+			try {
+				Thread.sleep(10);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		
+		System.out.println(sum);
+		long b = System.currentTimeMillis();
+		System.out.println(b-a);
+
+	}
+
+}
+
+
+=====================
+< com.naver 패키지에 SumThread 클래스 생성 >
+package com.naver;
+
+public class SumThread extends Thread {
+	
+	private int sum;
+
+	private int start;
+	private int end;
+	
+	public SumThread() {
+		// TODO Auto-generated constructor stub
+	}
+
+	public SumThread(int start, int end) {
+		super();
+		this.start = start;
+		this.end = end;
+	}
+
+	@Override
+	public void run() {
+		for(int i=start; i < end+1; i++) {
+			sum += i;
+		}
+		
+		System.out.println(sum);
+	}
+
+}
+
+=====================
+< dwitt 패키지에 MainEx4 클래스 생성 >
+package kr.co.dwitt;
+
+import com.naver.SumThread;
+
+public class MainEx4 {
+
+	public static void main(String[] args) {
+		
+		SumThread t1 = new SumThread(0, 500);
+		SumThread t2 = new SumThread(501, 1000);
+		
+		t1.start();
+		t2.start();
+
+	}
+
+}
+
+
+=====================
+< dwitt 패키지에 MainEx5 클래스 생성 >
+package kr.co.dwitt;
+
+import com.naver.Sum;
+
+import net.daum.CalThread;
+
+public class MainEx5 {
+
+	public static void main(String[] args) {
+		
+		Sum s = new Sum();
+		
+		CalThread t1 = new CalThread(s, 0, 5000);
+		CalThread t2 = new CalThread(s, 5001, 10000);
+		
+		t1.start();
+		t2.start();
+		
+		try {
+			t1.join();
+			t2.join();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		System.out.println(s.num1);
+	}
+
+}
+
+
+=====================
+< net.daum 패키지에 CalThread 클래스 생성 >
+package net.daum;
+
+import com.naver.Sum;
+
+public class CalThread extends Thread {
+	
+	public Sum s;
+	
+	int start;
+	int end;
+	
+	public CalThread() {
+		// TODO Auto-generated constructor stub
+	}
+
+	public CalThread(Sum s) {
+		
+		this.s = s;
+	}
+		
+	public CalThread(Sum s, int start, int end) {
+		super();
+		this.s = s;
+		this.start = start;
+		this.end = end;
+	}
+
+	@Override
+	public void run() {
+		for(int i=start; i < end+1; i++) {
+			s.plus(i);
+		}
+	}
+
+}
+
+
+=====================
+< com.naver 패키지에 Sum 클래스 생성 >
+package com.naver;
+
+public class Sum {
+	public int num1;	
+	public int num2;	
+	public int num3;
+	
+	Object key1 = new Object();	
+	Object key2 = new Object();
+	
+	public void plus(int i) {
+		
+		synchronized (this) {        // synchronized 동기화 문제해결 키워드
+			num1 += i;       // this 동기화블럭에 들어갈 수 있는 열쇠
+		}
+	}
+	
+	public void plus2(int i) {
+		synchronized (key1) {   // 변수(num2)가 여러개 있으면  갯수만큼 key 객체를 만들어준다
+			num2 += i;
+		}
+	}
+	
+	public void plus3(int i) {
+		synchronized (key2) {
+			num3 += i;
+		}
+	}
+
+}
+
+============================
+< CalendarEx1 프로젝트 생성 >
+< com.naver 패키지에 Test 클래스 생성 >
+package com.naver;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+
+import javax.swing.text.html.HTMLDocument.HTMLReader.CharacterAction;
+
+public class Test {
+	
+	public void me1() {
+		// Calendar클래스 학습
+		// cal
+		Calendar cal = Calendar.getInstance(); // new Calendar(); 이코드는 안된다.
+	}
+	
+	public void me2() {
+		// Calendar클래스 이용해서 cal 객체 생성
+		// sysout까지
+		Calendar cal = Calendar.getInstance();
+		System.out.println(cal);
+	}
+	
+	public void me3() {
+		// Calendar클래스 이용해서 cal 객체 생성
+		Calendar cal = Calendar.getInstance();
+		
+		int year = cal.get(Calendar.YEAR);
+		System.out.println(year);  // 2022
+		
+		// 월 정보 출력하기
+		int month = cal.get(Calendar.MONTH);
+		System.out.println(month+1);  // 11
+		
+		int[] months = {
+				1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12};		
+		System.out.println(months[month]);  // 11
+		
+		int date = cal.get(Calendar.DATE);
+		System.out.println(date);  // 28
+		
+		date = cal.get(Calendar.DAY_OF_MONTH);
+		System.out.println(date);  // 28
+		
+		int day = cal.get(Calendar.DAY_OF_WEEK);
+		System.out.println(day);  // 2
+		
+		int hour = cal.get(Calendar.HOUR);
+		System.out.println(hour);  // 3   12시간으로 했을 때
+		hour = cal.get(Calendar.HOUR_OF_DAY);
+		System.out.println(hour);  // 15  24시간으로했을때
+	}
+	
+	public void me4() {
+		
+		Calendar cal = Calendar.getInstance();
+		Calendar cal2 = (Calendar) cal.clone();  // 처음 날짜 cal꺼 복사하기
+		System.out.println(cal);
+		
+		cal.set(Calendar.YEAR, 2021);
+		//System.out.println(cal);   // 년도, 월, 날짜 하나하나 set으로 바꿔줘야한다.
+		
+		cal.set(Calendar.MONTH, 9);
+		System.out.println(cal);
+		
+		cal.clear();   // 전체 초기화 시키기
+		System.out.println(cal);
+		
+		System.out.println(cal2);  // cal초기화 된걸 cal2 값을 대입을 받아 처음날짜로 바꿔준다
+		cal = cal2; 
+	}
+	
+	public void me5() {
+		Calendar cal = Calendar.getInstance();
+		Calendar cal2 = (Calendar) cal.clone();
+		System.out.println(cal);
+		
+		cal.add(Calendar.DAY_OF_MONTH, 3);  // add 날짜더하기
+		System.out.println(cal);
+		
+		cal = cal2;
+	}
+	
+	public void me6() {
+		Calendar cal = Calendar.getInstance();
+		Calendar cal2 = (Calendar) cal.clone();
+		
+		System.out.println(cal);
+		cal.roll(Calendar.DAY_OF_MONTH, 3);
+		System.out.println(cal);
+		
+		cal = cal2;
+	}
+	
+	public void me7() {
+		//Calendar -> Date 로
+		//Date -> Calendar 로
+		
+		Date date = new Date();
+		System.out.println(date);
+	}
+	
+	public void me8() {
+		//Calendar -> Date 로
+		Calendar cal = Calendar.getInstance();
+		Date date1 = cal.getTime();		
+		System.out.println(date1);
+	}
+	
+	public void me9() {
+		//Date -> Calendar 로
+		Calendar cal = Calendar.getInstance();
+		Calendar cal2 = (Calendar) cal.clone();
+		
+		Date date1 = new Date(0);
+		System.out.println(date1);
+		
+		cal.setTime(date1);
+		
+		System.out.println(cal.get(Calendar.YEAR));
+		
+		cal = cal2;
+		
+	}
+	
+	public void me10() {
+		Date date1 = new Date();
+		
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd a HH"); 
+		String str_date = sdf.format(date1);
+		System.out.println(str_date);  // 2022-11-28 오후 16  16은 24시간 기준 시간을 나타냄 오후4시
+	}                                  // 오전 오후는 a, 초는 ss, 분은 mm
+	
+	public void me11() throws Exception {
+		// 문자열 -> Date -> Calendar
+		String msg = "2022-10-10";
+		System.out.println(msg); // 2022-10-10
+		
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+		Date date1 = sdf.parse(msg);  // parse 문자열을 해석하는 역할을 수행한다고 예측이 가능
+		System.out.println(date1);   // Mon Oct 10 00:00:00 KST 2022
+		
+	}
+
+	public void me11() throws Exception {
+		// 문자열 -> Date -> Calendar
+		String msg = "2022-10-10";
+		System.out.println(msg); // 2022-10-10
+		
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+		Date date1 = sdf.parse(msg);  // parse 문자열을 해석하는 역할을 수행한다고 예측이 가능
+		System.out.println(date1);   // Mon Oct 10 00:00:00 KST 2022
+		
+	}
+	
+
+}
+
+
+==========================
+< dwitt 패키지에 MainEx 클래스 생성 >
+package kr.co.dwitt;
+
+import com.naver.Test;
+
+public class MainEx {
+
+	public static void main(String[] args) throws Exception {
+		Test t = new Test();
+		//t.me2();
+		// time=1669614511710
+		// zone=sun.util.calendar.ZoneInfo
+		// [id="Asia/Seoul",offset=32400000,dstSavings=0,useDaylight=false,transitions=30,lastRule=null]
+		// YEAR=2022,
+		// MONTH=10,
+		// DATE=28	
+		// DAY_OF_WEEK=2
+		// DAY=2
+		// HOUR=2,
+		// HOUR_OF_DAY=14,
+		// MINUTE=47
+		// MINUTE=48,SECOND=31,MILLISECOND=710,ZONE_OFFSET=32400000,DST_OFFSET=0]
+		
+		//t.me3();
+		//t.me4();
+		//t.me10();
+		t.me11();
+
+	}
+
+}
+
+
+
+
+
+
+
+
