@@ -1,0 +1,764 @@
+< ThreadEx1 프로젝트 이어서 >
+< dwitt 패키지에 MainEx6 클래스 생성 >
+package kr.co.dwitt;
+
+import com.naver.TurtleThread;
+
+public class MainEx6 {
+
+	public static void main(String[] args) {
+		// 대몬스레드: 메인스레드가 dead가 되면, 해당 스레드도 dead가 되는 스레드
+		
+		Thread t1 = new TurtleThread();
+		t1.start();
+		
+		for(int i=0; i<100; i++) {
+			System.out.println("main: "+i);
+		}
+
+	}
+
+}
+
+===============================
+< com.naver 패키지에 TurtleThread 클래스 생성 >
+package com.naver;
+
+public class TurtleThread extends Thread {
+
+	@Override
+	public void run() {
+		for(int i=0; i<100; i++) {
+			System.out.println(i);
+			
+			try {
+				Thread.sleep(1000);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+	}	
+}
+
+
+===============================
+< dwitt 패키지에 MainEx7 클래스 생성 >
+package kr.co.dwitt;
+
+import com.naver.TurtleThread;
+
+public class MainEx7 {
+	
+	public static void main(String[] args) {
+		// 대몬스레드: 메인스레드가 dead가 되면, 해당 스레드도 dead가 되는 스레드
+		
+		Thread t2 = new TurtleThread();
+		t2.setDaemon(true);  // 대몬스레드가 되어짐 setDaemon, start하고 순서가 바뀌면 안된다
+		t2.start();
+		
+		for(int i=0; i<100; i++) {
+			System.out.println("main: "+i);
+		}
+		
+	}
+
+}
+
+
+================================
+writer 스레드가 먼저 러닝이 되면,
+reader 스레드가 러닝이 되면서, "글을 올렸습니다. 재밌게 보세요"가 콘솔에 출력이 됩니다
+
+그런데
+reader 스레드가 먼저 러닝이 되면,
+콘솔에 null이 출력이 됩니다.
+
+< ThreadEx2 프로젝트 생성 >
+< dwitt 패키지에 MainEx 클래스 생성 >
+package kr.co.dwitt;
+
+import com.naver.Board;
+
+import net.daum.ReaderThread;
+import net.daum.WriterThread;
+
+public class MainEx {
+
+	public static void main(String[] args) {
+		// 접근순서에 의한 스레드 동기화..
+		// 스레드 동기화 syncronized
+		// 홍길동, 김유신
+		// 홍길동이 김유신한테 돈을 빌려달라고 했어요.
+		// 김유신이 빌려준다고 했습니다.
+		// 홍길동이 계좌에 접속을 합니다.
+		// 아직 김유신은 돈을 안 보냈습니다.
+		// 홍길동 계좌에 돈이 안 들어와 있겠죠. 그러면 스레드는 종료
+		// 김유신이 지금 돈을 보냅니다... 그러면서 김유신의 스레드도 종료
+		// 이런 문제점을 해결하기 위해서, 접근순서에 의한 스레드 동기화가 필요합니다.
+		// 홍길동 스레드가 먼저 running됨, 그런데 아직 김유신 스레드가 돈을 안 보냈어.
+		// 홍길동 스레드는 대기상태로 빠짐...(blocked상태 X, 대기상태)
+		// 김유신 스레드가 돈을 보냅니다. 대기상태에 있는 스레드들을 깨우는 작업을 합니다. notify()메서드 호출
+		// 대기상태에 있는 홍길동 스레드가 깨어나고, 작업을 이어서 합니다.
+		
+		Board board = new Board();
+		
+		ReaderThread rt = new ReaderThread(board);
+		Thread wt = new WriterThread(board);
+		
+		rt.start();
+		
+		wt.start();
+
+	}
+
+}
+
+
+===============================
+< com.naver 패키지에 Board 클래스 생성 >
+package com.naver;
+
+public class Board {
+	
+	public String post;
+	boolean isOk; // false 상태임
+	
+	public Board() {}
+
+	public Board(String post) {
+		super();
+		this.post = post;
+	}
+
+	public String getPost() {
+		if(!isOk) { 
+			synchronized (this) {
+				try {
+					wait();
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+			
+		}
+		
+		return post;
+	}
+
+	public void setPost(String post) {
+		this.post = post;
+		isOk = true; //라이트스레드가 먼저 접근했을 때
+		
+		synchronized (this) {
+			notifyAll();
+		}
+	}
+
+}
+
+
+
+===============================
+< net.daum 패키지에 ReaderThread 클래스 생성 >
+package net.daum;
+
+import com.naver.Board;
+
+public class ReaderThread extends Thread {
+	
+	public Board board;
+	
+	public ReaderThread() {
+		// TODO Auto-generated constructor stub
+	}
+
+	public ReaderThread(Board board) {
+		super();
+		this.board = board;
+	}
+
+	@Override
+	public void run() {
+		
+		String post = board.getPost();
+		System.out.println(post);
+	}
+}
+
+
+
+
+===============================
+< net.daum 패키지에 WriterThread 클래스 생성 >
+package net.daum;
+
+import com.naver.Board;
+
+public class WriterThread extends Thread {
+	
+	public Board board;
+	
+	public WriterThread() {
+		// TODO Auto-generated constructor stub
+	}
+	
+	public WriterThread(Board board) {
+		super();
+		this.board = board;
+	}
+
+	@Override
+	public void run() {
+		board.setPost("지금 글을 등록했습니다. 재밌게 보세요");
+	}
+}
+
+
+===============================
+< dwitt 패키지에 MainEx2 클래스 생성 >
+package kr.co.dwitt;
+
+import com.naver.Account;
+
+import net.daum.HongThread;
+import net.daum.KimThread;
+
+public class MainEx2 {
+
+	public static void main(String[] args) {
+		// 김유신 스레드가 account에 돈을 1만원 입금하고,
+		// 홍길동 스레드에서는 account에 있는 잔액을 콘솔창에 출력하도록 해주세요
+		// 반드시 홍길동 스레가 실행되면 콘솔에 1만원이 출력되어야 함
+		
+		Account account = new Account();
+		
+		HongThread ht = new HongThread(account);
+		Thread kt = new KimThread(account);
+		
+		ht.start();
+		kt.start();
+
+	}
+
+}
+
+
+===============================
+< com.naver 패키지에 Account 클래스 생성 >
+package com.naver;
+
+public class Account {
+	private long balance;
+	private boolean isOk;
+	
+	public Account() {}
+
+	public Account(long balance) {
+		super();
+		this.balance = balance;
+	}
+
+	public long getBalance() {
+		if(!isOk) {
+			synchronized (this) {
+				try {
+					wait();
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		}
+		
+		return balance;
+	}
+
+	public void setBalance(long balance) {
+		this.balance = balance;
+		isOk = true;
+		
+		synchronized (this) {
+			notifyAll();
+		}
+	}
+
+}
+
+===============================
+< net.daum 패키지에 HongThread 클래스 생성 >
+package net.daum;
+
+import com.naver.Account;
+
+public class HongThread extends Thread {
+	
+	private Account account;
+	
+	public HongThread() {
+		// TODO Auto-generated constructor stub
+	}
+
+	public HongThread(Account account) {
+		super();
+		this.account = account;
+	}
+
+	@Override
+	public void run() {
+		long balance = account.getBalance();
+		System.out.println(balance);
+	}
+
+}
+
+
+===============================
+< net.daum 패키지에 KimThread 클래스 생성 >
+package net.daum;
+
+import com.naver.Account;
+
+public class KimThread extends Thread {
+	
+	private Account account;
+	
+	public KimThread() {
+		// TODO Auto-generated constructor stub
+	}
+
+	public KimThread(Account account) {
+		super();
+		this.account = account;
+	}
+
+	@Override
+	public void run() {
+		account.setBalance(10000);
+	}
+
+}
+
+==============================
+Input/Output 학습
+줄여서 I/O 학습
+
+프로그래밍의 기준은? 왼쪽
+
+<자바 프로그램>                                                   <장치>
+                                       Input
+                                <-----------------------------                                             
+                                                                             
+
+
+
+
+		          ------------------------------>
+                                        Output                                   
+
+자바 프로그램
+장치(파일, 메모리, 네트워크, 프린터, 스캐너, 키보드, ...)
+
+화살표(스트림): 스트림을 통해서 데이터가 이동함... 이 스트림이 없으면 데이터 이동 안됨
+                    스트림은 클래스로 구현되어 있음.
+	       
+1. 용도에 따른 스트림 분류
+ - input: 장치에서 데이터를 자바 프로그램으로 보낼 때 사용하는 스트림 
+ - output: 자바 프로그램에서 데이터를 장치로 보낼 때 사용하는 스트림
+
+2. 전송되는 데이터의 크기에 따른 스트림 분류
+ - 바이트스트림: 1 바이트씩 전송, ~stream 으로 끝난다
+ - inputStream, FileOutputStream, BufferedlnputStream -바이트스트림이다
+ - 문자스트림: 2 바이트씩 전송, ~er 로 끝난다
+ - PrintWriter, InputStreamReader - 문자스트림
+
+3. 특별한 기능이 있는 스트림인지 여부에 따른 분류
+ = 장치와 연결이 불가능한 스트림인지 여부에 따른 분류
+ - 노드스트림: 특별한 기능이 없음. 장치와 연결이 가능... 노드는 장치라고 생각하면 된다
+ - 필터스트림: 특별한 기능이 있어요. 장치와 연결이 불가능
+
+
+< IOEx1 프로젝트 생성 >
+< dwitt 패키지에 MainEx 클래스 생성 >
+package kr.co.dwitt;
+
+import com.naver.Dog;
+
+public class MainEx {
+
+	public static void main(String[] args) {
+		Dog dog1 = new Dog();
+		dog1.me1();
+		dog1.me2();
+		dog1.me3();
+
+	}
+
+}
+
+
+============================
+< com.naver 패키지에 Dog 클래스 생성 >
+package com.naver;
+
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+
+public class Dog {
+	
+	public void me1() {   // 출력하기
+		OutputStream out = null;
+		
+		try {
+			
+			out = new FileOutputStream("C://a.txt"); // 그림판에서 했던 검정색 화살표가 생성됨
+			
+			out.write('a');   // 메모장에다 출력할 값을 적어준다.
+			out.write('\n');
+			out.write('d');
+					
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				out.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+	
+	public void me2() {  // 읽어오기
+		// C://a.txt 파일에 있는 데이터를 읽어와서 콘솔창에 출력하세요
+		InputStream in = null;
+		
+		try {
+			in = new FileInputStream("C://a.txt");
+			
+			int what = -1;   
+		  //int what = in.read();
+			
+			while((what = in.read()) != -1) { // (what = in.read())이게 what이다
+				
+				System.out.println((char)what);
+			}
+			
+//			while(true) {  //반복문에 if문 있으면 속도가 느려져 위에 코드처럼 짜야한다.
+//				what = in.read();
+//				if(what == -1) {
+//					break;
+//				}
+//				System.out.println((char)what);
+//			}
+//			
+			
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				in.close();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}  
+	}
+	
+	public void me3() {
+		// C://a.txt 파일을 이용해서 파일 복사를 합니다.
+		// 복사본 파일명을 C://b.txt
+		// me1()메서드의 내용과 me2()메서드의 내용을 조합해서 만드세요
+		InputStream in = null;
+		OutputStream out = null;
+		
+		try {
+			
+			in = new FileInputStream("C://a.txt");
+			out = new FileOutputStream("C://b.txt");
+			
+			int what = -1;
+			
+			while((what = in.read()) != -1) {
+				out.write(what);
+			}
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				in.close();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+			try {
+				out.close();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+	}
+
+	public void me4() {
+		// test.jpg 파일을 test2.jpg 파일로 복사하세요
+		// 복사를 완료하는데 걸리는 시간도 측정하세요
+		long a = System.currentTimeMillis();
+		InputStream in = null;
+		OutputStream out = null;
+		
+		try {
+			in = new FileInputStream("C://test.jpg");
+			out = new FileOutputStream("C://test2.jpg");
+			
+			int what = -1;
+			
+			while((what = in.read()) != -1) {
+				out.write(what);
+			}
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				in.close();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+			try {
+				out.close();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		long b = System.currentTimeMillis();
+		System.out.println(b-a);
+		
+	}
+
+	public void me5() {
+		long a = System.currentTimeMillis();
+		
+		InputStream in = null;
+		BufferedInputStream bis = null;  // BufferedInputStream 은 자바프로그램에 가깝기때문에 속도를 빠르게 해준다.
+											
+		OutputStream out = null;
+		BufferedOutputStream bos = null;
+		
+		try {
+			in = new FileInputStream("c://test.jpg");
+			bis = new BufferedInputStream(in);
+			
+			out = new FileOutputStream("c://test3.jpg");
+			bos = new BufferedOutputStream(out);
+			
+			int what = -1;
+			
+			while((what = bis.read()) != -1) {
+
+				bos.write(what);
+			}
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				bis.close();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}  // InputStream / BufferedInputStream 같이 쓰일때는 close 순서가 중요함
+			
+			try {
+				in.close();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+			try {
+				bos.close();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+			try {
+				out.close();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		
+		long b = System.currentTimeMillis();
+		System.out.println(b-a);
+	}
+
+	public void me6() {    // 배열을 이용한 읽고 복사하기
+		long a = System.currentTimeMillis();
+		
+		InputStream in = null;
+		OutputStream out = null;
+		
+		try {
+			in = new FileInputStream("c://test.jpg");
+			out = new FileOutputStream("c://test5.jpg");
+			
+			byte[] arr = new byte[1024];  // 1024값을 높게하면할수록 속도가 빨라짐
+			int len = -1;
+			
+			while((len = in.read(arr)) != -1) {
+				 // len는 몇개 읽어왔는지 알수있다.
+				
+				out.write(arr, 0, len);
+			}						
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				in.close();
+			} catch (IOException e) {				
+				e.printStackTrace();
+			}
+			
+			try {
+				out.close();
+			} catch (IOException e) {			
+				e.printStackTrace();
+			}
+		}
+		
+		long b = System.currentTimeMillis();
+		System.out.println(b-a);
+	}
+
+	public void me7() {
+		long a = System.currentTimeMillis();
+		
+		InputStream in = null;
+		BufferedInputStream bis = null;
+		
+		OutputStream out = null;
+		BufferedOutputStream bos = null;
+	
+		try {
+			
+			in = new FileInputStream("c:"+File.separator+"test.jpg");
+			bis = new BufferedInputStream(in);
+			
+			out = new FileOutputStream("c:"+File.separator+"test7.jpg");
+			bos = new BufferedOutputStream(out);
+			
+			byte[] arr = new byte[1024];
+			int len = -1;
+			
+			while((len = bis.read(arr)) != -1) {
+				out.write(arr, 0, len);
+			}
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				bis.close();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+			try {
+				in.close();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+			try {
+				bos.close();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+			try {
+				out.close();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		
+		long b = System.currentTimeMillis();
+		System.out.println(b-a);
+	}
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
