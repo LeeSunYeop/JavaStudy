@@ -1,0 +1,507 @@
+계정 생성: dw1
+계정, 테이블, 테이블스페이스, 인덱스, 시퀀스, stored procedure, function..
+
+CREATE USER dw1 IDENTIFIED BY dw1;
+
+dw1의 비밀번호를 변경(= 개조)함.
+객체의 정보를 변경할 때는 alter문을 사용함.
+
+계정, 테이블, 테이블스페이스, 인덱스, 시퀀스, 프로시저, 함수, ...
+ALTER USER dw1 IDENTIFIED BY dw2;
+
+drop문
+계정, 테이블, 테이블스페이스, 인덱스, 시퀀스, 프로시저, 함수..
+DROP USER dw1;
+
+TABLE
+테이블 생성
+CREATE TABLE tbl_test(
+id NUMBER(3),    // NUMBER(3) 3자리수를 넣을수 있다 999까지...
+name VARCHAR2(15) //3의 배수넣기, 영어는 15글자, 한글은3글자 넣을수 잇다
+age NUMBER(3)
+);   // 보기편하게 줄바꿈하여 쓴다
+
+===============
+테이블 생성
+tbl_test2
+ssn 문자열이 들어가게 영문5글자까지
+name 문자열이 한글로 5글자까지
+birth 문자열
+
+CREATE TABLE tbl_test2(
+ssn VARCHAR2(5),
+name VARCHAR2(15),
+birth DATE
+);
+
+=============
+각자 알아서 테이블 생성하기
+tbl_test00(
+id NUMBER(3),
+name VARCHAR2(15),
+ename VARCHAR2(5),
+age NUMBER(3),
+birth DATE
+);
+
+============
+테이블 삭제
+DROP TABLE tbl_test;
+DROP TABLE tbl_test2;
+
+======
+CREATE TABLE tbl_member(
+id NUMBER,
+name VARCHAR2(15),
+age NUMBER(3)
+);
+
+
+CRUD작업(입력,조회,삭제)
+CREATE/RETRIEVE/UPDATE/DELETE
+테이블에 데이터를 입력할 때는
+- INSERT문
+INSERT INTO tbl_member 
+(id, name, age)
+VALUES
+(1, 'KIM', 20);
+
+INSERT INTO tbl_member
+(name, age, id)
+VALUES
+('LEE', 11, 2);
+
+INSERT INTO tbl_member
+(age, id)
+VALUES
+(33, 3);
+
+INSERT INTO tbl_member
+(id)
+VALUES
+(4);
+
+id, name, age순으로 데이터를 각자 입력하세요
+INSERT INTO tbl_member
+(id, name, age)
+VALUES
+(5, 'PARK', 27);
+
+INSERT INTO tbl_member
+(id, name, age)
+VALUES
+(6, 'HONG', 28);
+
+INSERT INTO tbl_member
+(id, name, age)
+VALUES
+(7, 'JO', 29);
+
+INSERT INTO tbl_member
+(id, name, age)
+VALUES
+(8, 'WOO', 30);
+
+INSERT INTO tbl_member
+VALUES
+(9, 'jung', 31);
+
+
+
+=========
+INSERT INTO tbl_member 
+VALUES
+(5, 'PARK', 1);   // 이렇게 쓸수도 있다
+
+dw1 계정에 접속하시고
+dw1 계정 상태에서
+1. tbl_member 테이블 생성하고
+CREATE TABLE tbl_member(
+id NUMBER,
+name VARCHAR(15),
+age NUMBER(3)
+);
+
+2. 4개의 레코드를 입력해주세요
+INSERT INTO tbl_member 
+(id, name, age)
+VALUES
+(1, 'KIM', 20);
+
+INSERT INTO tbl_member
+(name, age, id)
+VALUES
+('LEE', 11, 2);
+
+INSERT INTO tbl_member
+(age, id)
+VALUES
+(11, 3);
+
+INSERT INTO tbl_member
+(id)
+VALUES
+(4);
+
+================
+1. INSERT, UPDATE, DELETE문을 작업하면,
+작업이 확정된 상태가 아닙니다
+반드시
+COMMIT을 입력해서 확정을 해야 합니다
+만약 
+취소를 하고 싶다면,
+COMMIT이 아니라 ROLLBACK을 하시면 됩니다
+
+COMMIT을 하지 않고
+EXIT나 QUIT 명령을 이용해서 오라클에서 빠져나오면
+자동 COMMIT이 됩니다
+
+명령프롬프트의 우측 상단의 X(종료)버튼을 클릭하면
+자동으로 ROLLBACK이 됩니다
+
+===============
+2. SELECT문 (조회)
+SELECT * FROM tbl_member;
+조회하시오.
+조회하시오. tbl_member 테이블에서
+조회하시오. tbl_member 테이블에서 모든 레코드를
+조회하시오. tbl_member 테이블에서 모든 레코드를 그리고 그 레코드에 모든 컬럼을
+
+조회하시오. tbl_member 테이블에서 모든 레코드를 그리고 그 레코드에 id 컬럼만..
+SELECT id FROM tbl_member;
+
+조회하시오. tbl_member 테이블에서 모든 레코드를 그리고 그 레코드에 name 컬럼만..
+SELECT name FROM tbl_member;
+
+조회하시오. tbl_member 테이블에서 모든 레코드를 그리고 그 레코드의 id와 age 컬럼만..
+SELECT id, age FROM tbl_member;
+
+조회하시오. tbl_member 테이블에서 id 값이 2보다 큰 레코드만. 그리고 그 레코드의 name 컬럼만..
+=> tbl_member테이블에서 id가 2보다 큰 레코드의 name 컬럼만 조회하시오
+SELECT name FROM tbl_member WHERE id > 2;    -- WHERE절 이라고 한다(조건식) 
+SELECT id, name, age FROM tbl_member WHERE id > 2;
+
+================
+3. UPDATE문
+UPDATE tbl_member SET name = '김', age = 100;
+<해석> 
+업데이트하시오, : UPDATE
+tbl_member테이블의 : tbl_member
+모든 레코드에 대해서 
+name을 '김'으로, age는 100으로 : SET name = '김', age = 100
+
+UPDATE tbl_member SET name = '김', age = 100 WHERE id = 1;
+업데이트하시오, tbl_member테이블의 id가 1인 레코드에 대해서 name을 '김'으로 age는 100으로
+
+id가 1,2,3인 레코드에 대해서 업데이트 작업 하세요.
+UPDATE tbl_member SET name = '우', age = 20 WHERE id = 1;
+UPDATE tbl_member SET name = '영', age = 21 WHERE id = 2;
+UPDATE tbl_member SET name = '우', age = 22 WHERE id = 3;
+
+UPDATE tbl_member SET name = 'choiyoung' WHERE name = NULL;
+==> UPDATE tbl_member SET name = 'choiyoung' WHERE name IS NULL;
+
+age가 NULL인 레코드를 찾아서 원하는 값으로 수정하시오.
+UPDATE tbl_member SET age = 27 WHERE age IS NULL AND id = 4;
+
+WHERE절에 들어가는 연산자
+컬럼이 숫자: > , < , = , !=
+컬럼이 문자: = , !=
+컬럼이 NULL: IS, IS NOT
+AND, OR
+
+---
+뺑소니사건이 발생했는데 목격작 있음.
+번호판 123차1234 
+
+name
+3글자
+1 김유신
+2 이순신
+3 박민영
+4 최민식
+
+UPDATE tbl_member SET name = '김유신' WHERE id = 1;
+UPDATE tbl_member SET name = '이순신' WHERE id = 2;
+UPDATE tbl_member SET name = '박민영' WHERE id = 3;
+UPDATE tbl_member SET name = '최민식' WHERE id = 4;
+COMMIT;
+
+길에서 지인을 만나서
+내일 저녁에 같이 밥을 먹기로 함
+근데 지인의 이름이 기억이 안 남
+지인의 이름이 세 글자라는 것과
+마지막 글자가 '신'이라는 것은 기억함
+
+SELECT * FROM tbl_member WHERE name LIKE '__신';
+
+길에서 지인을 만나서 내일 저녁에 같이 밥을 먹기로 함.
+근데 지인의 이름이 기억이 안 남.
+그 지인은 외국인... 
+기억나는 것은 이름에 '민'이 들어감
+'민'자가 첫 번째에 있는지 마지막 글자인지조차도 모름.
+이런 상황은 어떻게 조회할까?
+SELECT * FROM tbl_member WHERE name LIKE '%민%';
+SELECT * FROM tbl_member WHERE name LIKE '%신%';
+
+값이 완벽하게 일치할 땐 = 쓰고
+값이 NULL일 땐 IS 쓰고
+값을 일부만 알고 있을 땐 LIKE 씀 .. %는 데이터가 얼마나 있는지를 의미함
+
+_(언더바): 모르는 한 글자
+%: 모르는 글자들(0~N개)
+
+= : 데이터를 정확히 알고 있을 때
+IS : 데이터가 NULL일 때
+LIKE: 데이터에 '_'나 '%'가 들어가 있을 때
+
+===================================
+4. DELETE문
+DELETE FROM tbl_member;  --> 전부 삭제됨
+
+삭제하세요, tbl_member테이블에서 id가 3인 레코드를..
+DELETE FROM tbl_member WHERE id = 3;
+
+삭제하세요, tbl_member테이블에서 age가 50보다 큰 레코드를..
+DELETE FROM tbl_member WHERE age > 50;
+
+삭제하세요, tbl_member 테이블에서 id가 NULL인 레코드를..
+DELETE FROM tbl_member WHERE id IS NULL;
+
+=============
+id는 중복되면 안 됩니다.
+회원가입할 때, id 중복검사를 하죠...
+
+INSERT INTO tbl_member
+(id, name, age)
+VALUES
+(1, '김유신', 33);
+COMMIT;
+
+id가 1이고, age가 33인 레코드를 삭제하고
+commit까지..
+DELETE FROM tbl_member WHERE id = 1 AND age = 33;
+COMMIT;
+
+===제약조건===
+기본키만 학습
+기본키 = 주키 = primary key = pk
+
+- 후보키: 기본키가 될 수 있는 모든 컬럼...
+- 기본키: 특정 레코드를 지목할 수 있는 키..
+ - 중복을 막아줌
+ - NULL을 허용하지 않음.
+
+1. 이미 만들어진 테이블에 기본키 제약조건을 추가하기
+ALTER TABLE tbl_member ADD CONSTRAINT pk_member_id PRIMARY KEY(id);
+// 중복된 값이 있으면 안된다.
+
+ALTER TABLE tbl_member DROP CONSTRAINT pk_member_id; --삭제
+
+
+2. 테이블을 생성하면서 기본키 제약조건을 설정하기
+CREATE TABLE tbl_test1(
+id NUMBER PRIMARY KEY,   // 제약조건을 걸면 id를 삭제를 할 수 없다
+name VARCHAR2(15)
+);
+
+
+3. 테이블을 생성하면서 기본키 제약조건에 이름을 설정하고 제약조건을 설정하기.
+CREATE TABLE tbl_test1(
+id NUMBER,
+name VARCHAR2(15),
+CONSTRAINT pk_test1_id PRIMARY KEY(id)
+);
+
+
+======================
+D:\oraclexe\app\oracle\product\11.2.0\server\jdbc\lib
+ojdbc6.jar 복사
+
+C:\Program Files\ojdkbuild\java-1.8.0-openjdk-1.8.0.332-1\jre\lib\ext
+붙여넣기
+
+자바이클립스 열고
+< OjdbcTest 프로젝트 생성 >
+< dwitt 패키지에 MainEx 클래스 생성 >
+package kr.co.dwitt;
+
+public class MainEx {
+
+	public static void main(String[] args) {
+		try {
+			Class.forName("oracle.jdbc.OracleDriver");
+			System.out.println("드라이버 로딩 성공");
+		} catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+	}
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
