@@ -1,0 +1,624 @@
+1. MemberDTO클래스 생성
+- id, name, age
+
+2. MemberDAO클래스 생성
+- 상수
+- 디폴트 생성자
+- close( )메서드
+
+3. Command 인터페이스 생성
+
+4. InsertCommand 클래스 생성
+
+5. MemberDAO클래스의 insert( )메서드를 생성
+
+6. SelectCommand 클래스 생성
+
+7. MemberDAO클래스의 select( )메서드를 생성
+
+=============
+- 이클립스에서 DB 작업할 수 있도록 설정
+이클립스 메뉴 중 window - show view - other - Data Management - Data Source Explorer
+
+- 외래키 학습
+ - 자식 테이블의 컬럼 값으로 부모 테이블의 기본키의 값을 입력해야 하는 컬럼.
+ - 부모테이블의 기본키 값이 범주형 데이터가 되고
+ - 자식 테이블에서는 부모테이블의 기본키 값중 하나를 입력합니다.
+   - NULL을 입력함.
+
+자식 테이블에게 외래키 제약조건을 넣으면,
+해당 컬럼은 범주형 데이터만을 넣습니다.
+범주형 데이터는 부모테이블이 갖고 있는 기본키 값들 중 하나이거나 NULL임.
+
+부모테이블에 있는 레코드를 삭제할 때,
+만약 자식 테이블에서 해당 레코드의 기본키 값을 사용하고 있다면 삭제가 안 됨.
+삭제하는 방법은 
+자식 테이블의 해당 값을 변경하거나 자식 테이블의 해당 레코드를 삭제한 후
+부모테이블의 레코드를 삭제하면 됨
+그러나 위 방법은 너무 번잡함.
+그래서
+자식 테이블의 외래키 제약 조건을 설정할 때,
+ON DELETE CASCADE(자식 테이블의 레코드를 삭제) 옵션을 추가하거나
+ON DELETE SET NULL(자식 테이블의 해당 컬럼값을 NULL로 설정) 옵션을 추가한다.
+
+- 트랜잭션 학습
+ - 트랜잭션 상황
+ - 하나의 사건에 대해 여러 개의 cud(insert, update, delete) 작업이 수반되는 상황
+
+- cmd에서 트랜잭션 구현 실습
+ - dep1의 레코드를 삭제하는 사건에 대해서
+  - emp의 레코드를 삭제하고 그런 후에 dep1의 해당 레코드를 삭제.
+   - DELETE FROM tbl_emp WHERE did = 1;
+   - SELECT * FROM tbl_emp;
+  - dep1의 레코드 삭제 작업을 실패
+   - DELETE FROM tbl_dep WHEEE did = 1;
+  - ROLLBACK을 함
+  - SELECT * FROM tbl_emp;
+
+ - dep1의 레코드를 삭제하는 사건에 대해서
+  - emp의 레코드를 삭제하고 그런 후에 dep1의 해당 레코드를 삭제.
+   - DELETE FROM tbl_emp WHERE did = 1;
+   - SELECT * FROM tbl_emp;
+  - dep1의 레코드 삭제 작업을 실패
+   - DELETE FROM tbl_dep1 WHERE did = 1;
+  - COMMIT; 을 함
+  - SELECT * FROM tbl_emp;
+
+- jdbc를 이용해서 트랜잭션 구현 실습
+ - Connection 생성 후에 바로 conn.setAutoCommit(false);로 설정
+ - int result1 과 int result2 변수를 선언하고
+ - 각각의 pstmt.executeUpdate( )메서드의 결과값을 대입받로록 한다.
+ - int result에 result1 과 result2의 곱의 결과를 대입한다.// result1과 result2가 둘 다 1일 때만 result 값이 1이 됨.
+ - finally{ } 구문의 첫 줄에
+   if(result > 0){
+	conn.commit( );
+   } else {
+	conn.rollback( );
+   }
+
+
+================
+실행시키려면 한문장씩 블록 지정해서 우클릭 알트+x 한다 그럼 콘솔창에 result1 결과를 볼수 잇다.
+
+SELECT * FROM tbl_member 
+SELECT name, id, age FROM tbl_member
+
+INSERT INTO tbl_member VALUES (6, '신돌석', 49)
+
+UPDATE tbl_member SET age = 100 WHERE id = 1
+
+부모테이블 생성
+
+CREATE TABLE tbl_dep1(
+did NUMBER,
+dname VARCHAR2(36),
+CONSTRAINT pk_dep1_did PRIMARY KEY(did)
+)
+
+INSERT INTO tbl_dep1 (did, dname) VALUES (1, '인사팀')
+INSERT INTO tbl_dep1 (did, dname) VALUES (2, '영업팀')
+
+COMMIT
+
+SELECT * FROM tbl_dep1
+
+자식 테이블 생성 & 외래 설정
+
+CREATE TABLE tbl_emp(
+eid NUMBER,
+ename VARCHAR2(15),
+did NUMBER
+)
+
+ALTER TABLE tbl_emp ADD CONSTRAINT fk_emp_did FOREIGN KEY(did) REFERENCES tbl_dep1(did)
+
+INSERT INTO tbl_emp (eid, ename, did) VALUES (1, '홍길동', 10)
+DELETE FROM tbl_emp
+INSERT INTO tbl_emp (eid, ename, did) VALUES (2, '김유신', 1)
+INSERT INTO tbl_emp (eid, ename, did) VALUES (3, '이순신', 1)
+INSERT INTO tbl_emp (eid, ename, did) VALUES (4, '박민영', 2)
+INSERT INTO tbl_emp (eid, ename, did) VALUES (5, '최민용', NULL)
+
+SELECT * FROM tbl_emp
+
+DELETE FROM tbl_dep1 WHERE did = 1 
+지우려고 했는데 자식테이블에서 사용하고 있어서 지울 수 없다고 에러메시지가 뜸
+
+UPDATE tbl_emp SET did = NULL WHERE eid = 4
+DELETE FROM tbl_dep1 WHERE did = 2 
+SELECT * FROM tbl_dep1
+결과를 보면 영업팀이 삭제 된 걸 볼수 있다.
+
+제약조건 삭제하기
+ALTER TABLE tbl_emp DROP CONSTRAINT fk_emp_did
+
+한꺼번에 삭제하기
+부모테이블의 특정 기본키 값이 삭제되면, 그 값을 참조하는 자식 테이블의 레코드도 삭제된다.
+ALTER TABLE tbl_emp ADD CONSTRAINT fk_emp_did FOREIGN KEY(did) REFERENCES tbl_dep1(did) ON DELETE CASCADE 
+
+DELETE FROM tbl_dep1 WHERE did = 1
+SELECT * FROM tbl_dep1
+SELECT * FROM tbl_emp
+
+ALTER TABLE tbl_emp ADD CONSTRAINT fk_emp_did FOREIGN KEY(did) 
+REFERENCES tbl_dep1(did) ON DELETE CASCADE SET NULL
+1이라는 did 키가 삭제되면서 null 값이 대신 들어간다.
+
+트랜잭션 학습
+1. 트랜잭션 학습을 위해서 dep1 테이블의 외래키 제약조건을 삭제하세요
+ALTER TABLE tbl_emp DROP CONSTRAINT fk_emp_did
+
+2. dep1에 데이터를 입력합니다.
+INSERT INTO tbl_dep1 (did, dname) VALUES (1, '인사팀')
+INSERT INTO tbl_dep1 (did, dname) VALUES (2, '영업팀')
+
+3. emp에 데이터를 추가합니다.
+INSERT INTO tbl_emp (eid, ename, did) VALUES (2, '김유신', 1)
+INSERT INTO tbl_emp (eid, ename, did) VALUES (3, '이순신', 2)
+
+4. dep1과 emp 조회
+SELECT * FROM tbl_dep1
+SELECT * FROM tbl_emp
+
+5. emp 테이블에 외래키 제약조건을 설정할 겁니다. 그런데 ON DELETE ~ 옵션을 안 넣습니다.
+ALTER TABLE tbl_emp ADD CONSTRAINT fk_emp_did FOREIGN KEY(did) REFERENCES tb1_dep1(did)
+
+6. dep1 테이블의 인사팀 레코드를 삭제할 겁니다. 삭제가 될까요?, 안 될까요? 참조무결성제약조건 위반으로 삭제가 안 됨.
+DELETE FROM tbl_dep1 WHERE did = 1
+
+7. emp 테이블의 레코드 중에서 did 값이 1인 레코드를 찾아서 해당 레코드를 삭제함. 그런 후에 dep1 테이블의 인사팀 레코드를 삭제함.
+   이것은 여기에서 하지 않습니다. cmd창에서 합니다. 왜냐하면 이클립스의 db 작업 화면은 auto commit이기 때문이다..
+
+8. 트랜잭션 학습이 끝났으니 dep1 테이블의 외래키 제약조건을 삭제하고, ON DELETE ~ 옵션을 추가하여 새로 추가
+- ALTER TABLE tbl_emp DROP CONSTRAINT fk_emp_did
+- ALTER TABLE tbl_emp ADD CONSTRAINT fk_emp_did FOREIGN KEY(did)
+  REFERENCES tb1_dep1(did) ON DELETE SET Null
+
+
+====================
+< SetAutoCommitFalse 프로젝트 생성 >
+< dwitt 패키지에 MainEx 클래스 생성 >
+package kr.co.dwitt;
+
+public class MainEx {
+
+	public static void main(String[] args) {
+		
+		DepDAO dao = new DepDAO();
+		
+ 		int result = dao.delete2(2);
+ 		if (result > 0) {
+			System.out.println("삭제 성공");
+		} else {
+			System.out.println("삭제 실패");
+		}
+
+	}
+
+}
+
+=======================
+< dwitt 패키지에 DepDAO 클래스 생성 >
+package kr.co.dwitt;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
+public class DepDAO {
+	
+	private static final String DRIVER = "oracle.jdbc.OracleDriver";
+	private static final String URL = "jdbc:oracle:thin:@localhost:1521:xe";
+	private static final String USERNAME = "dw1";
+	private static final String PASSWORD = "dw1";
+	
+	public DepDAO() {
+		try {
+			Class.forName(DepDAO.DRIVER);
+			System.out.println("드라이버 로딩 성공");
+		} catch (ClassNotFoundException e) {
+			
+			e.printStackTrace();
+		}
+	}
+	
+	private void closeAll(ResultSet rs, PreparedStatement pstmt, Connection conn) {
+		if (rs != null) {
+			try {
+				rs.close();
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		
+		if (pstmt != null) {
+			try {
+				pstmt.close();
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		
+		if (conn != null) {
+			try {
+				conn.close();
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+	}
+	
+	public int delete(int did) {
+		int result = -1;
+		
+		Connection conn = null;
+		PreparedStatement pstmt = null;
+		String sql = "DELETE FROM tbl_dep1 WHERE did = ?";
+		
+		try {
+			conn = DriverManager.getConnection(
+					DepDAO.URL, DepDAO.USERNAME, DepDAO.PASSWORD);
+			pstmt = conn.prepareStatement(sql);
+			pstmt.setInt(1, did);
+			
+			result = pstmt.executeUpdate();
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			closeAll(null, pstmt, conn);
+		}
+		
+		return result;
+	}
+	
+	public int delete2(int did) {
+		int result = -1;
+		int result1 = -1;
+		int result2 = -1;
+		
+		Connection conn = null;
+		PreparedStatement pstmt = null;
+		String sql = "DELETE FROM tbl_dep1 WHERE did = ?";
+		String sql2 = "DELETE FROM tbl_emp WHERE did = ?";
+		
+		try {
+			conn = DriverManager.getConnection(
+					DepDAO.URL, DepDAO.USERNAME, DepDAO.PASSWORD);
+			conn.setAutoCommit(false);
+			
+			pstmt = conn.prepareStatement(sql2);
+			pstmt.setInt(1, did);
+			
+			result1 = pstmt.executeUpdate();
+			
+			pstmt.close();
+			
+			
+			pstmt = conn.prepareStatement(sql);
+			pstmt.setInt(1, did);
+			
+			result2 = pstmt.executeUpdate();
+			
+			result = result1 * result2;
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			if (result > 0) {
+				try {
+					conn.commit();
+				} catch (SQLException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			} else {
+				try {
+					conn.rollback();
+				} catch (SQLException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+			
+			closeAll(null, pstmt, conn);
+		}
+		
+		return result;
+	}
+	
+	public int delete3(int did) {
+		int result = -1;
+		int result1 = -1;
+		int result2 = -1;
+		
+		Connection conn = null;
+		PreparedStatement pstmt = null;
+		String sql = "DELETE FROM tbl_dep1 WHERE did = ?";
+		//String sql2 = "DELETE FROM tbl_emp WHERE did = ?";
+		
+		try {
+			conn = DriverManager.getConnection(
+					DepDAO.URL, DepDAO.USERNAME, DepDAO.PASSWORD);
+			
+			conn.setAutoCommit(false);
+			
+  			result1 = delte_emp(conn, did); // delte_emp 아래쪽에 메서드 코드 잇음
+ 		           // result1 = pstmt.executeUpdate(); 이건데
+ 			// pstmt.executeUpdate();을 또 쓰는걸 방지하기 위해서 
+ 			// sql2를 따로 메서드로 만들어서 문장을 간결하게 만들어준다.
+			
+			pstmt = conn.prepareStatement(sql);
+			pstmt.setInt(1, did);
+			
+			result2 = pstmt.executeUpdate();
+			
+			result = result1 * result2;
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			if (result > 0) {
+				try {
+					conn.commit();
+				} catch (SQLException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			} else {
+				try {
+					conn.rollback();
+				} catch (SQLException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+			
+			closeAll(null, pstmt, conn);
+		}
+		
+		return result;
+	}
+
+	private int delte_emp(Connection conn, int did) {
+		int result1 = -1;
+		
+		PreparedStatement pstmt = null;
+		String sql2 = "DELETE FROM tbl_emp WHERE did = ?";
+		
+		try {
+			pstmt = conn.prepareStatement(sql2);
+			pstmt.setInt(1, did);
+			
+			result1 = pstmt.executeUpdate();
+			
+		} catch (Exception e) {
+			e.printStackTrace(); 
+		} finally {
+			closeAll(null, pstmt, null);
+		}
+		
+		return result1;
+	}
+
+}
+
+=================================
+< dwitt 패키지에 DepDAO 클래스 생성 >
+에서 중복된 코드를 메서드로 따로 빼어 만들고 간결하게 만들기
+package kr.co.dwitt;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
+public class DepDAO {
+	
+	private static final String DRIVER = "oracle.jdbc.OracleDriver";
+	private static final String URL = "jdbc:oracle:thin:@localhost:1521:xe";
+	private static final String USERNAME = "dw1";
+	private static final String PASSWORD = "dw1";
+	
+	public DepDAO() {
+		try {
+			Class.forName(DepDAO.DRIVER);
+			System.out.println("드라이버 로딩 성공");
+		} catch (ClassNotFoundException e) {
+			
+			e.printStackTrace();
+		}
+	}
+	
+	private void commitOrRollback(int result, Connection conn) {============================
+		if (result > 0) {
+			try {
+				conn.commit();
+			} catch (SQLException e) {				
+				e.printStackTrace();
+			}
+		} else {
+			try {
+				conn.rollback();
+			} catch (SQLException e) {				
+				e.printStackTrace();
+			}
+		}                                                            중복을 따로 빼서 메서드로 만든다.
+	}===================================================================
+	
+	private void closeAll(ResultSet rs, PreparedStatement pstmt, Connection conn) {
+		if (rs != null) {
+			try {
+				rs.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+		
+		if (pstmt != null) {
+			try {
+				pstmt.close();
+			} catch (SQLException e) {				
+				e.printStackTrace();
+			}
+		}
+		
+		if (conn != null) {
+			try {
+				conn.close();
+			} catch (SQLException e) {				
+				e.printStackTrace();
+			}
+		}
+	}
+	
+	public int delete(int did) {
+		int result = -1;
+		
+		Connection conn = null;
+		PreparedStatement pstmt = null;
+		String sql = "DELETE FROM tbl_dep1 WHERE did = ?";
+		
+		try {
+			conn = DriverManager.getConnection(
+					DepDAO.URL, DepDAO.USERNAME, DepDAO.PASSWORD);
+			pstmt = conn.prepareStatement(sql);
+			pstmt.setInt(1, did);
+			
+			result = pstmt.executeUpdate();
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			closeAll(null, pstmt, conn);
+		}
+		
+		return result;
+	}
+	
+	public int delete2(int did) {
+		int result = -1;
+		int result1 = -1;
+		int result2 = -1;
+		
+		Connection conn = null;
+		PreparedStatement pstmt = null;
+		String sql = "DELETE FROM tbl_dep1 WHERE did = ?";
+		String sql2 = "DELETE FROM tbl_emp WHERE did = ?";
+		
+		try {
+			conn = DriverManager.getConnection(
+					DepDAO.URL, DepDAO.USERNAME, DepDAO.PASSWORD);
+			conn.setAutoCommit(false);=======================
+			
+			pstmt = conn.prepareStatement(sql2);
+			pstmt.setInt(1, did);
+			
+			result1 = pstmt.executeUpdate();
+			
+			pstmt.close();
+			
+			
+			pstmt = conn.prepareStatement(sql);
+			pstmt.setInt(1, did);
+			
+			result2 = pstmt.executeUpdate();
+			
+			result = result1 * result2;
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			
+			commitOrRollback(result, conn);=========== 메서드로 따로 만들어 한문장으로 간결하게 만듬
+			
+			closeAll(null, pstmt, conn);
+		}
+		
+		return result;
+	}
+	
+	public int delete3(int did) {
+		int result = -1;
+		int result1 = -1;
+		int result2 = -1;
+		
+		Connection conn = null;
+		PreparedStatement pstmt = null;
+		String sql = "DELETE FROM tbl_dep1 WHERE did = ?";
+		//String sql2 = "DELETE FROM tbl_emp WHERE did = ?";
+		
+		try {
+			conn = DriverManager.getConnection(
+					DepDAO.URL, DepDAO.USERNAME, DepDAO.PASSWORD);
+			
+			conn.setAutoCommit(false);
+			
+ 			result1 = delte_emp(conn, did); // delte_emp 아래쪽에 메서드 코드 잇음
+ 		            // result1 = pstmt.executeUpdate(); 이건데
+ 			// pstmt.executeUpdate();을 또 쓰는걸 방지하기 위해서 
+ 			// sql2를 따로 메서드로 만들어서 문장을 간결하게 만들어준다.
+ 			
+			pstmt = conn.prepareStatement(sql);
+			pstmt.setInt(1, did);
+			
+			result2 = pstmt.executeUpdate();
+			
+			result = result1 * result2;
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			
+			commitOrRollback(result, conn);
+			
+			closeAll(null, pstmt, conn);
+		}
+		
+		return result;
+	}
+
+	private int delte_emp(Connection conn, int did) {
+		int result1 = -1;
+		
+		PreparedStatement pstmt = null;
+		String sql2 = "DELETE FROM tbl_emp WHERE did = ?";
+		
+		try {
+			pstmt = conn.prepareStatement(sql2);
+			pstmt.setInt(1, did);
+			
+			result1 = pstmt.executeUpdate();
+			
+		} catch (Exception e) {
+			e.printStackTrace(); 
+		} finally {
+			closeAll(null, pstmt, null);
+		}
+		
+		return result1;
+	}
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
