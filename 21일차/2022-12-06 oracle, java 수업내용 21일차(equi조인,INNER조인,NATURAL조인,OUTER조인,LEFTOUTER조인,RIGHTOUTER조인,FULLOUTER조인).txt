@@ -1,0 +1,167 @@
+A조 벨기에(로베르토 마르티네스), 캐나다(존 허드먼), 모로코(왈리드 레그라귀), 크로아티아(즐라트코 다리치)
+B조 브라질(치치), 세르비아(드라간 스토이코비치), 스위스(무라트 야킨), 카메룬(리고베르 송)
+
+C조 포르투칼(페르난두 산투스), 가나(찰스 아코너), 우루과이(디에고 알론소), 대한민국(파울루 벤투)
+D조 카타르(펠릭스 산체스), 에콰도르(구스타보 알파로), 세네갈(알리우 시세), 네덜란드(루이 판 할)
+
+조별: group  gname
+국가: country  ctyname
+축구감독: Head coach  hcname
+
+팀 프로젝트
+- 주제를 선정하고
+- 인터페이스를 둘이 같이 만들어요.
+- Command 클래스와 DAO클래스를 각자 만든 후 교환
+- 그런 후 main( )메서드 코딩
+
+
+부모테이블: 아이디, 각조
+
+자식테이블: 아이디, 나라이름, 감독이름
+
+
+
+===================
+conn dw1/dw1
+
+< 부모테이블 >
+CREATE TABLE tbl_group (
+id NUMBER,
+gname VARCHAR2(15),
+CONSTRAINT pk_gname_id PRIMARY KEY(id)
+);
+
+
+INSERT INTO tbl_group 
+(id, gname) 
+VALUES 
+(3, 'C조');
+
+INSERT INTO tbl_group 
+(id, gname) 
+VALUES 
+(4, 'D조');
+
+SELECT * FROM tbl_group;
+
+COMMIT;
+
+============================================
+< 자식테이블 >
+CREATE TABLE tbl_country(
+cid NUMBER,
+ctyname VARCHAR2(30),
+hcname VARCHAR2(30),
+id NUMBER
+);
+
+자식(외래키) 제약조건
+ALTER TABLE tbl_country ADD CONSTRAINT fk_country_id FOREIGN KEY(id) REFERENCES tbl_group(id);
+
+C조
+INSERT INTO tbl_country (cid, ctyname, hcname, id) VALUES (1, '포르투칼', '페르난두 산투스', 3);
+INSERT INTO tbl_country (cid, ctyname, hcname, id) VALUES (2, '가나', '찰스 아코너', 3);
+INSERT INTO tbl_country (cid, ctyname, hcname, id) VALUES (3, '우루과이', '디에고 알론소', 3);
+INSERT INTO tbl_country (cid, ctyname, hcname, id) VALUES (4, '대한민국', '파울루 벤투', 3);
+
+D조
+INSERT INTO tbl_country (cid, ctyname, hcname, id) VALUES (5, '카타르', '펠릭스 산체스', 4);
+INSERT INTO tbl_country (cid, ctyname, hcname, id) VALUES (6, '에콰도르', '구스타보 알파로', 4);
+INSERT INTO tbl_country (cid, ctyname, hcname, id) VALUES (7, '세네갈', '알리우 시세', 4);
+INSERT INTO tbl_country (cid, ctyname, hcname, id) VALUES (8, '네덜란드', '루이 판 할', 4);
+
+
+
+ALTER TABLE tbl_country DROP CONSTRAINT fk_country_id;
+
+
+SELECT * FROM tbl_country;
+
+
+DELETE FROM tbl_country;
+
+
+DROP TABLE tbl_country;
+
+
+
+
+
+
+
+권한 부여
+GRANT
+INSERT, SELECT, UPDATE, DELETE
+ON
+dw1.tbl_group
+TO 
+dw1;
+
+
+
+
+
+============================================
+1. join 학습을 위해 tbl_dep1 테이블에 데이터를 입력
+INSERT INTO tbl_dep1 (did, dname) VALUES (1, '인사팀')
+INSERT INTO tbl_dep1 (did, dname) VALUES (2, '영업팀')
+INSERT INTO tbl_dep1 (did, dname) VALUES (3, '관리팀')
+
+2. join 학습을 위해 tbl_emp 테이블에 데이터를 추가 입력
+INSERT INTO tbl_emp (eid, ename, did) VALUES (1, 'KIM', 1)
+INSERT INTO tbl_emp (eid, ename, did) VALUES (2, 'LEE', 2)
+INSERT INTO tbl_emp (eid, ename, did) VALUES (3, 'PARK', 2)
+
+3. tbl_dep1/tbl_emp 테이블의 레코드 조회
+SELECT * FROM tbl_dep1
+SELECT * FROM tbl_emp
+
+4. equi 조인
+SELECT e.eid, e.ename, d.dname FROM tbl_dep1 d, tbl_emp e WHERE d.did = e.did  // d 와 e는 별칭이다
+// 사원번호 사원이름 부서명이 나온다
+
+5. INNER 조인 -- 쓰기가 편함
+SELECT e.eid, e.ename, d.dname FROM tbl_dep1 d INNER JOIN tbl_emp e ON d.did = e.did
+// equi 조인 하고 같은 결과값이 나옴
+SELECT e.eid, e.ename, d.dname FROM tbl_dep1 d INNER JOIN tbl_emp e ON d.did = e.did WHERE e.eid >= 2
+// 사원번호가 2이상인 것만 출력됨
+
+6. NATURAL 조인: 외래키와 부모의 기본키는 항상 자료형이 크기 같은게 아닙니다. 
+                자료형도 같고, 자료형의 크기도 같을 떄, 컬럼명까지 같을 때... 사용
+SELECT e.eid, e.ename, d.dname FROM tbl_dep1 d NATURAL JOIN tbl_emp e
+// 사용하려면 조건이 많기 때문에 시험문제에서만 많이 나온다.
+
+7. equi, INNER, NATURAL 조인을 통해 확인한 우리 회사 사원은 총 몇 명인가? --> OUTER JOIN
+값이 없거나 일치하는게 없어도 출력이 된다.
+
+8. TABLE_A LEFT OUTER JOIN TABLE_B == TABLE_B RIGHT OUTER JOIN TABLE_A
+A = 1,2,3,4 라는 값이 있고
+B = 3,4,5,6 라는 값이 있다고 하면 
+왼쪽 테이블이 기준이 된다라는 의미 - LEFT OUTER JOIN   --> 1234 나옴
+오른쪽 테이블이 기준이 된다라는 의미 - RIGHT OUTER JOIN  --> 3456 나옴
+
+- 컬럼값이 일치하지 않은 레코드도 조회하는 JOIN을 OUTER JOIN 이라고 함
+SELECT e.eid, e.ename, d.dname FROM tbl_emp e LEFT OUTER JOIN tbl_depl d ON e.did = d.did
+SELECT e.eid, e.ename, d.dname FROM tbl_dep1 d RIGHT OUTER JOIN tbl_emp e ON e.did = d.did
+
+SELECT e.eid, e.ename, d.dname FROM tbl_dep1 d LEFT OUTER JOIN tbl_emp e ON e.did = d.did
+//사원은 일치되는것만 나오고 부서는 전체 다 나온다
+
+SELECT e.eid, e.ename, d.dname FROM tbl_dep1 d FULL OUTER JOIN tbl_emp e ON e.did = d.did
+// 양쪽 테이블 데이터가 다 나온다.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
