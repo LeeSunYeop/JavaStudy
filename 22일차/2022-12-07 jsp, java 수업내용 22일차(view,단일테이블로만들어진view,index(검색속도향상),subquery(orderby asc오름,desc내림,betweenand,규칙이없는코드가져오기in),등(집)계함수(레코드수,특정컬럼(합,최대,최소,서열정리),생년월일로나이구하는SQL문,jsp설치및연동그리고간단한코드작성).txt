@@ -1,0 +1,286 @@
+==================view 학습===================
+SELECT * FROM ZZZ  // 테이블이나 뷰가 없다고 메세지가 나옴
+
+1. 단순 VIEW 생성하기
+CREATE OR REPLACE VIEW v_emp
+AS
+SELECT e.eid, e.ename, d.dname FROM tbl_dep1 d INNER JOIN tbl_emp e ON d.did = e.did
+
+2. v_emp를 이용한 R(select) 작업
+SELECT * FROM v_emp
+SELECT eid, ename FROM v_emp
+SELECT * FROM v_emp WHERE eid >= 2
+
+3. v_emp를 이용한 c(insert) 작업 --- 여러 개의 테이블을 조인해서 만든 VIEW는 INSERT 작업 안됨.
+INSERT INTO v_emp (eid, ename, dname) VALUES (6, '될까', '비서실')
+
+4. v_emp를 이용한 u(update) 작업
+UPDATE v_emp SET ename = 'kim' WHERE eid = 1
+UPDATE v_emp SET dname = '비서실' WHERE eid = 1  // 오류뜸 where절의 조건을 did로 했으면 가능함.
+UPDATE v_emp SET ename = 'KIM' WHERE dname = '인사팀'
+
+5. v_emp를 이용한 d(delete) 작업 -- 자식테이블에는 영향이 미치치만, 부모테이블에는 영향이 미치지 않는다.
+DELETE FROM v_emp WHERE eid = 2
+DELETE FROM v_emp WHERE dname = '인사팀'
+DELETE FROM v_emp WHERE ename = 'PARK' 
+
+select * FROM tbl_emp
+SELECT * FEOM tbl_dep1
+
+6. join 결과를 이용해서 VIEW를 생성한다는 것은 select(조회) 작업만을 목적으로 뷰를 만들었다는 의미가 된다.
+
+7. with read only 옵션을 이용하자.
+CREATE OR REPLACE VIEW v_emp
+AS
+SELECT e.eid, e.ename, d.dname FROM tbl_dep1 d INNER JOIN tbl_emp e ON d.did = e.did
+WITH READ ONLY
+
+8. v_emp를 이용한 u(update) 작업
+UPDATE v_emp SET ename = 'kim' WHERE eid = 1 //읽기만 가능한 뷰이기 때문에 오류남
+DELETE FROM v_emp WHERE dname = '인사팀'  //읽기만 가능한 뷰이기 때문에 오류남
+// 읽기모드에서는 select만 가능하다.
+
+==========단일 데이블로 만들어진 VIEW============
+9. tbl_emp 테이블을 이용해서 v_emp_only
+CREATE OR REPLACE VIEW v_emp_only
+AS
+SELECT * FROM tbl_emp
+// 뷰를 만들 때 where절 잇을 수도 잇고 없을 수도 잇다
+
+10. v_emp_only view를 이용해서 입력 작업하세요
+INSERT INTO v_emp_only (eid, ename, did) VALUES (6, '강', 3) //단일테이블로 되어 있기때문에 가능함.
+
+11. v_emp_only view를 이용해서 조회 작업하세요
+SELECT * FROM v_emp_only
+
+12. v_emp_only view를 이용해서 수정 작업하세요
+UPDATE v_emp_only SET ename = 'KANG', did = 1 WHERE eid = 6
+
+13. v_emp_only view를 이용해서 삭제 작업하세요
+DELETE FROM v_emp_only WHERE eid = 6
+
+14. tbl_emp 테이블을 이용한 v_emp_only 뷰 생성. 단, where절 추가
+CREATE OR REPLACE VIEW v_emp_only
+AS
+SELECT * FROM tbl_emp
+WHERE did is NULL
+
+15. 조회
+SELECT * FROM v_emp_only
+
+15-1. 조건에 참여한 컬럼값은 절대로 변경하지 않고 그 외의 컬럼에 대해서만 작업하게 하고 싶을 때..
+아래의 작업을 못하게 만들려면, 어떻게 해야 할까?
+UPDATE v_emp_only SET did = 1 WHERE eid = 4 // 변경되면서 빠져나감
+
+16. with check option을 view를 생성할 때 추가한다
+CREATE OR REPLACE VIEW v_emp_only
+AS
+SELECT * FROM tbl_emp
+WHERE did is NULL   
+WITH CHECK OPTION
+// where절에 손대지 않게 하고 싶으면 WITH CHECK OPTION 넣어서 만든다.
+
+17. UPDATE v_emp_only SET did = 1 WHERE eid = 5 
+// 15-1에서는 변경되서 빠져나갓지만 did를 손댈수 없기에 지금은 오류가 뜬다
+
+18. UPDATE v_emp_only SET ename = '김민용' WHERE eid = 5 
+
+19. view 삭제하기
+DROP VIEW v_emp_only
+
+============ index =============
+DB에서 테이블 내의 데이터(레코드) 검색 속도를 향상시켜 주는 자료구조를 일컬음.
+기본키가 있으면, 기본키는 하나의 인덱스가 됨.
+인덱스를 만들 때 주의사항: 수정/삭제가 빈번한 컬럼을 이용해서 인덱스를 만들지 마라.
+
+1. tbl_emp: ename과 did를 이용해서 index 생성
+CREATE INDEX idx_emp_ename_did
+ON tbl_emp(ename, did)
+
+2. index 삭제하기 - 객체이기 때문에 DROP 사용
+DROP INDEX idx_emp_ename_did
+
+===========subquery==========
+1. select 문의 결과는 또 다른 테이블(릴레이션)이다. 
+SELECT * FROM tbl_emp
+
+2. order by를 이용한 레코드 정렬
+SELECT * FROM tbl_emp ORDER BY ename ASC
+SELECT * FROM tbl_emp ORDER BY ename DESC
+// ASC   A->Z 순서로 정렬 오름차순
+// DESC  Z->A 순서로 정렬 내림차순
+
+3. ename을 내림차순으로 tbl_emp 테이블을 정렬하겠음
+SELECT * FROM tbl_emp ORDER BY ename DESC
+
+4. 3번의 조회 결과 중 위 2번째~4번째 레코드를 조회하겠음
+subquery를 활용함
+SELECT * FROM
+(SELECT rownum rnum, 사번, 사원명, 부서코드 FROM
+(SELECT eid 사번, ename 사원명, did 부서코드 FROM tbl_emp ORDER BY ename DESC)) 
+WHERE rnum >= 2 AND rnum <= 4  
+// 깔끔한코드로 WHERE rnum BETWEEN 2 AND 4 짜면 됨
+// ()로 묶은걸 테이블이라고 보면된다.
+// rownum(컬럼명없고 숫자만 나와잇는거, 별칭은 rnum을 많이씀)
+
+5. 
+SELECT * FROM
+(SELECT rownum rnum, 사번, 사원명, 부서코드 FROM
+(SELECT eid 사번, ename 사원명, did 부서코드 FROM tbl_emp ORDER BY ename DESC)) 
+WHERE rnum BETWEEN 2 AND 4
+
+6. 규칙이 없는 코드를 가져오기
+SELECT * FROM
+(SELECT rownum rnum, 사번, 사원명, 부서코드 FROM
+(SELECT eid 사번, ename 사원명, did 부서코드 FROM tbl_emp ORDER BY ename DESC)) 
+WHERE rnum = 1 OR rnum = 4 OR rnum = 5
+// 깔끔하게 WHERE rnum IN(1, 4, 5) 짜면 된다.
+
+7.
+SELECT * FROM
+(SELECT rownum rnum, 사번, 사원명, 부서코드 FROM
+(SELECT eid 사번, ename 사원명, did 부서코드 FROM tbl_emp ORDER BY ename DESC)) 
+WHERE rnum IN(1, 4, 5)
+
+========== 등(집)계 함수 =============
+1. 레코드의 수 확인하기
+SELECT * FROM tbl_emp
+SELECT COUNT(*) FROM tbl_emp
+SELECT COUNT(eid) FROM tbl_emp  -- 속도가 더 빠르다
+
+2. 특정 컬럼의 합 구하기
+SELECT SUM(age) FROM tbl_member
+SELECT SUM(age) sum_age FROM tbl_member //별칭을 넣어서 나타낼수 잇다.
+
+3. 특정 컬럼의 최대값 구하기
+SELECT * FROM tbl_member
+SELECT MAX(age) FROM tbl_member
+
+4. 특정 컬럼의 최솟값 구하기
+SELECT MIN(age) FROM tbl_member
+
+5. 서열 정리 쿼리 학습 전 준비
+UPDATE tbl_member SET age = 27 WHERE name = '신돌석'
+
+6. 서열 정리 쿼리 학습
+SELECT id, name, age, RANK() OVER(ORDER BY age ASC) 순위 FROM tbl_member
+// 같은 순위로 나온다  순위가 4 4 다음 6 나온다
+
+SELECT id, name, age, DENSE_RANK() OVER(ORDER BY age ASC) 순위 FROM tbl_member
+// 순위가 4 4 다음 5가 나온다
+
+SELECT id, name, age, DENSE_RANK() OVER(ORDER BY age ASC, id DESC) 순위 FROM tbl_member
+// 같은 순위에서 id가 높으면 순위가 올라간다
+
+========== 생년월일로 나이 구하는 SQL문 ================
+SELECT SYSDATE FROM DUAL 
+
+1. 한국 나이 구하기: 베트남도 사용하고 있음.
+SELECT SYSDATE FROM DUAL
+SELECT TO_CHAR(SYSDATE, 'YYYY') 연도, TO_CHAR(TO_DATE('2010-01-01'), 'YYYY') 생년 FROM DUAL 
+// 연도만 가져와서 문자로 만들겠다라는 의미 , 날짜데이터를 입력해서 연도만 문자로 만들겠다라는 의미
+
+SELECT TO_CHAR(SYSDATE, 'YYYY') - TO_CHAR(TO_DATE('2022-01-01'), 'YYYY') + 1 한국나이 FROM DUAL
+// 한국 나이 1 이 나옴,  +1을 안하면 0이 나온다.
+
+2. 만으로 나이 구하기
+SELECT FLOOR(MONTHS_BETWEEN(SYSDATE, TO_DATE('2010-01-01')) /12) FROM DUAL
+// FLOOR 소숫점 제거하는 코드
+// 12는 1살이 12개월이니 12로 나눠준다
+// 결과는 12살 나옴
+
+==================
+jsp설치하기
+D드라이브 -> java -> workspace_jsp 폴더 생성 -> 이클립스 File -> 스위치워크스페이스 -> other 선택 -> 워크스페이스jsp선택
+
+톰갯버전9  폴더명tomcat9 
+
+1. jre를 우리가 설치한 오픈jdk의 것을 선택
+
+2. encoding을 utf-8로 설정
+- window -> 맨아래 pre 선택 -> Web 폴더의
+ - CSS Files
+ - HTML Files
+ - JSP Files
+다 설정이 끝나면 apply and close 누른다.
+
+2-1. window -> 맨아래 pre 선택 java -> installed jres선택 -> edit선택 -> directory 선택 ->
+ c드라이브 프로그램파일 -> 오픈jdk -> jre선택 -> finish -> 다시 박스체크 jav 체크 -> 다 설정이 끝나면 apply and close 누른다.
+
+3. server를 설치 --servers 탭
+server 눌러서 데이터베이스 커넥션 더블클릭하고 창 뜨면 ports 에 8080을 8090으로 바꿔준다
+초록색동그라미 삼각형을 눌러 실행시킨다
+
+4. Dynamic Web project 생성
+
+5. main( ) 메서드가 없음
+
+6. Java Resources - src/main/java 여기에 패키지를 생성한 후
+ - kr.co.command, kr.co.controller, kr.co.domain, kr.co.repository 패키지 생성
+ - java 및 servlet 파일
+
+7. webapp 폴더에
+ - html, img, js, jsp 폴더 생성
+
+8. webapp - WEB-INF - lib에
+ 각종 jar 파일 넣어서 사용할 수 있음.
+
+9. webapp - WEB-INF-classes 폴더
+9. HelloWorld 우클릭 -> 자바 EE 툴 -> Generate 문장선택 -> webapp - WEB-INF에 web.xml이 생긴다
+
+10. 서블릿 맵핑을 배웠습니다.
+- @WebServlet("/이름")
+- @WebServlet("*.이름")
+
+==============
+서블릿맵핑
+- 원래 web.xml에서 했음
+- controller에서 WebServlet annotation을 이용해서 합니다.
+- url: 
+
+HiWorld 다이나믹 프로젝트 생성하기
+
+url-pattern값은 둘 중 하나입니다.
+- 디렉토리 패턴: /say, /hello, /fc ... 반드시  /(슬래시)를 붙이고 다음 이름을 넣어주면 된다.
+- 확장장형 패턴: *.do, *.bo, *.nhn ... 반드시 *(별표)를 붙여야 함.
+
+@WebServlet
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
