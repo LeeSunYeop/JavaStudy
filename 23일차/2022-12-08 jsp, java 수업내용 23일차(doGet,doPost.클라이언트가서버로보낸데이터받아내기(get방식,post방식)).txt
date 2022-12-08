@@ -1,0 +1,131 @@
+jsp일부..
+protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	// TODO Auto-generated method stub
+	response.getWriter().append("ms1: ").append(request.getContextPath());
+
+이클립스에 블럭 친 영역의 메서드명은? 
+- doGet( )
+
+doGet( )메서드의 매개변수는 몇 개 인가?
+- 2개
+
+doGet( )메서드의 매개변수의 자료형과 변수명은 적어 주세요.
+- 자료형 HttpServletRequest , HttpServletResponse 
+- 변수명 request              , response
+
+doGet( ) 와 doPost( ) 메서드는 
+url-pattern이
+디렉토리 패턴: doGet( )메서드와 doPost( )메서드의 실행 코드는 일반적으로 다름
+확장자형 패턴: doGet( )메서드와 doPost( )메서드의 실행 코드는 일반적으로 같음
+
+그러면 언제 doGet( )메서드가 실행이 되고,
+언제 doPost( )메서드가 실행이 되는가?
+클라이언트가 서버 쪽으로 데이터를 전송할 때, get방식으로 전송하면 doGet( )메서드가 실행
+클라이언트가 서버 쪽으로 데이터를 전송할 때, post 방식으로 전송하면 doPost( )메서드가 실행
+
+get 방식 vs post 방식이 뭐냐?
+- get: 데이터를 전송할 때, 메시지 헤더에 데이터를 붙여서 전송(편지봉투 라고 생각하면 됨), 브라우저 주소에 데이터 있음.
+   - 한 방식만 빼고 다 get방식
+
+- post: 데이터를 전송할 때, 메시지 본문에 데이터를 붙여서 전송(편지지 라고 생각하면 됨), 안 보이죠..
+   - html코드에서 form태그의 method 속성 값이 post일 때..
+
+클라이언트가 서버로 보낸 데이터 받아내기
+- get 방식으로 전송: doGet( )메서드에서 획득하고
+- post 방식으로 전송: doPost( )메서드에서 획득..
+String 변수명 = request.getParameter("name값");
+ex) String id = request.getParameter("id");
+
+
+=========================
+<body>
+	<form action="/ms2" method="post">  // 실행하면 주소창에 입력한 값이 나오지 않는다.
+		id: <input name="id">          // form태그를 사용하면 반드시 name이라는 속성 값을 써줘야한다.
+		<br>
+		pw: <input name="pw">
+		<br>
+		<input type="submit">
+	
+	</form>
+
+</body>
+
+=======================
+<body>
+	<form action="/ms2" method="get">  // 실행하면 주소창에 입력한 값이 출력이 된다.
+		id: <input name="id">
+		<br>
+		pw: <input name="pw">
+		<br>
+		<input type="submit">
+	
+	</form>
+
+</body>
+
+
+===========================
+< MyServlet2 클래스 >
+package kr.co.controller;
+
+import java.io.IOException;
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+/**
+ * Servlet implementation class Myservlet2
+ */
+@WebServlet({"/MS2", "/Ms2", "/mS2"})
+public class MyServlet2 extends HttpServlet {
+	private static final long serialVersionUID = 1L;
+       
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		
+		String id = request.getParameter("id");
+		String pw = request.getParameter("pw");
+		// 무조건 String 이다.
+		
+		System.out.println(id);
+		System.out.println(pw);  m001 , 1234가 콘솔창에 나오고, 브라우저 주소창에도 나옴.
+	}
+
+
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		
+		String id = request.getParameter("id");
+		String pw = request.getParameter("pw");
+		
+		System.out.println("doPost( )메서드");
+		System.out.println(id);
+		System.out.println(pw);
+		//doPost( )메서드
+		//t111
+		//1234  콘솔창에나옴.  하지만 브라우저에는 아무것도 나오지 않음.
+		
+	}
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
