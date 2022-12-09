@@ -1,0 +1,632 @@
+jsp/servlet
+
+1. 웹프로그램을 만들기 위해 이클립스의 메뉴 중 어떤 프로젝트를 선택해야 하는가?
+- Dynamic Web Proiect
+
+2. 위 프로젝트에서 서블릿과 클래스를 저장하는 폴더의 이름은?
+- src/main/java
+
+3. 위 프로젝트에서 jsp/js/img/css/html 파일을 저장하는 폴더의 이름은?
+- webapp
+
+4. 위 프로젝트의 환경설정파일명은?
+- web.xml
+
+5. web.xml이 들어 있는 폴더로 보안상 가장 안전한 폴더명은?
+- WEB-INF
+
+6. web.xml의 이름은 환경설정파일도 있다. 그 외에 3개의 이름을 추가로 입력하시오.
+- deployment descriptor, dd, 배포 서술자
+
+7. web.xml 파일에서 서블릿 맵핑을 할 때, 필요한 태그 두개를 적어 주세요.
+- <servlet></servlet> , <servlet-mapping></servlet-mapping>
+
+8. <servlet-mapping> 태그에 들어가는 2개의 태그를 적어 주세요
+- <servlet-name></servlet-name> , <url-pattern></url-pattern>
+
+9. <servlet> 태그에 들어 가는 2개의 태그를 적어 주세요.
+- <servlet-name></servlet-name> , <servlet-class></servlet-class>
+
+10. 클라이언트가 브라우저 주소창에 http://localhost:8090/helloworl/ms1 이라고 입력하고 엔터를 눌렀습니다.
+이 떄 web.xml에 있는 서블릿 맵핑과 관련된 태그 중 어떤 것이 /ms1을 감지하는가?
+- <url-pattern></url-pattern>
+
+11. 10번 다음에 동작하는 태그는?
+- <servlet-name></servlet-name>
+
+12. web.xml에서 서블릿 맵핑을 하지 않고, servlet 클래스에서 서블릿 맵핑을 할 때, 사용되는 코드(어노테이션명)은?
+- @WebServlet()
+
+13. url-pattern에 들어가는 값은 2가지 있음. == 서블릿 맵핑을 하는 방법은 2가지가 있음
+ 2가지 방법을 적어 주세요.
+- 디렉토리 패턴
+- 확장자형 패턴
+
+14. 서블릿 맵핑할 때, 디렉토리 패턴의 구조는?
+- /uri명
+
+15. 서블릿 맵핑할 때, 확장자형 패턴의 구조는?
+- *.uri명
+
+16. 데이터 전송 방식은 2가지가 있습니다. 2종류를 적어 주세요.
+- get , post 방식
+
+17. 데이터가 get 방식으로 전송되면, servlet의 어떤 메서드가 실행되는가?
+- doGet()
+
+18. 데이터가 post 방식으로 전송되면, servlet의 어떤 메서드가 실행되는가?
+- doPost()
+
+19. post 방식으로 데이터를 전송하는 방법을 적어 주세요.
+- <form action="/ms" method="post"> </form>
+
+20. id=111, pw=222를 get 방식으로 전송할 때,
+브라우저의 주소창에 입력된 url은 어떻게 되는가?
+단, http://localhost:8090/helloworld/ms1 인 상황에서..
+- http://localhost:8090/helloworl/ms1?id=111&pw=222
+
+21. form 태그를 이용해서 서블릿으로 데이터를 전송할 때,
+데이터를 입력하는 태그(<input>)에 반드시 들어가는 하는 속성은?
+- name
+
+22. <form action="/ms2" method="get">
+	id: <input name="eid"> <br>
+	pw: <input name="pass"> <br>
+	<input type=""submit>
+</form>
+id: m001, pw: 1234를 입력했을 떄,
+브라우저의 주소창에 찍히는 url은? 단, root 컨텍스트이다.
+http://localhost:8090/
+- http://localhost:8090/ms2?eid=m001&pass1234
+
+23. 22번에서 보내준 데이터를 url-pattern이 /ms2인 서블릿에서
+획득하려고 합니다.
+관련 코드를 다 작성해 주세요.
+- String eid = request.Parameter("eid");
+  String pass = request.Parameter("pass");
+
+24. doGet( ) 와 doPost( )메서드의 매개변수 자료형과 변수명을 적어 주세요
+- HttpServletRequest request, HttpServletResponse response
+
+=============================
+우리가 tomcat9버전
+get/post 방식이든
+클라이언트가 보낸 한글 데이터를
+request.setCharacterEncoding( ); 메서드를 이용해서 지원을 합니다
+
+그런데
+tomcat7 버전이 표준..
+get 방식일 때와 post 방식일 때의
+클라이언트가 보낸 한글 데이터를 지원하는 방식이 다릅니다.
+post: request.setCharacterEncoding( ); 메서드 사용하고
+get: Servers 폴더의 server.xml파일의 63번째.. <Connector URIEncoding="utf-8"> 태그에 속성을 추가
+<Connector URIEncoding="utf-8" connectionTimeout="20000" port="8090" protocol="HTTP/1.1" redirectPort="8443"/>
+를 하고나서 doGet( )메서드에서 
+request.setCharacterEncoding("utf-8"); 를 삭제안써도 된다.
+
+서버가 클라이언트한테 한글을 보냈을 때,
+깨지지 않게 하는 코드는 아직 없습니다.
+
+
+==============
+< kr.co.controller에 MyServlet4 servlet 생성 >
+@WebServlet("/ms4")
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		
+		request.setCharacterEncoding("utf-8");
+		
+		String name = request.getParameter("name");
+		System.out.println(name);		
+		
+	}
+
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		
+		// test4.jsp에서 보내준 name 데이터를 획득하고 콘솔에 출력하는
+		
+		String name = request.getParameter("name");				
+		System.out.println(name);
+		
+	}
+
+=============
+< jsp폴더에 test3 jsp파일 생성 >
+<body>
+	<form action="/ms4" method="post">
+		<label for="name">이름</label>
+		<input name="name" id="name">
+		<br>
+		<input type="submit">
+	</form>
+</body>
+
+
+=============
+< jsp폴더에 test4 jsp파일 생성 >
+<body>
+
+	<a href="/ms4?name=홍길동">ms4로 get방식 데이터 전송</a>
+
+</body>
+브라우저에 ms4로 get방식 데이터 전송 이 찍히고 그걸 클릭하면 홍길동이 콘솔에 출력이 된다.
+
+
+===================
+< Good 다이나믹 웹 프로젝트 생성 >
+기본적으로 패키기랑 webapp에 폴더 생성하고 시작
+< kr.co.controller에 MyServlet1 servlet 생성 >
+@WebServlet("/ms1")
+
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		
+		response.setContentType("text/html; charset=UTF-8");
+		
+		String id = request.getParameter("id");
+		String name = request.getParameter("name");
+		
+		PrintWriter out = response.getWriter();
+		
+		out.print("<!DOCTYPE html>");
+		out.print("<html>");
+		out.print("<body>");
+		
+		out.print(id);
+		out.print("<br>");
+		out.print(name);
+		
+		out.print("</body>");
+		out.print("</html>");
+	}
+
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		
+		request.setCharacterEncoding("utf-8");
+		response.setContentType("text/html;charset=utf-8");
+		// text 와 test 차이점
+		// "test/html;charset=utf-8" 로 입력하면 브라우저에 입력을 끝내면 다운로드가 되어진다
+		
+		String id = request.getParameter("id");
+		String pw = request.getParameter("pw");
+		String name = request.getParameter("name");
+		
+		System.out.println(id);
+		System.out.println(pw);
+		System.out.println(name);
+		
+		PrintWriter out = response.getWriter();
+		
+		out.print("<!DOCTYPE html>");
+		out.print("<html>");
+		out.print("<body>");
+		
+		out.print(id);
+		out.print("<br>");
+		out.print(pw);
+		out.print("<br>");
+		out.print(name);
+		out.print("<br>");
+		
+		out.print("</body>");
+		out.print("</html>");
+	}
+
+=============
+< jsp폴더에 test1 jsp파일 생성 >
+post 방식임
+
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+	<form action="/ms1" method="post">
+		<label for="id">ID</label>
+		<input id="id" name="id"><br>
+		
+		<label for="pw">PW</label>
+		<input type="password" id="pw" name="pw"><br>
+		
+		<label for="name">NAME</label>
+		<input id="name" name="name"><br>
+		
+		<input type="submit" value="로그인">
+	</form>
+
+</body>
+</html>
+
+=============
+< jsp폴더에 test2 jsp파일 생성 >
+get 방식임
+
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+	<a href="/ms1?id=m001&name=이순신">ms1로 get방식 데이터 전송</a>
+
+</body>
+</html>
+
+
+=======================
+< kr.co.controller에 MyServlet2 servlet 생성 >
+@WebServlet("/ms2")
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		// 선택한 취미들을 콘솔에 출력하세요.
+		response.setContentType("text/html; charset=UTF-8"); // 한글을 브라우저로 보내기위해..
+		
+		String[] hobbis = request.getParameterValues("hobby");
+		for (int i = 0; i < hobbis.length; i++) {
+			String hobby = hobbis[i];
+			System.out.println(hobby); // 콘솔창에 독서,낮잠이 출력이 된다
+		}
+		
+		PrintWriter out = response.getWriter();
+		
+		out.print("<!DOCTYPE html>");
+		out.print("<html>");
+		out.print("<body>");
+		
+		for (int i = 0; i < hobbis.length; i++) {
+			String hobby = hobbis[i];
+			out.print(hobby);
+			out.print("<br>");   // 브라우저에 독서 낮잠 이라고 출력이 된다.
+		}
+		
+		out.print("</html>");
+		out.print("</body>");
+		
+	}
+
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		request.setCharacterEncoding("utf-8");
+		response.setContentType("text/html; charset=UTF-8");
+		
+		String school = request.getParameter("school");
+		
+		PrintWriter out = response.getWriter();
+		
+		out.print("<!DOCTYPE html>");
+		out.print("<html>");
+		out.print("<body>");
+		
+		out.print(school);     // 브라우저에 나오는 글자를 클릭하면 선택이 되어진다.
+		
+		out.print("</body>");
+		out.print("</html>");
+	}
+
+}
+
+=============
+< jsp폴더에 test3 jsp파일 생성 >
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+	
+	<form action="/ms2" method="get">
+		<p>당신의 취미는?</p>
+		
+		<input type="checkbox" name="hobby" value="독서" id="book">
+		<label for="book">독서</label>    
+		// 브라우저에 나오는 글자를 클릭하면 선택이 되어진다.
+		
+		<input type="checkbox" name="hobby" value="낮잠" id="sleep">
+		<label for="sleep">낮잠</label>
+		
+		<input type="checkbox" name="hobby" value="운동" id="play">
+		<label for="play">운동</label>
+		
+		<br>
+		
+		<input type="submit" value="선택">		
+	</form>
+
+</body>
+</html>
+
+
+=============
+< jsp폴더에 test4 jsp파일 생성 >
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+	<form action="/ms2" method="post">
+		<p>최종 학력을 선택하세요.</p>
+		
+		<input type="radio" name="school" value="초등" id="el">
+		<label for="el">초등</label>
+		<br>
+		<input type="radio" name="school" value="중학교" id="mi">
+		<label for="mi">증학교</label>
+		<br>
+		<input type="radio" name="school" value="고등학교" id="hi">
+		<label for="hi">고등학교</label>
+		<br>
+		<input type="radio" name="school" value="기타" id="ect">
+		<label for="ect">기타</label>
+		<br>
+		
+		<input type="submit" value="학력 선택">
+		
+	</form>
+
+</body>
+</html>
+
+=============================================
+forwarding: 자동으로 화면이 바뀌는 기술
+- dispatcher 방식: 좁은 의미의 포워딩
+- redirect 방식
+
+1. post 방식으로 클라이언트가 서버로 한글 데이터를 보낼 때, 한글이 깨지지 않게 하는 코드를 적으시오.
+- request.setCharacterEncoding("utf-8");
+
+2. get 방식으로 클라이언트가 서버로 한글 데이터를 보낼 때, 한글이 깨지지 않게 하기 위해서 코드를 작성해야 하는데,
+어떤 파일의 몇 번째 줄인가?(톰갯7 기준)
+- server.xml 파일의 63번째 라인
+
+3. 2번에 들어갈 코드를 적으시오
+- URIEncoding="UTF-8"
+
+4. 서버에서 클라이언트 쪽으로 한글 데이터를 보낼 때, 깨지지 않게 하는 코드를 적으시오
+- response.setContentType("text/html; charset=utf-8");
+
+5. 지금까지 여러분이 배운 jsp 내장객체 3개를 적어 주세요.
+- request, response, out
+
+6. 당신의 성별은? 이라는 항목으로 뷰를 만들려고 합니다. 이 때 남성과 여성을 선택하게 하려면, input 태그의 type을 뭘로 해야하는가?
+- radio
+
+7. 다음 중 당신이 좋아하는 상품을 모두 고르시오. 항목을 만들 때, input 태그의 type은?
+- checkbox
+
+8. hobby 라는 name으로 여러개의 항목을 선택해서 서버로 전송할 때, 이 데이터를 획득하는 코드를 적어 주세요.
+- String[ ] hobbies = request.getParameterValues("hobby");
+
+9. 8번의 hobbies를 request 바인딩(저장)해 보세요.
+- request.getAttribute("hobbies", hobbies);
+
+10. 9번에서 바인딩한 데이터를 EL을 이용해서 jsp에서 출력하려고 합니다
+관련 코드를 작성하세요
+- ${hobbies}
+
+11. forward 방법 2가지를 적어 보세요.
+- dispatcher 방식: 일반적으로 포워딩하면
+- redirect 방식: 리다렉트
+
+12. forwarding을 하면 request는 몇 개가 생성 되는가?
+- 1개
+
+13. redirect는 request는 몇 개가 생성 되는가?
+- 2개 이상
+
+14. request.setAttribute("id", "m001"); 데이터를 바인딩(저장)하고 redirect를 한 후에 ${id} 했을 때 출력 결과는?
+- 아무것도 안 나옴.
+
+15. request.setAttribute("id", "m001"); 데이터를 바인딩(저장)하고 forwarding를 한 후에 ${id} 했을 때 출력 결과는?
+- m001
+
+16. 포워딩 코드를 적으세요
+- request.getRequestDispatcher("jsp/ms.jsp").forward(request, response);
+
+17. 리다이렉트 코드
+- response.sendRedirect("넘어갈 곳");
+
+
+=======================
+- dispatcher 방식
+< kr.co.controller에 MyServlet3 servlet 생성 >
+@WebServlet("/ms3")
+
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		
+		System.out.println(1111);
+		RequestDispatcher dis = request.getRequestDispatcher("/ms4");
+		dis.forward(request, response);
+		
+	}
+
+
+=============
+< jsp폴더에 test5 jsp파일 생성 >
+<body>
+	<a href="/ms3">클릭하면 /ms3으로 접속하고 자동으로 /ms4가 실행됩니다. 그러나 /ms3이 한 것처럼 보입니다.</a>
+</body>
+
+=============
+< jsp폴더에 test6 jsp파일 생성 >
+<body>
+	end
+</body>
+
+
+==============================================
+- 주석이 없는 코드는 dispatcher 방식으로 포워딩 이다
+
+< kr.co.controller에 MyServlet1 servlet 을 mvc방식으로 연결 >
+-doGet방식-
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		
+		response.setContentType("text/html; charset=UTF-8");
+		
+		String id = request.getParameter("id");
+		String name = request.getParameter("name");
+		
+//		PrintWriter out = response.getWriter();
+//		
+//		out.print("<!DOCTYPE html>");
+//		out.print("<html>");
+//		out.print("<body>");
+//		
+//		out.print(id);
+//		out.print("<br>");
+//		out.print(name);
+//		
+//		out.print("</body>");
+//		out.print("</html>");
+		
+		request.setAttribute("id", id);
+		request.setAttribute("name", name);
+		
+		request.getRequestDispatcher("jsp/ms11.jsp").forward(request, response);
+
+- doPost 방식 -
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		
+		request.setCharacterEncoding("utf-8");
+		response.setContentType("text/html;charset=utf-8");
+		// text 와 test 차이점
+		// "test/html;charset=utf-8" 로 입력하면 브라우저에 입력을 끝내면 다운로드가 되어진다
+		
+		String id = request.getParameter("id");
+		String pw = request.getParameter("pw");
+		String name = request.getParameter("name");
+		
+//		PrintWriter out = response.getWriter();
+//		
+//		out.print("<!DOCTYPE html>");
+//		out.print("<html>");
+//		out.print("<body>");
+//		
+//		out.print(id);
+//		out.print("<br>");
+//		out.print(pw);
+//		out.print("<br>");
+//		out.print(name);
+//		out.print("<br>");
+//		
+//		out.print("</body>");
+//		out.print("</html>");   
+		
+		request.setAttribute("id", id);
+		request.setAttribute("pw", pw);
+		request.setAttribute("name", name);  // ms1.jsp 파일하고 이어져 있음
+		
+		RequestDispatcher dis = request.getRequestDispatcher("jsp/ms1.jsp");
+		dis.forward(request, response);
+		
+		//request.getRequestDispatcher("jsp/ms1.jsp").forward(request, response); 위의 코드를 한문장으로 만들수 잇음
+	}
+
+=============
+< jsp폴더에 test1 jsp파일 이용 >
+< jsp폴더에 ms1.jsp jsp파일 생성 >
+post 방식
+<body>
+${id}
+<br>
+${pw}
+<br>
+${name}
+
+</body>
+
+
+=============
+< jsp폴더에 test1 jsp파일 이용 >
+< jsp폴더에 ms11.jsp jsp파일 생성 >
+get 방식
+<body>
+${id}
+<br>
+${name}
+<br>
+
+</body>
+
+=============
+< kr.co.controller에 MyServlet2 servlet 을 mvc방식으로 연결 >
+- doGet 방식-
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		// 선택한 취미들을 콘솔에 출력하세요.
+		response.setContentType("text/html; charset=UTF-8"); // 한글을 브라우저로 보내기위해..
+		
+		String[] hobbis = request.getParameterValues("hobby");
+//		for (int i = 0; i < hobbis.length; i++) {
+//			String hobby = hobbis[i];
+//			System.out.println(hobby); // 콘솔창에 독서,낮잠이 출력이 된다
+//		}
+		
+//		PrintWriter out = response.getWriter();
+//		
+//		out.print("<!DOCTYPE html>");
+//		out.print("<html>");
+//		out.print("<body>");
+//		
+//		for (int i = 0; i < hobbis.length; i++) {
+//			String hobby = hobbis[i];
+//			out.print(hobby);
+//			out.print("<br>");   // 브라우저에 독서 낮잠 이라고 출력이 된다.
+//		}
+//		
+//		out.print("</html>");
+//		out.print("</body>");
+		
+		request.setAttribute("hobbis", hobbis);
+		
+		request.getRequestDispatcher("jsp/ms2.jsp").forward(request, response);
+		
+	}
+
+
+=============
+< jsp폴더에 test3 jsp파일 이용 >
+< jsp폴더에 ms2.jsp jsp파일 생성 >
+- get방식 -
+<body>
+${hobbis}
+
+</body>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

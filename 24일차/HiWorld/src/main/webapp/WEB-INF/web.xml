@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://xmlns.jcp.org/xml/ns/javaee" xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_4_0.xsd" id="WebApp_ID" version="4.0">
+  <display-name>HiWorld</display-name>
+  <welcome-file-list>
+    <welcome-file>index.html</welcome-file>
+    <welcome-file>index.jsp</welcome-file>
+    <welcome-file>index.htm</welcome-file>
+    <welcome-file>default.html</welcome-file>
+    <welcome-file>default.jsp</welcome-file>
+    <welcome-file>default.htm</welcome-file>
+  </welcome-file-list>
+
+
+  <servlet>
+    <servlet-name>myservlet1</servlet-name>
+    <servlet-class>kr.co.controller.MyServlet1</servlet-class>
+  </servlet>
+  
+  <servlet>
+    <servlet-name>myservlet2</servlet-name>
+    <servlet-class>kr.co.controller.MyServlet2</servlet-class>
+  </servlet>
+  
+  <servlet>
+    <servlet-name>myservlet3</servlet-name>
+    <servlet-class>kr.co.controller.MyServlet3</servlet-class>
+  </servlet>
+  
+  <servlet>    
+    <servlet-name>myservlet4</servlet-name>
+    <servlet-class>kr.co.controller.MyServlet4</servlet-class>
+  </servlet>
+  
+  <servlet-mapping>
+    <servlet-name>myservlet4</servlet-name>
+    <url-pattern>*.nhn</url-pattern>  
+  </servlet-mapping>
+    
+  <servlet-mapping>
+    <servlet-name>myservlet3</servlet-name>
+    <url-pattern>*.do</url-pattern>
+  </servlet-mapping>
+  
+  <servlet-mapping>
+    <servlet-name>myservlet2</servlet-name>
+    <url-pattern>/ms2</url-pattern>
+  </servlet-mapping>
+  
+  <servlet-mapping>
+    <servlet-name>myservlet1</servlet-name>
+    <url-pattern>/ms1</url-pattern>
+  </servlet-mapping>
+  
+
+</web-app>
+
+
+
+
+
+
