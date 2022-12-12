@@ -1,0 +1,958 @@
+포워딩
+- 디스팻처 방식: 포워딩하세요..
+ - 서버의 내부에서 서블릿끼리 또는 서블릿과 jsp, jsp와 jsp끼리 주고 받는다고 했음.
+ - 그렇다보니까 request, response가 1개 뿐입니다.
+ - 실제로 구현 코드를 보면, request, response 객체를 넘겨주고 있죠.
+ - 왜 넘겨줬을까? 재활용하려고 넘겨줌.
+ - request에 데이터를 바인딩(저장) 할 수 있는데, 디스팻처 방식으로 포워딩하면 그 데이터가 유지가 됨..
+
+- 리다이렉트 방식: 리다이렉트하세요
+ - 클라이언트에서 요청하면, 서버에서 재요청할 서버의 자원 주소를 클라이언트에게 응답으로 전해 줌
+  - 클라이언트가 응답에 들어 있는 주소로 재요청함.
+ - request, response가 2개 이상이 됨.
+ - 주소가 바뀐다는 의미임.
+ - request 데이터를 바인딩(저장)해봤자 의미가 없음.
+
+====>
+디스팻처 방식과 리다이렉트 방식을 구분해서 사용해야 함.
+ - 어려움..
+ - 다만, 대부분이 디스팻처 방식을 사용하면 됨.
+ - 그러나 rediect 방식을 사용할 때가 있는데, 기능이 다를 때...
+
+회원 정보를 DB에 저장한 후에
+회원 목록 보기 화면으로 간다면,
+
+==================================
+session 학습이 안 됐음.
+- 로그인과 관련된 작업일 때 사용함..
+
+jsp의 내장객체 중 하나
+request, response, out, session
+
+영역객체
+- pageContext: 현재 화면
+- request: 같은 요청일 때까지
+- session: 같은 브라우저.. + timeout(로그인한 후에 해당 웹사이트에서 작업을 안 하고 흐른 시간)
+- application(=프로젝트=컨텍스트=서블릿컨텍스트): 프로젝트 전테
+
+================
+HTTP 프로토콜: 규약(약속)
+사내에서 비밀연애하는 연인들이 "사랑해"...라고 말하면 들키죠.. 
+"사랑해" = "바닥에 뭐 떨어진 것 같은데요"
+"보고싶어" = "돈 좀 빌려줄래요?"
+서로간 이렇게 하자라는 서로간의 약속 의미
+
+- 비연결성
+ - 클라이언트가 서버에 요청을 함.. 서버가 응답을 함...
+
+크롬에서 로그인하고,
+main.jsp 파일의 주소를
+edge 브라우저에 복사해서 붙여넣기 하면,
+크롬의 내용과 다르게 출력되는 것을 확인할 수 있음.
+세션의 스코프 중 같은 브라우저 조건을 만족하지 못 했기 때문...
+
+컨텍스트 = context = project = servletcontext
+
+application의 스코프는 프로젝트 전체
+
+
+cookie 학습도 안 됐음.
+
+url-pattern
+- directory pattern
+
+
+- 확장자형 패턴
+get/post 방식이든 실행하는 코드가 같음.
+*.do
+*.bo
+*.apple
+*.nhn
+
+
+==================
+< Morning 다이나믹 웹 프로젝트 생성 >
+- 4개의 패키지 생성, webapp 폴더생성, web.xml 생성
+
+< jsp폴더에 test1 jsp파일 생성 >
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+
+	<a href="/ys1">To YourServlet1</a>
+
+</body>
+</html>
+
+===========================
+< kr.co.controller 패키지에 YourServlet1 서블릿 생성 >
+
+@WebServlet("/ys1")
+public class YourServlet1 extends HttpServlet {
+	private static final long serialVersionUID = 1L;
+       
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		
+		request.setAttribute("id", "m001");
+		request.setAttribute("pw", "1234");
+		
+		response.sendRedirect("/jsp/ys1.jsp");
+		
+	}
+
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		
+	}
+
+}
+
+
+==========================
+< jsp폴더에 ys1.jsp jsp파일 생성 >
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+	${id}<br>
+	${pw}<br>
+
+</body>
+</html>
+
+
+==========================
+< jsp폴더에 test2 jsp파일 생성 >
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8" session="false" %>   ----- session="false" 추가됨
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+	
+	<form action="/ys2" method="post">
+		ID: <input name="id"><br>
+		PW: <input name="pw" type="password"><br>
+		<input type="submit" value="로그인">
+		
+	</form>
+
+</body>
+</html>
+
+
+
+===========================
+< kr.co.controller 패키지에 YourServlet2 서블릿 생성 >
+
+@WebServlet("/ys2")
+public class YourServlet2 extends HttpServlet {
+	private static final long serialVersionUID = 1L;
+
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		
+	}
+
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		String id = request.getParameter("id");
+		String pw = request.getParameter("pw");
+		
+		System.out.println("DB에 접속해서 전달받은 id가 있는지 확인");
+		System.out.println("해당 id의 비번이 전달받은 값과 일치하는지 확인");
+		System.out.println("일치하면 dto 객체 반환, 그렇지 않으면 null 반환");
+		
+		request.setAttribute("id", id);
+		request.setAttribute("pw", pw);
+		
+		System.out.println("메인 페이지로 이동");
+		
+		response.sendRedirect("jsp/main.jsp");
+	}
+
+}
+
+==========================
+< jsp폴더에 main.jsp jsp파일 생성 >
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8" session="false"%>  ---- session="false" 추가됨
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+<%
+	HttpSession session = request.getSession(false);
+	String id = null;
+	
+	if(session != null){
+		id = (String)session.getAttribute("id"); 
+		// Object를 사용안하면 String 으로 형변환 해야 한다.
+		// Object obj_id = session.getAttribute("id");
+	}
+%>
+
+<%= id %> 님, 환영합니다. <a href="/logout">로그아웃</a>
+</body>
+</html>
+
+
+==========================
+< jsp폴더에 test3 jsp파일 생성 >
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8" session="false" %>  ----- session="false" 추가됨
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+	
+	<form action="/ys3" method="post">
+		ID: <input name="id"><br>
+		PW: <input name="pw" type="password"><br>
+		<input type="submit" value="로그인">
+		
+	</form>
+
+</body>
+</html>
+
+===========================
+< kr.co.controller 패키지에 YourServlet3 서블릿 생성 >
+@WebServlet("/ys3")
+public class YourServlet3 extends HttpServlet {
+	private static final long serialVersionUID = 1L;
+
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		
+	}
+
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		String id = request.getParameter("id");
+		String pw = request.getParameter("pw");
+		
+		System.out.println("DB에 접속해서 전달받은 id가 있는지 확인");
+		System.out.println("해당 id의 비번이 전달받은 값과 일치하는지 확인");
+		System.out.println("일치하면 dto 객체 반환, 그렇지 않으면 null 반환");
+		
+		// session작업
+		//session 객체가 있으면, 있는 것을 반환하세요
+		// 만약 없으면, session 객체를 만들어서 넘겨 주세요.
+		// 로그인할 때 사용함
+		HttpSession session = request.getSession();  // 괄호안에 아무것도 안 적어도 true임.
+		//request.getSession(true); 
+		session.setMaxInactiveInterval(60); //60초임, 60초가 지나면 브라우저에 id목록이 사라짐
+		
+		session.setAttribute("id", id);
+		
+		
+		
+		// session 객체가 있으면, 있는 것을 반환하세요.
+		// 만약 없으면, null을 넘겨주세요.
+		// request.getSession(false); // 만약 없으면, session 객체를 만들어서 넘겨 주세요.
+		// 로그인 이후 행해지는 작업
+		
+		
+		System.out.println("메인 페이지로 이동");
+		
+		response.sendRedirect("jsp/main.jsp");
+	}
+
+}
+
+
+===========================
+< web.xml >
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://xmlns.jcp.org/xml/ns/javaee" xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_4_0.xsd" id="WebApp_ID" version="4.0">
+  <display-name>Morning</display-name>
+  <welcome-file-list>
+    <welcome-file>index.html</welcome-file>
+    <welcome-file>index.jsp</welcome-file>
+    <welcome-file>index.htm</welcome-file>
+    <welcome-file>default.html</welcome-file>
+    <welcome-file>default.jsp</welcome-file>
+    <welcome-file>default.htm</welcome-file>
+  </welcome-file-list>
+  
+  <context-param>
+  	<param-name>id</param-name>
+  	<param-value>m001</param-value> 	
+  </context-param>
+</web-app>
+
+
+===========================
+< kr.co.controller 패키지에 YourServlet4 서블릿 생성 >
+@WebServlet("/ys4")
+public class YourServlet4 extends HttpServlet {
+	private static final long serialVersionUID = 1L;
+
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		ServletContext application = getServletContext();
+		String id = application.getInitParameter("id");
+		
+		application.setAttribute("id", id);
+		application.setAttribute("count", 1000000); // 방문자수 알고 싶을 때씀
+		
+		response.sendRedirect("/jsp/main2.jsp");
+	}
+
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		
+	}
+
+}
+
+==========================
+< jsp폴더에 main2.jsp jsp파일 생성 >
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8" session="false"%>
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+
+${id} : ${count}
+
+</body>
+</html>
+
+
+===========================
+< MMS1 다이나믹 웹 프로젝트 생성 >
+- 4개의 패키지 생성, webapp 폴더생성, web.xml 생성
+
+==========================
+< kr.co.domain 패키지에 MemberDTO 클래스 생성 >
+package kr.co.domain;
+
+import java.io.Serializable;
+import java.util.Objects;
+
+public class MemberDTO implements  Serializable {
+
+	private static final long serialVersionUID = 1L;	
+	
+	private int id;
+	private String name;
+	private int age;
+	
+	public MemberDTO() {
+		
+	}
+
+	public MemberDTO(int id, String name, int age) {
+		super();
+		this.id = id;
+		this.name = name;
+		this.age = age;
+	}
+
+	public int getId() {
+		return id;
+	}
+
+	public void setId(int id) {
+		this.id = id;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public int getAge() {
+		return age;
+	}
+
+	public void setAge(int age) {
+		this.age = age;
+	}
+
+	public static long getSerialversionuid() {
+		return serialVersionUID;
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(id);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		MemberDTO other = (MemberDTO) obj;
+		return id == other.id;
+	}
+
+	@Override
+	public String toString() {
+		return "MemberDTO [id=" + id + ", name=" + name + ", age=" + age + "]";
+	}
+		
+}
+
+
+==========================
+< kr.co.repository 패키지에 MemberDAO 클래스 생성 >
+package kr.co.repository;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+
+import kr.co.domain.MemberDTO;
+
+public class MemberDAO {
+	
+	//static 상수 4개 선언
+	//closeAll()
+	//commitOrRollback()
+	//디폴트 생성자
+	
+	private static final String DRIVER = "oracle.jdbc.OracleDriver";
+	private static final String URL = "jdbc:oracle:thin:@localhost:1521:xe";
+	private static final String USERNAME = "dw1";
+	private static final String PASSWORD = "dw1";
+	
+	public MemberDAO() {
+		try {
+			Class.forName(MemberDAO.DRIVER);
+			System.out.println("드라이버 로딩 성공");
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	private void closeAll(ResultSet rs, PreparedStatement pstmt, Connection conn) {
+		if (rs != null) {
+			try {
+				rs.close();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			
+		}
+		
+		if (pstmt != null) {
+			try {
+				pstmt.close();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+		
+		if (conn != null) {
+			try {
+				conn.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+	}	
+	
+	private void commitOrRollback(int result, Connection conn) {
+		if (result > 0) {
+			try {
+				conn.commit();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}			
+		} else {
+			try {
+				conn.rollback();
+			} catch (SQLException e) {				
+				e.printStackTrace();
+			}
+		}
+	}
+
+	public void insert(MemberDTO dto) {
+		
+		Connection conn = null;
+		PreparedStatement pstmt = null;
+		
+		String sql = "INSERT INTO tbl_member (id, name, age) VALUES (?, ?, ?)";
+		
+		try {
+			conn = DriverManager.getConnection(
+					MemberDAO.URL, MemberDAO.USERNAME, MemberDAO.PASSWORD);
+			pstmt = conn.prepareStatement(sql);
+			
+			pstmt.setInt(1, dto.getId());
+			pstmt.setString(2, dto.getName());
+			pstmt.setInt(3, dto.getAge());
+			
+			pstmt.executeUpdate();			
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			closeAll(null, pstmt, conn);
+		}
+		
+	}
+
+	public List<MemberDTO> list() {
+		List<MemberDTO> list = new ArrayList<MemberDTO>();
+		
+		Connection conn = null;
+		PreparedStatement pstmt = null;
+		String sql = "SELECT * FROM tbl_member";
+		ResultSet rs = null;
+		
+		try {
+			conn = DriverManager.getConnection(
+					MemberDAO.URL, MemberDAO.USERNAME, MemberDAO.PASSWORD);
+			pstmt = conn.prepareStatement(sql);
+			
+			rs = pstmt.executeQuery();
+			
+			while (rs.next()) {
+				int id = rs.getInt("id");
+				String name = rs.getString("name");
+				//int age = rs.getInt("age");  나이는 자세히보기 할때 나오게끔 할거..
+				
+				//MemberDTO dato = new MemberDTO(id, name, -1);
+				//list.add(dto);
+				list.add(new MemberDTO(id, name, -1));
+				
+			}
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			closeAll(rs, pstmt, conn);
+		}
+		
+		return list;
+	}
+
+	public MemberDTO read(int id) {
+		MemberDTO dto = null;
+		
+		Connection conn = null;
+		PreparedStatement pstmt = null;
+		String sql = "SELECT * FROM tbl_member WHERE id = ?";
+		ResultSet rs = null;
+		
+		try {
+			conn = DriverManager.getConnection(
+					MemberDAO.URL, MemberDAO.USERNAME, MemberDAO.PASSWORD);
+			pstmt = conn.prepareStatement(sql);
+			pstmt.setInt(1, id);
+			
+			rs = pstmt.executeQuery();
+			
+			if(rs.next()) {
+				String name = rs.getString("name");
+				int age = rs.getInt("age");
+				
+				dto = new MemberDTO(id, name, age);
+			}
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			closeAll(rs, pstmt, conn);
+		}
+		
+		return dto;
+	}
+
+}
+
+==========================
+< kr.co.command 패키지에 Command 인터페이스 생성 >
+package kr.co.command;
+
+import java.io.IOException;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+public interface Command {
+	
+	public abstract void execute(HttpServletRequest request, 
+			HttpServletResponse response) throws ServletException, IOException;
+
+}
+
+===========================
+< kr.co.controller 패키지에 FrontController 서블릿 생성 >
+package kr.co.controller;
+
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import kr.co.command.Command;
+import kr.co.command.InsertCommand;
+import kr.co.command.InsertUICommand;
+import kr.co.command.ListCommand;
+import kr.co.command.ReadCommand;
+
+/**
+ * Servlet implementation class FrontController
+ */
+@WebServlet("*.do")
+public class FrontController extends HttpServlet {
+	private static final long serialVersionUID = 1L;
+
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		
+		request.setCharacterEncoding("UTF-8");
+		response.setContentType("text/html; charset=UTF-8");
+		
+		Map<String, Command> menus = new HashMap<String, Command>();
+		menus.put("/insertui.do", new InsertUICommand());  // 파일 위치를 kr.co.command 패키지에다 하기
+		menus.put("/insert.do", new InsertCommand());  // 파일 위치를 kr.co.command 패키지에다 하기
+		menus.put("/list.do", new ListCommand());  // 파일 위치를 kr.co.command 패키지에다 하기
+		// if문을 사용하면 한도끝도 없기 때문에 Map을 사용함
+		menus.put("/read.do", new ReadCommand());
+		
+		String uri = request.getRequestURI();
+		String ctxp = request.getContextPath();
+		String what = uri.substring(ctxp.length());
+		
+		Command menu = menus.get(what);
+		
+		if(menu != null){
+			menu.execute(request, response);
+		} else {
+			System.out.println("지원하지 않는 서비스입니다.");
+		}
+		
+	}
+	
+
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		// TODO Auto-generated method stub
+		doGet(request, response);
+	}
+
+}
+
+
+===========================
+< kr.co.command 패키지에 InsertUICommand. 클래스 자동 생성 >
+FrontController 에서 menus.put("/insertui.do", new InsertUICommand()); 코드 작성하면 자동생성을 누른다
+그리고 파일 위치를 kr.co.command 패키지에다 변경한다.
+package kr.co.command;
+
+import java.io.IOException;
+
+import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+public class InsertUICommand implements Command {
+
+	@Override
+	public void execute(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		// 1. 클라이언트가 보내준 데이터 획득 및 가공
+		// 2. DAO객체 생성 및 해당 메서드 호출
+		// 3. 데이터 바인딩
+		// 4. 포워딩
+		
+		request.getRequestDispatcher("jsp/insert.jsp").forward(request, response);
+	
+	}
+
+}
+
+
+===========================
+< kr.co.command 패키지에 InsertCommand. 클래스 자동 생성 >
+FrontController 에서 menus.put("/insert.do", new InsertCommand()); 코드 작성하면 자동생성을 누른다
+그리고 파일 위치를 kr.co.command 패키지에다 변경한다.
+package kr.co.command;
+
+import java.io.IOException;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import kr.co.domain.MemberDTO;
+import kr.co.repository.MemberDAO;
+
+public class InsertCommand implements Command {
+
+	@Override
+	public void execute(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		// 1. 유저가 보내 준 데이터 획득 및 가공
+		String sid = request.getParameter("id");
+		int id = Integer.parseInt(sid);
+		
+		String name = request.getParameter("name");
+		
+		String sage = request.getParameter("age");
+		int age = Integer.parseInt(sage);
+		
+		MemberDTO dto = new MemberDTO(id, name, age);
+		
+		// 2. DAO 객체 생성 및 해당 메서드 호출
+		MemberDAO dao = new MemberDAO();
+		dao.insert(dto);
+		
+		// 3. 데이터 바인딩
+		
+		// 4. 포워딩: 목록으로 가기
+		response.sendRedirect("/list.do");
+
+	}
+
+}
+
+
+
+==========================
+< jsp폴더에 insert.jsp jsp파일 생성 >
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>회원 정보 입력 화면</title>
+</head>
+<body>
+	<form action="/insert.do" method="post">
+		ID: <input name="id"><br>
+		NAME: <input name="name"><br>
+		AGE: <input name="age"><br>
+		<input type="submit" value="입력">
+	</form>
+
+</body>
+</html>
+
+
+
+===========================
+< kr.co.command 패키지에 ListCommand. 클래스 자동 생성 >
+FrontController 에서 menus.put("/list.do", new ListCommand()); 코드 작성하면 자동생성을 누른다
+그리고 파일 위치를 kr.co.command 패키지에다 변경한다.
+package kr.co.command;
+
+import java.io.IOException;
+import java.util.List;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import kr.co.domain.MemberDTO;
+import kr.co.repository.MemberDAO;
+
+public class ListCommand implements Command {
+
+	@Override
+	public void execute(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		// 1. 유저가 보내 준 데이터 획득 및 가공
+		// 2. DAO 객체 생성 및 메서드 호출
+		MemberDAO dao = new MemberDAO();
+		List<MemberDTO> list = dao.list();
+		
+		// 3. 바인딩
+		request.setAttribute("list", list);
+		
+		// 4. 포워딩
+		request.getRequestDispatcher("jsp/list.jsp").forward(request, response);
+
+	}
+
+}
+
+
+==========================
+< jsp폴더에 list.jsp jsp파일 생성 >
+<%@ page import="kr.co.domain.MemberDTO"%>
+<%@ page import="java.util.List"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+	<% 
+		List<MemberDTO> list = (List<MemberDTO>)request.getAttribute("list");
+	
+		for(int i=0; i<list.size(); i++){
+			MemberDTO dto = list.get(i);
+			%>
+			
+				<%= dto.getId() %>
+				<%= " : " %>
+				<a href="/read.do?id=<%= dto.getId()%>"><%= dto.getName() %></a>
+				<%= "<br>" %>
+			<% 
+		}
+	%>
+
+</body>
+</html>
+
+
+===========================
+< kr.co.command 패키지에 ReadCommand. 클래스 자동 생성 >
+FrontController 에서 menus.put("/read.do", new ReadCommand()); 코드 작성하면 자동생성을 누른다
+그리고 파일 위치를 kr.co.command 패키지에다 변경한다.
+package kr.co.command;
+
+import java.io.IOException;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.util.List;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import kr.co.domain.MemberDTO;
+import kr.co.repository.MemberDAO;
+
+public class ReadCommand implements Command {
+
+	@Override
+	public void execute(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		
+		String sid = request.getParameter("id");
+		int id = Integer.parseInt(sid);
+		
+		MemberDAO dao = new MemberDAO();
+		MemberDTO dto = dao.read(id);
+		
+		request.setAttribute("dto", dto);
+		
+		request.getRequestDispatcher("jsp/read.jsp").forward(request, response);
+		
+	}
+
+}
+
+
+==========================
+< jsp폴더에 read.jsp jsp파일 생성 >
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+ID : ${dto.id}<br>
+NAME : ${dto.name}<br>
+AGE : ${dto.age}<br>
+
+<a href="/list.do">목록</a> | <a href="#">수정화면으로</a> | <a href="#">삭제</a>
+
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
