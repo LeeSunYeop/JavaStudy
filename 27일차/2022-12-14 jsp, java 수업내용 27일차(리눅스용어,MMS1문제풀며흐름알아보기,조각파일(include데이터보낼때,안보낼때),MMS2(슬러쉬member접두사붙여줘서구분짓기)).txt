@@ -1,0 +1,403 @@
+linux 기본 명령어
+
+1. clear: 쉘(cmd의 역할) 화면을 깨끗하게 지움(ctrl + L)
+
+2. pwd: (present working directory) 현재의 디렉토리 위치 출력, cd 명령 후 항상 조회
+
+3 .cd: change directory 디렉토리 위치 변경
+# cd .. : cd와 .. 사이에 반드시 한 칸을 비워야 함(윈도우즈와 다름) 상위 디렉토리로 이동
+cd . : 현재 디렉토리로 이동.. cd ./bin/aaa
+# cd ~ : 사용자 계정의 홈 디렉토리로 이동.. 사용자 계정이 있고, root 계정(최상위 계정)이 있음.
+        /home/ubuntu, /home/user1 홈이라는 디렉토리에 우분투
+# cd : cd ~ 같음..
+# cd /home/ubuntu, cd /user1/local, cd ./bin 현재 디렉토리 밑에 있는 bin폴더로 가겠다라는 의미
+   cd 다음에 경로 쓰고 cd 다음에 / 있으면 절대경로 이며 /가 없으면 상대경로 이다.
+cd / : 루트 디렉토리.
+
+
+4. ls(엘에스): 현재 디렉토리 안에 있는 디렉토리나 파일 조회
+ls -a : 숨겨져 있는 파일이나 디렉토리까지 조회
+ls -l(엘) : 파일이나 디렉토리에 대한 자세한 정보까지 조회
+       - : 파일을 의미함.
+       d : 디렉토리
+     l(엘) : 파일인데 링크 파일..
+
+d rwxrwxrwx(r읽고,w쓰고,x실행)
+d rw-rw-rw-(주인도, 그룹에 속해있는곳도, 일반인도 읽고 쓸수 있다 하지만 실행못함)
+d rw-r--r--(주인은 읽고쓸수 있으며 , 그룹에 속해있는곳은 읽을수만 있고, 일반도 읽을수만 있다. 그리고 전부다 실행은 못함)
+
+ls -al, ls -la
+
+5. mkdir: directory 생성...
+mkdir aaa: aaa라는 디렉토리를 현재 디렉토리 안에 생성하시오. 라는 의미
+
+6. touch: 빈 파일 생성
+touch aaa.txt : aaa.txt 파일을 생성하라. 라는 의미
+
+7. rm : remove 기능
+rm 파일명 : 해당 파일 삭제
+rm 빈 디렉토리명 : 아무것도 안 들어있는 디렉토리를 삭제
+rm 디렉토리명 : 디렉토리 안에 뭔가가 들어 있으면, 디렉토리는 삭제 안 됨.
+rm -r 디렉토리명 : 디렉토리 안에 있는 것들을 다 삭제하고, 마지막에 디렉토리를 삭제함.
+
+8. cp : copy 약자 - 원본파일이 남아있음
+cp a.txt b.txt : a.txt를 복사해서 b.txt를 생성해라. 라는 의미
+cp a.txt /user/bin/b.txt  a.txt를 복사해서 절대경로인 user의 bin 디렉토리안에 b.txt를 생성해라
+
+9. mv: move (이동)  - 원본파일이 이동
+mv a.txt ./test/a.txt
+mv a.txt ./test/c.txt
+
+10. ln(엘엔): link 파일 생성
+ln -s a.txt a-link.txt  -> a-link.txt 바로가기가 만들어지며 실행 되는건 a.txt가 실행된다.
+
+11. apt: 원하는 프로그램을 다운로드 받거나 그 목록을 갱신할 때 사용
+apt -cache search tomcat : 저장소에서 톰캣을 찾아라. 라는 의미
+apt -cache search tomcat | grep tomcat : 저장소에서 톰캣을 찾아서 하이라이트(색깔을 입힘)를 줌
+
+sudo apt update : 저장소 목록을 갱신함.. (목록만 가져오고 프로그램은 다운로드하지 않는다)
+sudo apt install tomcat9 ==> sudo apt -y install tomcat9 다운받으면서 자동으로 y(yes)를 누른다. 
+
+
+================================
+< MMS 문제로 흐름 파악하기 >
+
+1. [회원 등록 화면으로 가기]
+ - 이 기능 구현할 때, 사용한 태그명을 올려주세요.
+- <a>회원 등록 화면으로 가기</a>
+
+2. 1의 a태그에서 특정 페이지로 이동하려면, 어떤 속성의 값을 입력해야 하는가? 속성명을 적어 주세요.
+- <a href="">회원 등록 화면으로 가기</a>
+
+3. [회원 등록 화면으로 가기]를 구현하는 코드를 작성하세요.
+- <a href="/insertui.do">회원 등록 화면으로 가기</a>
+
+
+				     /insertui.do
+목록 - [회원 등록 화면으로 가기] 클릭 ---------------------FrontController(servlet)--------------InsertUICommand-------
+return new CommandAction(false, "jsp/insert.jsp");   ---밑에 이어서 함
+
+3-2. a, b 값을 입력하세요
+- a: 포워딩 방식  false (디스팻처방식으로 하기때문에 주소가 안 바뀜)
+- b: 포워딩하는 곳 "jsp/insert.jsp"
+
+
+==============================
+---jsp/insert.jsp----
+<form action="/insert.do" method="post" >
+ID : <input name="id"><br>
+NAME: <input name="name"><br>
+AGE : <input name="age"><br>
+
+<input type="submit" value="입력">
+</form>
+
+4. form 태그에서 데이터 전송 방식과 관련된 속성명은?
+- method
+
+5. 위 form 태그의 method 값은 무엇일까요?
+- post
+
+6. form 태그에 데이터를 전송할 서버 페이지의 이름을 적을 수 있는 속성명은?
+- action
+
+7. 아이디나 이름, 나이는 어떤 주소로 보내기로 했나요?
+- /insert.do
+
+8. 위 form 태그에 입력된 데이터는 절대로 서버로 넘어가지 않습니다. 왜일까요?
+단, <input value="입력"> 는 정상이라고 가정한다.
+- name 속성값이 없어서..
+
+9. 위 form 태그를 보면, 입력 버튼이 버튼으로 표기 안되어 있음. 이것을 전송 버튼으로 만들려면 어떻게 해야 하는가?
+- type="submit"
+
+10.                        
+                              /insert.do   
+  회원 정보 입력 화면 -----------------FrontController-------InsertCommand-------- return new CommandAction(true, "/list.do");
+- a: true (리다이렉트 방식으로 하면서 주소가 바뀜)
+- b: "/list.do" (DB로 가려면 .do로 가야한다.)
+
+11.
+  /list.do  
+--------------FrontController-----------ListCommand-------return new CommandAction(a, b);
+- a: false (request에 저장된 데이터가 살아남으려면 디스팻처방식으로 하고 주소는 바뀌지 않으므로 false다)
+- b: "jsp/read.jsp"
+
+12. 목록에서 특정 회원의 이름이나 id를 클릭하면, 회원정보 자세히 보기로 이동합니다.
+이 기능을 구현하기 위해 어떤 태그를 사용했을까요?
+- <a>1 : 홍길동</a>
+
+13. 12번 코드 상태에서는 [회원 정보 자세히 보기] 화면으로 이동하지 않습니다. 이동하려면 a태그의 어떤 속성에 값을 넣어야 하는가?
+속성명만 올려 주세요.
+- <a href="">1 : 홍길동</a>
+
+14. 13번 코드를 완성하세요.
+- <a href="/read.do?id=1">1 : 홍길동</a>
+
+15. 14번 코드의 결과를 클릭하면
+      /read.do
+목록-------------FrontController--------ReadCommand--------return new CommandAction(a, b);
+- a:  false
+- b: "jsp/read.jsp"
+
+16. 5개의 메뉴를 구현한 태그는?
+- <a></a>
+
+17. <a>목록</a> 이 코드를 완성하시오
+- <a href="list.do">목록</a>  (데이터를 가져오려면 .do 로 해야한다)
+
+            /list.do
+상세보기 ---------FrontController --------ListCommand-----------return new CommandAction(a, b);
+- a: false
+- b: "jsp/list.jsp"
+
+18. [수정화면으로]를 구현하는 코드를 작성해 보세요.
+- <a href="/updateui.do?id=${dto.id}">수정화면으로</a>
+
+            /updateui.do
+상세보기 ------------------FrontController--------UpdateUICommand---------return new CommandAction(a, b);
+- a: false
+- b: "jsp/update.jsp"
+
+
+19. 
+<form method="post" action="/update.do">
+	id: <input ><br>
+	name: <input><br>
+	age: <input><br>
+
+	<input value="수정">
+</form>
+
+
+20. id: <input ><br> 를 완성하세요. 단, id는 수정이 안됨
+- <input name="id" value="${dto.id}" readonly><br>
+
+<form method="post" action="/update.do">
+	id: <input name="id" readonly><br>
+	name: <input name="name"><br>
+	age: <input name="age"><br>
+
+	<input type="submit" value="수정">
+</form>
+
+21.  <input type="submit" value="수정"> 를 클릭하면
+
+            /update.do
+수정화면------------------FrontController--------UpdateCommand---------return new CommandAction(a, b);
+- a: true
+- b: "/read.do?id="+id
+
+22. [회원정보자세히보기] 화면에서 삭제 버튼을 구현하세요.
+- <a href="/delete.do?id="+${dto.id}>삭제</a>
+
+23. 
+                         /delete.do
+회원정보자세히보기------------------FrontController-----DeleteCommand---------return new CommandAction(a, b);
+- a: true
+- b: "/list.do"
+
+24. 
+                     /list.do
+DeleteCommand------------FrontController --------------- ListCommand------------retrun new CommandAction(a, b)
+- a: false
+- b: "jsp/list.jsp"
+
+
+
+=====================================
+조각 파일에 데이터를 넘겨주고 싶으면, include action tag를 이용하고
+그렇지 않으면 include
+
+<jsp:include page="part_footer.jsp"/> ---> 데이터를 보낼게 없으면 한문장으로 코드를 짠다
+
+데이터를 보낼게 있으면 아래처럼 코드를 짠다.
+<jsp:include page="part_contents.jsp">
+	<jsp:param value="1" name="id"/>
+	<jsp:param value="홍길동" name="name"/>
+	<jsp:param value="16" name="age"/>
+</jsp:include>
+실행하면  브라우저에 1 : 홍길동 : 16 이 나온다
+
+request에 바인딩 데이터는
+param 액션 태그를 이용하지 않아도
+part_파일로 전달이 된다.
+
+==============
+< JSPEx1 프로젝트에서 webapp 폴더에  test8.jsp jsp파일  생성>
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8" session="false"%>
+    
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>  
+
+
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>include 액션 태그</title>
+</head>
+<body>
+<%@ include file="part_head.jsp" %>
+<h1>본문입니다.</h1>
+
+<jsp:include page="part_contents.jsp">
+	<jsp:param value="1" name="id"/>
+	<jsp:param value="홍길동" name="name"/>
+	<jsp:param value="16" name="age"/>
+</jsp:include>
+
+<jsp:include page="part_footer.jsp"/>
+
+
+</body>
+</html>
+
+
+==================
+< webapp 폴더에  part_contents.jsp jsp파일  생성>
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8" session="false"%>
+    
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>  
+
+<hr>
+${param.id} : ${param.name} : ${param.age}   -----방법 1 을 쓰는게 좋다
+<br>
+<%
+	String id = request.getParameter("id");   ----방법2 
+	String name = request.getParameter("name");
+	String age = request.getParameter("age");
+	pageContext.setAttribute("id", id);
+	pageContext.setAttribute("name", name);
+	pageContext.setAttribute("age", age);
+%>
+
+${id} : ${name} : ${age}
+<hr>
+
+
+==============
+< kr.co.test 패키지에 krEncoding filter 생성>
+package kr.co.test;
+
+import java.io.IOException;
+import javax.servlet.Filter;
+import javax.servlet.FilterChain;
+import javax.servlet.FilterConfig;
+import javax.servlet.ServletException;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
+import javax.servlet.annotation.WebFilter;
+import javax.servlet.http.HttpFilter;
+
+/**
+ * Servlet Filter implementation class krEncoding
+ */
+@WebFilter("/*")
+public class KrEncoding extends HttpFilter implements Filter {
+       
+	private static final long serialVersionUID = 1L;
+
+	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
+		// Http가 빠진 서블릿을 사용한다.
+		
+		//요청할 때 적용할 코드..
+		request.setCharacterEncoding("utf-8");
+		response.setContentType("text/html; charset=UTF-8");
+		
+		chain.doFilter(request, response);
+		
+		
+		//응답할때 적용할 코드..
+	}
+
+	public void init(FilterConfig fConfig) throws ServletException {
+		// TODO Auto-generated method stub
+	}
+
+}
+
+
+
+==================
+< webapp 폴더에  test9.jsp jsp파일  생성>
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8" session="false"%>
+    
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>  
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+<h1>ggggggggg</h1>    ----> 브라우저에 출력이 안된다
+<jsp:forward page="test8.jsp"/>
+<h1>ggggggggg</h1>    ----> 브라우저에 출력이 안된다
+</body>
+</html>
+
+브라우저에 test8.jsp 에 입력된 코드가 출력이 된다.
+
+
+=============
+
+게시판과 회원관리가 같이 있는 프로젝트에서는
+/insertui.do 가
+회원 등록 화면인지
+게시글 등록 화면인지
+헷갈리게 됨.
+따라서 이를 명확히 해줘야 함
+mms2의 uri에
+/member를 접두어로 붙여주세요
+
+회원은 /member
+게시글은 /board 이런식으로 붙여줘서 알아보려고한다.
+.do 가 있는건 /member/list.do 이렇게 붙여주고
+jsp/list.jsp 는 /jsp/list.jsp 즉 맨앞에 /만 붙여준다.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
