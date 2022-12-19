@@ -1,0 +1,21 @@
+CREATE SEQUENCE seq_board_num
+START WITH 100
+INCREMENT BY 1;
+
+
+
+
+CREATE TABLE tbl_board(
+num NUMBER,
+author VARCHAR2(15) NOT NULL,
+title VARCHAR2(45) NOT NULL,
+content VARCHAR2(3000) NOT NULL,
+pw NUMBER NOT NULL,
+writeday DATE DEFAULT SYSDATE,
+readcnt NUMBER DEFAULT 0,
+
+repRoot NUMBER, 
+repStep NUMBER,
+repIndent NUMBER,
+CONSTRAINT pk_board_num PRIMARY KEY(num)
+)

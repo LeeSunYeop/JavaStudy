@@ -232,6 +232,7 @@ public class CommandAction {
 	private boolean isRedirect;
 	private String where;
 	
+	// 사용자생성자, getter/setter 만 만들기
 	public CommandAction(boolean isRedirect, String where) {
 		super();
 		this.isRedirect = isRedirect;
@@ -1644,6 +1645,7 @@ public class Board_ReplyUICommand implements Command {
 	public CommandAction execute(HttpServletRequest request, HttpServletResponse response)
 			throws IOException, ServletException {
 		String sorgNum = request.getParameter("orgNum");
+		// orgNum 오리지널넘버(원래글)
 		int orgNum = Integer.parseInt(sorgNum);
 		
 		request.setAttribute("orgNum", orgNum);
@@ -1826,11 +1828,1018 @@ String sql = "SELECT num, author, title, To_CHAR(writeday, 'yyyy-mm-dd') writeda
 
 
 
+reply( ) 메서드에 구현하지 않은게 있음.
+
+원래글의 repStep과 
+repRoot가 기존 답글의 repStep을 비교해서
+repRoot가 기존 답글의 repStep이 더 크면
+repRoot가 기존 답글의 repStep = repStep +1
+
+원래글과 답글이 붙어있게 하기 위해서
+어떤 컬럼을 사용했죠?
+repRoot 컬럼을 이용했음.
+ORDER BY repRoot desc,
+
+답글들끼리의 정렬을 위해서
+특히
+답글과 [답글의답글]이 떨어져서 존재하는 모습을 보였죠..
+아직 구현을 안 했는데,
+엑셀에서 답글과 [답글의답글]이 붙어 있게 하는 모습을 보여줬음.
+
+답글이 달리면,
+repRoot: 새로운 답글의 repRoot는 그 답글의 원래글의 repRoot값
+repStep: 새로운 답글의 repStep은 답글의 원래글의 repStep + 1
+	+(repRoot값이 같은 기존 답글들 중에서 새로운 답글의 원래글의 repStep값보다 큰 repStep값을 갖고 있는 기존 답글들의
+	repStep을 +1 해줌.)
+
+답글이 있는 여부 확인
+답글이 있는데
+기존 답글 중에
+새 답글의 부모 답글보다 repStep
+
+페이징 작업을 합니다.
+그러려면 데이터가 많이 있어어야 합니다.
+125개 추가 할게요.
+
+
+==========================
+< DAO에  reply 수정하러 가기 >
+	public void reply(int orgNum, BoardDTO dto) {
+		Connection conn = null;
+		PreparedStatement pstmt = null;
+		String sql = "INSERT INTO tbl_board (num, author, title, content, pw, repRoot, repStep, repIndent) "
+				+ "VALUES (seq_board_num.NEXTVAL, ?, ?, ?, ?, ?, ?, ?)";
+		
+		int result = 0;
+		int result1 = 0;
+		int result2 = 0;
+		
+		try {
+			conn = DriverManager.getConnection(
+					BoardDAO.URL, BoardDAO.USERNAME, BoardDAO.PASSWORD);
+			conn.setAutoCommit(false);
+			
+			BoardDTO orgDto = getOrgBoard(conn, orgNum);
+			
+			// 기존 답글이 있는지 확인하는 작업
+			boolean isExists = isExistsAnotherReply(conn, orgDto);						
+			
+			if (isExists) {
+				result1 = increaseRepStep(conn, orgDto);
+			} else {
+				result1 = 1;
+			}
+			
+			pstmt = conn.prepareStatement(sql);
+			
+			pstmt.setString(1, dto.getAuthor());
+			pstmt.setString(2, dto.getTitle());
+			pstmt.setString(3, dto.getContent());
+			pstmt.setInt(4, dto.getPw());
+			
+			pstmt.setInt(5, orgDto.getRepRoot());
+			pstmt.setInt(6, orgDto.getRepStep()+1);
+			pstmt.setInt(7, orgDto.getRepIndent()+1);
+			
+			result2 =  pstmt.executeUpdate();
+			
+			result = result1 * result2;
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			commitOrRollback(result, conn);
+			
+			closeAll(null, pstmt, conn);
+		}
+		
+		
+	}
+
+==========================
+< DAO에  increaseRepStep 자동생성된거 작성하러 가기 >
+	private int increaseRepStep(Connection conn, BoardDTO orgDto) {
+		int result1 = 0;
+		PreparedStatement pstmt = null;
+		String sql = "UPDATE tbl_board SET repStep = repStep + 1 WHERE repRoot = ? "
+				+ "AND repStep > ?";
+		try {
+			pstmt = conn.prepareStatement(sql);
+			
+			pstmt.setInt(1, orgDto.getRepRoot());
+			pstmt.setInt(2, orgDto.getRepStep());
+			
+			result1 = pstmt.executeUpdate();
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			closeAll(null, pstmt, null);
+		}
+		
+		return result1;
+		
+	}
+
+
+==========================
+< DAO에  isExistsAnotherReply 자동생성된거 작성하러 가기 >
+	// 기존 답글 존재여부 확인
+	private boolean isExistsAnotherReply(Connection conn, BoardDTO orgDto) {
+		boolean isExists = false;
+		
+		PreparedStatement pstmt = null;
+		String sql = "SELECT MAX(repStep) FROM tbl_board WHERE repRoot = ? AND repStep > ?";
+		ResultSet rs = null;
+		
+		try {
+			pstmt = conn.prepareStatement(sql);
+			
+			pstmt.setInt(1, orgDto.getRepRoot());
+			pstmt.setInt(2, orgDto.getRepStep());
+			
+			rs = pstmt.executeQuery();
+			
+			if (rs.next()) {
+				int maxRepStep = rs.getInt(1);
+				if(maxRepStep > 0) {
+					isExists = true;
+				} else {
+					isExists = false;
+				}
+			}
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			closeAll(rs, pstmt, null);
+		}
+		
+		return isExists;
+	}
+
+
+
+==========================
+< board.sql 에서 기존 데이터 테이블 삭제하기 >
+
+ALTER TABLE tbl_board DROP CONSTRAINT pk_board_num  // 기본키 삭제
+DROP TABLE tbl_board  // 그리고나서 테이블 삭제
+
+delete from tbl_board  // 기존 데이터 삭제
+commit
+
+
+CREATE SEQUENCE seq_board_num
+START WITH 100
+INCREMENT BY 1;
+
+CREATE TABLE tbl_board(
+num NUMBER,
+author VARCHAR2(15) NOT NULL,
+title VARCHAR2(45) NOT NULL,
+content VARCHAR2(3000) NOT NULL,
+pw NUMBER NOT NULL,
+writeday DATE DEFAULT SYSDATE,
+readcnt NUMBER DEFAULT 0,
+
+repRoot NUMBER,
+repStop NUMBER,
+repIndent NUMBER,
+repStep NUMBER,
+CONSTRAINT pk_board_num PRIMARY KEY(num)
+)
+
+
+==========================
+< webapp 폴더에 board 폴더에 list.jsp 수정 및  삭제하기 >
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8" session="false"%>
+    
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>  
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>게시글 보기</title>
+</head>
+<body>
+	<p>
+		안녕하세요. 띄어쓰기는&nbsp;&nbsp;&nbsp;&nbsp;원래 없었는데, 미국인이 제안해서 생긴 문법입니다.
+	</p>
+	<a href="/board/insertui.do">글쓰기 화면으로 가기</a>
+	
+	<table border="1">
+		<thead>
+			<tr>
+				<th>num</th>
+				<th>author</th>
+				<th width="300px">title</th>  // title 넓이조절
+				<th>writeday</th>
+				<th>readcnt</th>
+				
+				<th>repIndent</th>
+			</tr>
+		</thead>
+		
+		<tbody>
+			<c:forEach items="${list}" var="dto">
+			
+				<tr>
+					<td>${dto.num}</td>
+					<td>${dto.author}</td>
+					<td>
+						<c:forEach begin="1" end="${dto.repIndent}">
+							&nbsp;   // 답글의 답글 title 띄워쓰기
+						</c:forEach>
+						<a href="/board/read.do?num=${dto.num}">${dto.title}</a>
+					</td>
+					<td>${dto.writeday}</td>
+					<td>${dto.readcnt}</td>
+					
+					<td>${dto.repIndent}</td>
+				</tr>
+				
+			</c:forEach>
+		</tbody>
+	</table>
+
+</body>
+</html>
+
+
+==========================
+< DAO에  list2작성하러 가기(list복사함) --페이징작업 >
+	public PageTO<BoardDTO> list2(int curPage) {
+		PageTO<BoardDTO> pt = new PageTO<>(curPage);
+		
+		List<BoardDTO> list = new ArrayList<BoardDTO>();
+		
+		Connection conn = null;
+		PreparedStatement pstmt = null;
+		String sql = "SELECT * FROM "
+				+ "(SELECT rownum rnum, num, author, title, To_CHAR(writeday, 'yyyy-mm-dd') writeday, "
+				+ "readcnt, repIndent "
+				+ "FROM " 
+				+ "(SELECT * FROM tbl_board ORDER BY repRoot DESC, repStep ASC)) "
+				+ "WHERE " 
+				+ "rnum BETWEEN ? AND ?";
+		ResultSet rs = null;
+		
+		try {
+			conn = DriverManager.getConnection(
+					BoardDAO.URL, BoardDAO.USERNAME, BoardDAO.PASSWORD);
+			
+			int amount = getAmount(conn);
+			
+			pt.setAmount(amount);
+			
+			int startNum = pt.getStartNum();
+			int endNum = pt.getEndNum();			
+			
+			pstmt = conn.prepareStatement(sql);
+			
+			pstmt.setInt(1, startNum);
+			pstmt.setInt(2, endNum);
+			
+			rs = pstmt.executeQuery();
+			
+			while (rs.next()) {
+				int num = rs.getInt("num");
+				String author = rs.getString("author");
+				String title = rs.getString("title");
+				String writeday = rs.getString("writeday");
+				int readcnt = rs.getInt("readcnt");								
+				int repIndent = rs.getInt("repIndent");
+				
+				BoardDTO dto = new BoardDTO(num, author, title, writeday, 
+										readcnt, -1, -1, repIndent);
+				list.add(dto);
+				
+			}
+			
+			pt.setList(list);   // 반드시 넣어줘야한다.
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			closeAll(rs, pstmt, conn);
+		}
+		
+		return pt;
+	}
+
+
+==========================
+< board.sql 에서 기존 데이터 추가하기 --  list2의 페이징작업 >
+SELECT * FROM tbl_board ORDER BY repRoot DESC, repStep ASC
+
+SELECT * FROM
+(SELECT rownum rnum, num, author, title, To_CHAR(writeday, 'yyyy-mm-dd') writeday, readcnt, repIndent
+FROM 
+(SELECT * FROM tbl_board ORDER BY repRoot DESC, repStep ASC))
+WHERE 
+rnum BETWEEN 21 AND 30    // 21페이지부터 30페이지라는 의미
+
+
+ALTER TABLE tbl_board DROP CONSTRAINT pk_board_num
+DROP TABLE tbl_board
+
+delete from tbl_board
+commit
+
+
+CREATE SEQUENCE seq_board_num
+START WITH 100
+INCREMENT BY 1;
+
+CREATE TABLE tbl_board(
+num NUMBER,
+author VARCHAR2(15) NOT NULL,
+title VARCHAR2(45) NOT NULL,
+content VARCHAR2(3000) NOT NULL,
+pw NUMBER NOT NULL,
+writeday DATE DEFAULT SYSDATE,
+readcnt NUMBER DEFAULT 0,
+
+repRoot NUMBER,
+repStop NUMBER,
+repIndent NUMBER,
+repStep NUMBER,
+CONSTRAINT pk_board_num PRIMARY KEY(num)
+)
+
+
+
+===========================
+페이징 처리에 필요한 지식들...
+
+1. perPage : 한 페이지당 최대로 표현하할 수 있는 게시글의 수 --- 10으로 가정하여 코드를 작성함.
+
+2. amount : 게시글 총 수
+
+3. totalPage : 페이징의 최댓값..
+-  totalPage = ((amount-1)/perPage) + 1 
+
+   amount = 1이면, totalPage = 1
+   amount = 2이면, totalPage = 1
+   amount = 3이면, totalPage = 1
+   amount = 9이면, totalPage = 1
+   amount = 10이면, totalPage = 1
+
+   amount = 11이면, totalPage = 2
+   amount = 12이면, totalPage = 2
+   amount = 13이면, totalPage = 2
+   amount = 19이면, totalPage = 2
+   amount = 20이면, totalPage = 2
+
+4. curPage : 현재 페이지
+
+5. startNum : 
+01~   --1페이지일때
+11~   --2페이지일때
+21~   --3페이지일때
+31~   --4페이지일때
+41~   --5페이지일때
+startNum = (curPage-1)*perPage + 1
+
+6. endNum :
+endNum = curPage * perPage
+만약 endNum = 50
+그런데 게시글의 총 수(amount)가 43개라면..
+if(endNum > amount){
+	endNum = amount;
+}
+
+7. lineMax : 페이징 최대 표현 수 ----- 10로 가정하고 코드를 작성함.
+
+8. beginPageNum
+beginPageNum = ((curPage-1) / lineMax) * lineMax +1
+
+curPage = 1
+a. 01~
+b. 11~
+c. 21~
+d. 31~
+e. 41~
+
+9. finishPageNum
+finishPageNum = ((curPage-1) / lineMax) + 1) * lineMax
+
+~10 = 10
+~20 = 20
+~30 = 30
+~40 = 40
+
+10. list
+
+
+==========================
+< kr.co.domain 패키지에  PageTO 클래스 생성 >
+package kr.co.domain;
+
+import java.util.List;
+
+public class PageTO<T> {
+	// 독립변수
+	private int perPage = 10;  // 한 페이지당 최대로 표현하할 수 있는 게시글의 수
+	private int amount;        // 게시글 총 수
+	private int curPage;	   // 현재 페이지
+	private int lineMax = 10;  //  페이징 최대 표현 수
+	
+	// 종속변수
+	private int totalPage;  // 페이징의 최댓값
+	private int startNum;   
+	private int endNum;		
+	
+	// 종속변수
+	private List<T> list;
+	
+	// 종속변수
+	private int beginPageNum;  // 시작페이지수
+	private int finishPageNum; // 끝페이지수
+	
+	// 디폴트 생성자
+	public PageTO() {
+		curPage = 1;
+		
+		execute();
+	}
+	
+	// 사용자 생성자 curPage만 체크
+	public PageTO(int curPage) {
+		super();
+		this.curPage = curPage;
+		
+		execute();
+	}
+
+	public int getPerPage() {
+		return perPage;
+	}
+
+	public void setPerPage(int perPage) {
+		this.perPage = perPage;
+		
+		execute();
+	}
+
+	public int getAmount() {
+		return amount;
+	}
+
+	public void setAmount(int amount) {
+		this.amount = amount;
+		
+		execute();
+	}
+
+	public int getCurPage() {
+		return curPage;
+	}
+
+	public void setCurPage(int curPage) {
+		this.curPage = curPage;
+		
+		execute();
+	}
+
+	public int getLineMax() {
+		return lineMax;
+	}
+
+	public void setLineMax(int lineMax) {
+		this.lineMax = lineMax;
+		
+		execute();
+	}
+
+	public int getTotalPage() {
+		return totalPage;
+	}
+
+	public void setTotalPage(int totalPage) {
+		this.totalPage = totalPage;
+	}
+
+	public int getStartNum() {
+		return startNum;
+	}
+
+	public void setStartNum(int startNum) {
+		this.startNum = startNum;
+	}
+
+	public int getEndNum() {
+		return endNum;
+	}
+
+	public void setEndNum(int endNum) {
+		this.endNum = endNum;
+	}
+
+	public List<T> getList() {
+		return list;
+	}
+
+	public void setList(List<T> list) {
+		this.list = list;
+	}
+
+	public int getBeginPageNum() {
+		return beginPageNum;
+	}
+
+	public void setBeginPageNum(int beginPageNum) {
+		this.beginPageNum = beginPageNum;
+	}
+
+	public int getFinishPageNum() {
+		return finishPageNum;
+	}
+
+	public void setFinishPageNum(int finishPageNum) {
+		this.finishPageNum = finishPageNum;
+	}
+	
+	private void execute() {
+		totalPage = ((amount-1) / perPage) + 1;
+		startNum = (curPage-1) * perPage + 1;
+		endNum = curPage * perPage;
+		if(endNum > amount){
+			endNum = amount;
+		}
+		
+		beginPageNum = ((curPage - 1) / lineMax) * lineMax + 1;
+		finishPageNum = (((curPage-1) / lineMax) + 1) * lineMax;		
+		if (finishPageNum > totalPage) {
+			finishPageNum = totalPage;
+		}
+	}
+
+}
+
+
+==========================
+< DAO에  list2작성하러 가기 수정 및 추가 > 
+	public PageTO<BoardDTO> list2(int curPage) {
+		PageTO<BoardDTO> pt = new PageTO<>(curPage);
+		
+		List<BoardDTO> list = new ArrayList<BoardDTO>();
+		
+		Connection conn = null;
+		PreparedStatement pstmt = null;
+		String sql = "SELECT * FROM "
+				+ "(SELECT rownum rnum, num, author, title, To_CHAR(writeday, 'yyyy-mm-dd') writeday, "
+				+ "readcnt, repIndent "
+				+ "FROM " 
+				+ "(SELECT * FROM tbl_board ORDER BY repRoot DESC, repStep ASC)) "
+				+ "WHERE " 
+				+ "rnum BETWEEN ? AND ?";
+		ResultSet rs = null;
+		
+		try {
+			conn = DriverManager.getConnection(
+					BoardDAO.URL, BoardDAO.USERNAME, BoardDAO.PASSWORD);
+			
+			int amount = getAmount(conn);
+			
+			pt.setAmount(amount);
+			
+			int startNum = pt.getStartNum();
+			int endNum = pt.getEndNum();			
+			
+			pstmt = conn.prepareStatement(sql);
+			
+			pstmt.setInt(1, startNum);
+			pstmt.setInt(2, endNum);
+			
+			rs = pstmt.executeQuery();
+			
+			while (rs.next()) {
+				int num = rs.getInt("num");
+				String author = rs.getString("author");
+				String title = rs.getString("title");
+				String writeday = rs.getString("writeday");
+				int readcnt = rs.getInt("readcnt");								
+				int repIndent = rs.getInt("repIndent");
+				
+				BoardDTO dto = new BoardDTO(num, author, title, writeday, 
+										readcnt, -1, -1, repIndent);
+				list.add(dto);
+				
+			}
+			
+			pt.setList(list);   // 반드시 넣어줘야한다.
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			closeAll(rs, pstmt, conn);
+		}
+		
+		return pt;
+	}
+
+==========================
+< DAO에  getAmount작성하러가기 자동생성 >
+	private int getAmount(Connection conn) {
+		int amount = 0;
+		
+		PreparedStatement pstmt = null;
+		String sql = "SELECT COUNT(num) FROM tbl_board";
+		ResultSet rs = null;
+		
+		try {
+			pstmt = conn.prepareStatement(sql);
+			rs = pstmt.executeQuery();
+			if (rs.next()) {
+				amount = rs.getInt(1);
+			}
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			closeAll(rs, pstmt, null);
+		}
+		
+		return amount;
+	}
+
+
+==========================
+< kr.co.command 패키지에  Board_ListCommand 클래스 수정하기 >
+package kr.co.command;
+
+import java.io.IOException;
+import java.util.List;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import kr.co.domain.BoardDTO;
+import kr.co.domain.CommandAction;
+import kr.co.domain.PageTO;
+import kr.co.repository.BoardDAO;
+
+public class Board_ListCommand implements Command {
+
+	@Override
+	public CommandAction execute(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+		int curPage = 1;
+		
+		String scurPage = request.getParameter("curPage");
+		
+		if (scurPage != null) {
+			curPage = Integer.parseInt(scurPage);
+		} 
+		
+		BoardDAO dao = new BoardDAO();
+//		List<BoardDTO> list = dao.list();		
+//		request.setAttribute("list", list);
+		
+		PageTO<BoardDTO> pt = dao.list2(curPage);
+		request.setAttribute("pt", pt);
+		
+		return new CommandAction(false, "/jsp/board/list.jsp");
+	}
+
+}
+
+
+
+==========================
+< webapp 폴더에 board 폴더에 list.jsp 수정하기 >
+
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8" session="false"%>
+    
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>  
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>게시글 보기</title>
+</head>
+<body>
+	<p>
+		안녕하세요. 띄어쓰기는&nbsp;&nbsp;&nbsp;&nbsp;원래 없었는데, 미국인이 제안해서 생긴 문법입니다.
+	</p>
+	<a href="/board/insertui.do">글쓰기 화면으로 가기</a>
+	
+	<table border="1">
+		<thead>
+			<tr>
+				<th>num</th>
+				<th>author</th>
+				<th width="300px">title</th>
+				<th>writeday</th>
+				<th>readcnt</th>		
+			</tr>
+		</thead>
+		
+		<tbody>
+			<c:forEach items="${pt.list}" var="dto">  // 이부분 수정함
+			
+				<tr>
+					<td>${dto.num}</td>
+					<td>${dto.author}</td>
+					<td>
+						<c:forEach begin="1" end="${dto.repIndent}">
+							&nbsp;
+						</c:forEach>
+						<a href="/board/read.do?num=${dto.num}">${dto.title}</a>
+					</td>
+					<td>${dto.writeday}</td>
+					<td>${dto.readcnt}</td>
+				</tr>
+				
+			</c:forEach>
+		</tbody>
+	</table>
+
+</body>
+</html>
+
+
+
+==========================
+< webapp 폴더에 board 폴더에 part_page jsp파일 생성 >
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8" session="false"%>
+    
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>  
+
+<c:if test="${pt.curPage > 1}" >
+	<a href="/board/list.do?curPage=${pt.curPage-1}">&lt;</a>
+</c:if>
+
+<c:forEach begin="1" end="${pt.totalPage}" var="i">
+	<c:if test="${i != pt.curPage}" >
+		<a href="/board/list.do?curPage=${i}">${i}</a> // 페이지 수를 나타냄
+	</c:if>
+	
+	<c:if test="${i ==  pt.curPage}" >
+		<a style="color:red;" href="/board/list.do?curPage=${i}">${i}</a>  // 현재페이지에 빨간색으로 표시함
+	</c:if>
+</c:forEach>
+
+<c:if test="${pt.curPage < pt.totalPage}" >
+	<a href="/board/list.do?curPage=${pt.curPage+1}">&gt;</a>
+</c:if>
+
+
+==========================
+< kr.co.domain 패키지에  PageTO 클래스 수정 및 추가 >
+package kr.co.domain;
+
+import java.util.List;
+
+public class PageTO<T> {
+	// 독립변수
+	private int perPage = 10;  // 한 페이지당 최대로 표현하할 수 있는 게시글의 수
+	private int amount;        // 게시글 총 수
+	private int curPage;	   // 현재 페이지
+	private int lineMax = 10;  //  페이징 최대 표현 수
+	
+	// 종속변수
+	private int totalPage;  // 페이징의 최댓값
+	private int startNum;   
+	private int endNum;		
+	
+	// 종속변수
+	private List<T> list;
+	
+	// 종속변수
+	private int beginPageNum;  // 시작페이지수
+	private int finishPageNum; // 끝페이지수
+	
+	// 디폴트 생성자
+	public PageTO() {
+		curPage = 1;
+		
+		execute();
+	}
+	
+	// 사용자 생성자 curPage만 체크
+	public PageTO(int curPage) {
+		super();
+		this.curPage = curPage;
+		
+		execute();
+	}
+
+	public int getPerPage() {
+		return perPage;
+	}
+
+	public void setPerPage(int perPage) {
+		this.perPage = perPage;
+		
+		execute();
+	}
+
+	public int getAmount() {
+		return amount;
+	}
+
+	public void setAmount(int amount) {
+		this.amount = amount;
+		
+		execute();
+	}
+
+	public int getCurPage() {
+		return curPage;
+	}
+
+	public void setCurPage(int curPage) {
+		this.curPage = curPage;
+		
+		execute();
+	}
+
+	public int getLineMax() {
+		return lineMax;
+	}
+
+	public void setLineMax(int lineMax) {
+		this.lineMax = lineMax;
+		
+		execute();
+	}
+
+	public int getTotalPage() {
+		return totalPage;
+	}
+
+	public void setTotalPage(int totalPage) {
+		this.totalPage = totalPage;
+	}
+
+	public int getStartNum() {
+		return startNum;
+	}
+
+	public void setStartNum(int startNum) {
+		this.startNum = startNum;
+	}
+
+	public int getEndNum() {
+		return endNum;
+	}
+
+	public void setEndNum(int endNum) {
+		this.endNum = endNum;
+	}
+
+	public List<T> getList() {
+		return list;
+	}
+
+	public void setList(List<T> list) {
+		this.list = list;
+	}
+
+	public int getBeginPageNum() {
+		return beginPageNum;
+	}
+
+	public void setBeginPageNum(int beginPageNum) {
+		this.beginPageNum = beginPageNum;
+	}
+
+	public int getFinishPageNum() {
+		return finishPageNum;
+	}
+
+	public void setFinishPageNum(int finishPageNum) {
+		this.finishPageNum = finishPageNum;
+	}
+	
+	private void execute() {
+		totalPage = ((amount-1) / perPage) + 1;
+		startNum = (curPage-1) * perPage + 1;
+		endNum = curPage * perPage;
+		if(endNum > amount){
+			endNum = amount;
+		}
+		
+		beginPageNum = ((curPage - 1) / lineMax) * lineMax + 1;
+		finishPageNum = (((curPage-1) / lineMax) + 1) * lineMax;		
+		if (finishPageNum > totalPage) {
+			finishPageNum = totalPage;
+		}
+	}
+
+}
+
+
+==========================
+< webapp 폴더에 board 폴더에 part_page jsp파일 수정 및 추가 >
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8" session="false"%>
+    
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>  
+
+<c:if test="${pt.curPage > 1}" >
+	<a href="/board/list.do?curPage=${pt.curPage-1}">&lt;</a>  // 현재페이지가 1보다 작으면 브라우저에 <표시 나오지 않게함
+</c:if>
+
+<c:forEach begin="${pt.beginPageNum}" end="${pt.finishPageNum}" var="i">
+	<c:if test="${i != pt.curPage}" >
+		<a href="/board/list.do?curPage=${i}">${i}</a>
+	</c:if>
+	
+	<c:if test="${i == pt.curPage}" >
+		<a style="color:red;" href="/board/list.do?curPage=${i}">${i}</a>
+	</c:if>
+</c:forEach>
+
+<c:if test="${pt.curPage < pt.totalPage}" >
+	<a href="/board/list.do?curPage=${pt.curPage+1}">&gt;</a> // 현재페이지가 총토탈페이지 보다 작으면 브라우저에 >표시 나오지 않게함
+</c:if>
+
+
+
+=========================
+< Servers에   context.xml 파일 선택>
+맨 아래쪽에 리소스 추가하기
+    <Manager pathname="" />
+    -->
+    <Resource
+    	name ="jdbc/Oracle11g"
+    	auth = "Container"
+    	type = "javax.sql.DataSource"
+    	maxTotal = "4"            // 예를들어 동시접속자가 천명이 한번에 접속한다면 최대4명까지 접속하고 5초간 대기시킨다는 의미임
+    	maxWaitMillis = "5000"   // 5초임
+    	driverClassName="oracle.jdbc.OracleDriver"
+    	url = "jdbc:oracle:thin:@localhost:1521:xe"
+    	username = "dw1"
+    	password = "dw1"
+    />
+</Context>
+이 리소스를 추가하므로써 
+DriverManager.getConnection(BoardDAO.URL, BoardDAO.USERNAME, BoardDAO.PASSWORD);
+코드를 반복해서 사용안하고 간결하게 쓸수 있도록 설정한것이다.
+
+
+==========================
+< DAO에  코드 추가하기 >
+	public static final String DIRVER = "oracle.jdbc.OracleDriver";
+	public static final String URL = "jdbc:oracle:thin:@localhost:1521:xe";
+	public static final String USERNAME = "dw1";
+	public static final String PASSWORD = "dw1";
+
+	private DataSource dataFactory;	---- 여기서부터 코드 추가	 
+	
+	// 디폴트 생성자   
+	public BoardDAO() {
+	    try {
+	       Context ctx = new InitialContext();
+	       dataFactory = (DataSource) ctx.lookup("java:comp/env/jdbc/Oracle11g");
+	    } catch (NamingException e) {
+	       // TODO Auto-generated catch block
+	       e.printStackTrace();
+	    }
+	}
+
+그리고
+conn = DriverManager.getConnection(BoardDAO.URL, BoardDAO.USERNAME, BoardDAO.PASSWORD); 
+코드를 아래 코드로 
+conn = dataFactory.getConnection(); 전부다 변경하기
+
+
+
+
+==========================
+< webapp 폴더에 board 폴더에 .jsp jsp파일 생성 >
+
+
+
+
+
+
+
+
+
+
 
 
 ==========================
 < kr.co.command 패키지에  클래스 자동생성 >
-
 
 
 ==========================
@@ -1847,52 +2856,6 @@ String sql = "SELECT num, author, title, To_CHAR(writeday, 'yyyy-mm-dd') writeda
 
 ==========================
 < webapp 폴더에 member 폴더 생성 >
-
-
-
-reply( ) 메서드에 구현하지 않은게 있음.
-
-원래글의 repStep과 
-repRoot가 기존 답글의 repStep을 비교해서
-repRoot가 기존 답글의 repStep이 더 크면
-repRoot가 기존 답글의 repStep = repStep +1
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
