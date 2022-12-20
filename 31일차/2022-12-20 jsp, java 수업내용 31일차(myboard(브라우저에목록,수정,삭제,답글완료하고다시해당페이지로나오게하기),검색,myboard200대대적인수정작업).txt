@@ -1,0 +1,4120 @@
+Data Source Explorer설정하기
+데이터 베이스 커넥션 선택 우클릭 -> new -> 오라클 -> 드라이버 오른쪽에 나침반모양 클릭 -> 
+<name/type탭>오라클thin드라이버/오라클/11 선택 -> <jar list탭>기존에 있던거 clearall -> add -> 오픈jdk->jre->lib->ext->ojdbc6.jar 선택
+-> <properties탭> server를 localhost:1521:xe 로 수정, name을 xe로 수정, pass를 dw1로 입력, id를 dw1로 입력 -> test커넥션 -> finish
+
+
+=========================  < 순서대로 작성한거 > =======================
+
+< MyBoard 다이나믹 웹 프로젝트  생성 >
+- 기존 패키지 4개 만들고 kr.co.filter 패키지 생성, webapp폴더에 5가지 폴더 생성 
+
+< kr.co.filter 패키지에 KrEncoding filter 생성 >
+@WebFilter("/*")
+public class KrEncoding extends HttpFilter implements Filter {
+
+	private static final long serialVersionUID = 1L;
+
+	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
+		
+		request.setCharacterEncoding("utf-8");
+		response.setContentType("text/html; charset=utf-8");
+		
+		chain.doFilter(request, response);
+		
+		
+	}
+
+}
+
+==========================
+< 오라클 파일 생성 및 작성 방법 >
+< MyBoard 클릭후 컨+n -> SQL파일 선택 -> 파일이름: board 쓰고 타입 오라클_11 선택 -> 
+프로파일네임에 뉴오라클 선택, 데이터베이스이네임에 xe선택 >
+
+CREATE TABLE tbl_board(
+num NUMBER,
+author VARCHAR2(15) NOT NULL,      -- 작성자
+title VARCHAR2(45) NOT NULL,          -- 제목
+content VARCHAR2(3000) NOT NULL,   -- 본문내용
+pw NUMBER NOT NULL,                  -- 비번
+writeday DATE DEFAULT SYSDATE,       -- 작성날짜
+readcnt NUMBER DEFAULT 0,            -- 조회수
+
+repRoot NUMBER,                   ---
+repStep NUMBER,                   ---
+repIndent NUMBER,                 ---
+CONSTRAINT pk_board_num PRIMARY KEY(num)
+)
+
+실행은 블럭 지정하고 알트+x
+
+
+==========================
+< kr.co.domain 패키지에 BoradDTO 클래스 생성 >
+package kr.co.domain;
+
+import java.io.Serializable;
+import java.util.Objects;
+
+public class BoardDTO implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+	
+	private int num;
+	private String author;
+	
+	private String title;
+	private String content;
+	private int pw;
+	private String writeday;
+	private int readcnt;
+	
+	private int repRoot;
+	private int repStep;
+	private int repIndent;
+	
+	public BoardDTO() {
+		// TODO Auto-generated constructor stub
+	}
+
+
+
+	public BoardDTO(int num, String author, String title, String writeday, int readcnt, int repRoot, int repStep,
+			int repIndent) {
+		super();             // 사용자 생성자 pw,content빼고 전부 체크하기
+		this.num = num;
+		this.author = author;
+		this.title = title;
+		this.writeday = writeday;
+		this.readcnt = readcnt;
+		this.repRoot = repRoot;
+		this.repStep = repStep;
+		this.repIndent = repIndent;
+	}
+
+
+
+	public BoardDTO(int num, String author, String title, 
+			String content, int pw, String writeday, int readcnt, 
+			int repRoot, int repStep, int repIndent) {
+		super();        // 사용자 생성자 전부 체크하기
+		this.num = num;
+		this.author = author;
+		this.title = title;
+		this.content = content;
+		this.pw = pw;
+		this.writeday = writeday;
+		this.readcnt = readcnt;
+		this.repRoot = repRoot;
+		this.repStep = repStep;
+		this.repIndent = repIndent;
+	}
+
+	public int getNum() {
+		return num;
+	}
+
+	public void setNum(int num) {
+		this.num = num;
+	}
+
+	public String getAuthor() {
+		return author;
+	}
+
+	public void setAuthor(String author) {
+		this.author = author;
+	}
+
+	public String getTitle() {
+		return title;
+	}
+
+	public void setTitle(String title) {
+		this.title = title;
+	}
+
+	public String getContent() {
+		return content;
+	}
+
+	public void setContent(String content) {
+		this.content = content;
+	}
+
+	public int getPw() {
+		return pw;
+	}
+
+	public void setPw(int pw) {
+		this.pw = pw;
+	}
+
+	public String getWriteday() {
+		return writeday;
+	}
+
+	public void setWriteday(String writeday) {
+		this.writeday = writeday;
+	}
+
+	public int getReadcnt() {
+		return readcnt;
+	}
+
+	public void setReadcnt(int readcnt) {
+		this.readcnt = readcnt;
+	}
+
+	public int getRepRoot() {
+		return repRoot;
+	}
+
+	public void setRepRoot(int repRoot) {
+		this.repRoot = repRoot;
+	}
+
+	public int getRepStep() {
+		return repStep;
+	}
+
+	public void setRepStep(int repStep) {
+		this.repStep = repStep;
+	}
+
+	public int getRepIndent() {
+		return repIndent;
+	}
+
+	public void setRepIndent(int repIndent) {
+		this.repIndent = repIndent;
+	}
+
+	public static long getSerialversionuid() {
+		return serialVersionUID;
+	}
+
+	@Override
+	public int hashCode() {   // num만 체크
+		return Objects.hash(num);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		BoardDTO other = (BoardDTO) obj;
+		return num == other.num;
+	}
+
+	@Override
+	public String toString() {  // pw, content 뺴고 전부 체크
+		return "BoradDTO [num=" + num + ", author=" + author + ", title=" + title + ", writeday=" + writeday
+				+ ", readcnt=" + readcnt + ", repRoot=" + repRoot + ", repStep=" + repStep + ", repIndent=" + repIndent
+				+ "]";
+	}
+
+}
+
+
+
+==========================
+< kr.co.domain 패키지에 CommandAction 클래스 생성 >
+package kr.co.domain;
+
+public class CommandAction {
+	
+	private boolean isRedirect;
+	private String where;
+	
+	// 사용자생성자, getter/setter 만 만들기
+	public CommandAction(boolean isRedirect, String where) {
+		super();
+		this.isRedirect = isRedirect;
+		this.where = where;
+	}
+
+	public boolean isRedirect() {
+		return isRedirect;
+	}
+
+	public void setRedirect(boolean isRedirect) {
+		this.isRedirect = isRedirect;
+	}
+
+	public String getWhere() {
+		return where;
+	}
+
+	public void setWhere(String where) {
+		this.where = where;
+	}
+
+}
+
+
+==========================
+< kr.co.repository 패키지에 BoradDAO 클래스 생성 >
+package kr.co.repository;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+
+import kr.co.domain.BoardDTO;
+
+public class BoardDAO {
+	// 4개 상수
+	// 디폴트생성자는 생략
+	// closeAll()
+	// commitOrRollback()
+	
+	public static final String DIRVER = "oracle.jdbc.OracleDriver";
+	public static final String URL = "jdbc:oracle:thin:@localhost:1521:xe";
+	public static final String USERNAME = "dw1";
+	public static final String PASSWORD = "dw1";
+	
+	private void closeAll(ResultSet rs, PreparedStatement pstmt, Connection conn) {
+		if (rs != null) {
+			try {
+				rs.close();
+			} catch (SQLException e) {				
+				e.printStackTrace();
+			}
+		}
+		
+		if (pstmt != null) {
+			try {
+				pstmt.close();
+			} catch (SQLException e) {				
+				e.printStackTrace();
+			}
+		}
+		
+		if (conn != null) {
+			try {
+				conn.close();
+			} catch (SQLException e) {				
+				e.printStackTrace();
+			}
+		}
+		
+	}
+	
+	private void commitOrRollback(int result, Connection conn) {
+		if (result > 0) {
+			try {
+				conn.commit();
+			} catch (SQLException e) {				
+				e.printStackTrace();
+			}
+		} else {
+			try {
+				conn.rollback();
+			} catch (SQLException e) {				
+				e.printStackTrace();
+			}
+		}
+		
+	}
+
+	public List<BoardDTO> list() {
+		List<BoardDTO> list = new ArrayList<BoardDTO>();
+		
+		Connection conn = null;
+		PreparedStatement pstmt = null;
+		String sql = "SELECT * FROM tbl_board ORDER BY num DESC";
+		ResultSet rs = null;
+		
+		try {
+			conn = DriverManager.getConnection(
+					BoardDAO.URL, BoardDAO.USERNAME, BoardDAO.PASSWORD);
+			pstmt = conn.prepareStatement(sql);
+			
+			rs = pstmt.executeQuery();
+			
+			while (rs.next()) {
+				int num = rs.getInt("num");
+				String author = rs.getString("author");
+				String title = rs.getString("title");
+				String writeday = rs.getString("writeday");
+				int readcnt = rs.getInt("readcnt");
+				
+				int repRoot = rs.getInt("repRoot");
+				int repStep = rs.getInt("repStep");
+				int repIndent = rs.getInt("repIndent");
+				
+				BoardDTO dto = new BoardDTO(num, author, title, writeday, 
+										readcnt, repRoot, repStep, repIndent);
+				list.add(dto);
+				
+			}
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			closeAll(rs, pstmt, conn);
+		}
+		
+		return list;
+	}
+
+	public void insert(BoardDTO dto) {
+		
+		Connection conn = null;
+		PreparedStatement pstmt = null;		
+		String sql = "INSERT INTO tbl_board "
+				+ "(num, author, pw, title, content, repRoot, repStep, repIndent) VALUES "
+				+ "(?, ?, ?, ?, ?, ?, ?, ?)";
+		
+		try {
+			conn = DriverManager.getConnection(
+					BoardDAO.URL, BoardDAO.USERNAME, BoardDAO.PASSWORD);
+			pstmt = conn.prepareStatement(sql);
+			
+			pstmt.setInt(1, dto.getNum());
+			pstmt.setString(2, dto.getAuthor());
+			pstmt.setInt(3, dto.getPw());
+			pstmt.setString(4, dto.getTitle());
+			pstmt.setString(5, dto.getContent());
+			pstmt.setInt(6, dto.getNum());
+			pstmt.setInt(7, 0);
+			pstmt.setInt(8, 0);
+			
+			// 원래글의 repRoot: num
+			// 답글의 repRoot: 원래글의 repRoot
+			
+			// 원래글의 repStep: 0
+			// 답글의 repStep: 복잡함
+			
+			// 원래글의 repIndent: 0
+			// 답글의 repIndent:
+			// 1차 답글: 원래글의 repIndent + 1
+			// 2차 답글: 1차 답글의 repIndent + 1
+			
+			pstmt.executeUpdate();
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			closeAll(null, pstmt, conn);
+		}
+	}
+
+}
+
+
+
+==========================
+< kr.co.command 패키지에 Command 인터페이스 생성 >
+package kr.co.command;
+
+import java.io.IOException;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import kr.co.domain.CommandAction;
+
+public interface Command {
+	
+	public abstract CommandAction execute(HttpServletRequest request, HttpServletResponse response)
+		throws ServletException, IOException;
+
+}
+
+
+==========================
+< kr.co.controller 패키지에 FrontController 서블릿 생성 >
+@WebServlet("*.do")
+public class FrontController extends HttpServlet {
+	private static final long serialVersionUID = 1L;
+
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		
+		// 작성순서 2번
+		Map<String, Command> menus = new HashMap<String, Command>();
+		
+		// 작성순서 4번
+		menus.put("/board/list.do", new Board_ListCommand());
+		menus.put("/board/insertui.do", new Board_InsertUICommand());
+		menus.put("/board/insert.do", new Board_InsertCommand());
+		menus.put("/board/read.do", new Board_ReadCommand());
+		menus.put("/board/updateui.do", new Board_UpdateUICommand());
+		menus.put("/board/update.do", new Board_UpdateCommand());
+		menus.put("/board/delete.do", new Board_DeleteCommand());
+
+		// 작성순서 1번
+		String uri = request.getRequestURI();
+		String ctxp = request.getContextPath();
+		String what = uri.substring(ctxp.length());
+		
+		// 작성순서 3번
+		Command menu = menus.get(what);
+		
+		if (menu == null) {
+			
+			menu = new NotServiceCommand();
+
+		}
+		
+		CommandAction action = menu.execute(request, response);
+		
+		if (action.isRedirect()) {
+			response.sendRedirect(action.getWhere());			
+		} else {
+			request.getRequestDispatcher(action.getWhere()).forward(request, response);
+		}
+		
+		
+	}
+
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		// TODO Auto-generated method stub
+		doGet(request, response);
+	}
+
+}
+
+==========================
+< kr.co.command 패키지에 NotServiceCommand 클래스 자동생성 >
+package kr.co.command;
+
+import java.io.IOException;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import kr.co.domain.CommandAction;
+
+public class NotServiceCommand implements Command {
+
+	@Override
+	public CommandAction execute(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+		// TODO Auto-generated method stub
+		return new CommandAction(false, "/jsp/notservice.jsp");
+	}
+
+}
+
+
+==========================
+< webapp 폴더에 notservice.jsp jsp파일 생성 >
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8" session="false"%>
+    
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>  
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>not service</title>
+</head>
+<body>
+	<h1>지원하지 않는 서비스입니다.</h1>
+</body>
+</html>
+
+==========================
+< webapp 폴더로해서 index.jsp jsp파일 생성 >
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8" session="false"%>
+    
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>  
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+<jsp:forward page="/board/list.do"/>
+</body>
+</html>
+
+
+
+====================== 실행해서 안될경우 =========================
+netstat -a -o를 입력하면, port의 pid를 확인할 수 있다.
+
+pid를 확인한 후에
+
+taskkill /f /pid [앞서 확인한 pid]
+
+===================================================
+==========================
+< kr.co.command 패키지에 Board_ListCommand 클래스 자동생성 >
+package kr.co.command;
+
+import java.io.IOException;
+import java.lang.reflect.Member;
+import java.util.List;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import kr.co.domain.BoardDTO;
+import kr.co.domain.CommandAction;
+import kr.co.repository.BoardDAO;
+
+public class Board_ListCommand implements Command {
+
+	@Override
+	public CommandAction execute(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+		
+		BoardDAO dao = new BoardDAO();
+		List<BoardDTO> list = dao.list();
+		
+		request.setAttribute("list", list);
+		
+		return new CommandAction(false, "/jsp/board/list.jsp");
+	}
+
+}
+
+
+==========================
+DAO에 list 작성하러 가기
+	public List<BoardDTO> list() {
+		List<BoardDTO> list = new ArrayList<BoardDTO>();
+		
+		Connection conn = null;
+		PreparedStatement pstmt = null;
+		String sql = "SELECT * FROM tbl_board ORDER BY num DESC";
+		ResultSet rs = null;
+		
+		try {
+			conn = DriverManager.getConnection(
+					BoardDAO.URL, BoardDAO.USERNAME, BoardDAO.PASSWORD);
+			pstmt = conn.prepareStatement(sql);
+			
+			rs = pstmt.executeQuery();
+			
+			while (rs.next()) {
+				int num = rs.getInt("num");
+				String author = rs.getString("author");
+				String title = rs.getString("title");
+				String writeday = rs.getString("writeday");
+				int readcnt = rs.getInt("readcnt");
+				
+				int repRoot = rs.getInt("repRoot");
+				int repStep = rs.getInt("repStep");
+				int repIndent = rs.getInt("repIndent");
+				
+				BoardDTO dto = new BoardDTO(num, author, title, writeday, 
+										readcnt, repRoot, repStep, repIndent);
+				list.add(dto);
+				
+			}
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			closeAll(rs, pstmt, conn);
+		}
+		
+		return list;
+	}
+
+==========================
+< webapp 폴더에 board 폴더 생성 >
+
+< webapp 폴더에 board 폴더에 list jsp파일 생성 >
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8" session="false"%>
+    
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>  
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>게시글 보기</title>
+</head>
+<body>
+	<a href="/board/insertui.do">글쓰기 화면으로 가기</a>
+	
+	<table border="1">
+		<thead>
+			<tr>
+				<th>num</th>
+				<th>author</th>
+				<th>title</th>
+				<th>writeday</th>
+				<th>readcnt</th>
+				<th>repRoot</th>
+				<th>repStep</th>
+				<th>repIndent</th>
+			</tr>
+		</thead>
+		
+		<tbody>
+			<c:forEach items="${list}" var="dto">
+			
+				<tr>
+					<td>${dto.num}</td>
+					<td>${dto.author}</td>
+					<td>${dto.title}</td>
+					<td>${dto.writeday}</td>
+					<td>${dto.readcnt}</td>
+					<td>${dto.repRoot}</td>
+					<td>${dto.repStep}</td>
+					<td>${dto.repIndent}</td>
+				</tr>
+				
+			</c:forEach>
+		</tbody>
+	</table>
+
+</body>
+</html>
+
+
+글쓰기 화면으로 가기  ==> 클릭할수 있게 밑줄이 있음
+num	     author	title	  writeday	readcnt	       repRoot	     repStep	 repIndent
+${dto.num}   ${dto.author}	${dto.title}  ${dto.writeday}  ${dto.readcnt}  ${dto.repRoot}   ${dto.repStep}  ${dto.repIndent}  ==> 입력하면 값이 들어감
+=> 표가만들어짐(브라우저에 있는걸 복사해서 선이 안그려있음) 표가 그려진것은 border="1" 를 해서 그렇다
+
+
+==========================
+< kr.co.command 패키지에 Board_InsertUICommand 클래스 자동생성 >
+package kr.co.command;
+
+import java.io.IOException;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import kr.co.domain.CommandAction;
+
+public class Board_InsertUICommand implements Command {
+
+	@Override
+	public CommandAction execute(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+		
+		return new CommandAction(false, "/jsp/board/insert.jsp");
+	}
+
+}
+
+
+
+==========================
+< webapp 폴더에 board 폴더에 insert.jsp jsp파일 생성 >
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8" session="false"%>
+    
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>  
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>게시글 등록</title>
+</head>
+<body>
+<h1>게시글 등록</h1>
+<form action="/board/insert.do" method="post">
+	num : <input name="num"> <br>
+	author : <input name="author" required><br>
+	pw : <input name="pw" type="password" required><br>
+	title : <input name="title" required><br>
+	
+	content<br>
+	<textarea rows="10" name="content" required></textarea>
+	<br>
+	
+	<input type="submit" value="등록">
+
+</form>
+
+</body>
+</html>
+
+required 속성
+필수입력요소를 설정할때 required 속성을 지정하면 된다.
+필수입력요소를 입력하지않고 submit버튼을 누르면 해당칸을 입력하라는 메세지가 출력되고 포커스까지 해준다.
+
+==========================
+< kr.co.command 패키지에 Board_InsertCommand 클래스 자동생성 >
+package kr.co.command;
+
+import java.io.IOException;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import kr.co.domain.BoardDTO;
+import kr.co.domain.CommandAction;
+import kr.co.repository.BoardDAO;
+
+public class Board_InsertCommand implements Command {
+
+	@Override
+	public CommandAction execute(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+		
+		String snum = request.getParameter("num");
+		int num = Integer.parseInt(snum);
+		
+		String author = request.getParameter("author");		
+		
+		String spw = request.getParameter("pw");
+		int pw = Integer.parseInt(spw);		
+		
+		String title = request.getParameter("title");		
+		String content = request.getParameter("content");
+		
+		BoardDTO dto = new BoardDTO(num, author, title, content, pw, null, 0, 0, 0, 0);
+		
+		BoardDAO dao = new BoardDAO();
+		dao.insert(dto);
+		
+		return new CommandAction(true, "/board/list.do");
+	}
+
+}
+
+
+==========================
+DAO에 insert 작성하러 가기
+	public void insert(BoardDTO dto) {
+		
+		Connection conn = null;
+		PreparedStatement pstmt = null;		
+		String sql = "INSERT INTO tbl_board "
+				+ "(num, author, pw, title, content, repRoot, repStep, repIndent) VALUES "
+				+ "(seq_board_num.NEXTVAL, ?, ?, ?, ?, seq_board_num.CURRVAL, ?, ?)";
+		
+		try {
+			conn = DriverManager.getConnection(
+					BoardDAO.URL, BoardDAO.USERNAME, BoardDAO.PASSWORD);
+			pstmt = conn.prepareStatement(sql);
+			
+			
+			pstmt.setString(1, dto.getAuthor());
+			pstmt.setInt(2, dto.getPw());
+			pstmt.setString(3, dto.getTitle());
+			pstmt.setString(4, dto.getContent());
+			
+			pstmt.setInt(5, 0);
+			pstmt.setInt(6, 0);
+			
+			// 원래글의 repRoot: num
+			// 답글의 repRoot: 원래글의 repRoot
+			
+			// 원래글의 repStep: 0
+			// 답글의 repStep: 복잡함
+			
+			// 원래글의 repIndent: 0
+			// 답글의 repIndent:
+			// 1차 답글: 원래글의 repIndent + 1
+			// 2차 답글: 1차 답글의 repIndent + 1
+			
+			pstmt.executeUpdate();
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			closeAll(null, pstmt, conn);
+		}
+	}
+
+==============================
+< sql에 시퀀스 추가해서 수정및 삭제 순서 >
+1. 시퀀스 생성 --- 시퀀스를 생성해서 num값이 자동 생성된다 지금은 100부터 1씩 증가하는 코드를 작성함
+                      시퀀스를 생성하지 않았으면 수동으로 num값을 입력해야되는데 시퀀스를 생성하므로써 
+		num 값이 자동 생성된다. 
+CREATE SEQUENCE seq_board_num
+START WITH 100
+INCREMENT BY 1;
+
+2. insert.jsp에서 num값 입력창 삭제
+
+3. Board_InsertCommand에서 num값 획득/가공하는 코드 삭제
+
+4. Board_InsertCommand dto 객체 생성 시, num란에 -1 입력
+
+5. BoardDAO 클래스의 insert( )메서드에서 sql문의 값 입력란 중에 num 값이 입력되는 곳(?처리되어 있음)에 시퀀스 적용
+seq_board_num.NEXTVAL 입력,
+
+6. BoardDAO 클래스의 insert( )메서드에서 sql문의 값 입력란 중에 num 값이 입력되는 곳(?처리되어 있음)에 시퀀스 적용
+seq_board_num.CURRVAL 입력,
+
+7. BoardDAO 클래스의 insert( )메서드에서 ?에 대응하는 값을 입력하는 코드에서
+pstmt.setInt(1, dto.getNum( )); 생략
+pstmt.setInt(6, dto.getNum( )); 생략
+
+8. BoardDAO 클래스의 insert( )메서드에서 
+?에 대응하는 값을 입력하는 코드의 인덱스를 1부터 다시 입력
+
+
+==========================
+< board.sql 파일이어서 작성하기  >
+
+// 처음에 적은 코드
+CREATE TABLE tbl_board(
+num NUMBER,
+author VARCHAR2(15) NOT NULL,
+title VARCHAR2(45) NOT NULL,
+content VARCHAR2(3000) NOT NULL,
+pw NUMBER NOT NULL,
+writeday DATE DEFAULT SYSDATE,
+readcnt NUMBER DEFAULT 0,
+
+repRoot NUMBER,
+repStep NUMBER,
+repIndent NUMBER,
+CONSTRAINT pk_board_num PRIMARY KEY(num)
+)
+
+// 시퀀스 추가 내용
+CREATE SEQUENCE seq_board_num
+START WITH 100
+INCREMENT BY 1;
+
+
+==========================
+< board.sql 파일에서 시퀀스문을 추가해서 insert.jsp파일 추가 및 삭제 >
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8" session="false"%>
+    
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>  
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>게시글 등록</title>
+</head>
+<body>
+<h1>게시글 등록</h1>
+<form action="/board/insert.do" method="post">
+						
+	author : <input name="author" required><br>
+	pw : <input name="pw" type="password" required><br>
+	title : <input name="title" required><br>
+	
+	content<br>
+	<textarea rows="10" name="content" required></textarea>
+	<br>
+	
+	<input type="submit" value="등록">
+
+</form>
+
+</body>
+</html>
+-----------num : <input name="num"> <br> 이부분을 삭제함-----------
+
+==========================
+< board.sql 파일에서 시퀀스문을 추가해서 Board_InsertCommand 추가 및 삭제 >
+package kr.co.command;
+
+import java.io.IOException;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import kr.co.domain.BoardDTO;
+import kr.co.domain.CommandAction;
+import kr.co.repository.BoardDAO;
+
+public class Board_InsertCommand implements Command {
+
+	@Override
+	public CommandAction execute(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+		
+		
+		
+		String author = request.getParameter("author");		
+		
+		String spw = request.getParameter("pw");
+		int pw = Integer.parseInt(spw);		
+		
+		String title = request.getParameter("title");		
+		String content = request.getParameter("content");
+		
+		BoardDTO dto = new BoardDTO(-1, author, title, content, pw, null, 0, 0, 0, 0);
+		// -1을 넣었지만 사용하지 않음.
+		BoardDAO dao = new BoardDAO();
+		dao.insert(dto);
+		
+		return new CommandAction(true, "/board/list.do");
+	}
+
+}
+
+-------------- 	String snum = request.getParameter("num");   ---------------  삭제함
+		int num = Integer.parseInt(snum);
+-------------   -1 자리가 원래 num 이였는데  -1 로 수정함
+
+==========================
+< board.sql 파일에서 시퀀스문을 추가해서 BoardDAO 추가 및 삭제 >
+< insert 부분만 수정 및 삭제 >
+	public void insert(BoardDTO dto) {
+		
+		Connection conn = null;
+		PreparedStatement pstmt = null;		
+		String sql = "INSERT INTO tbl_board "
+				+ "(num, author, pw, title, content, repRoot, repStep, repIndent) VALUES "
+				+ "(seq_board_num.NEXTVAL, ?, ?, ?, ?, seq_board_num.CURRVAL, ?, ?)";
+		
+		try {
+			conn = DriverManager.getConnection(
+					BoardDAO.URL, BoardDAO.USERNAME, BoardDAO.PASSWORD);
+			pstmt = conn.prepareStatement(sql);
+			
+			
+			pstmt.setString(1, dto.getAuthor());
+			pstmt.setInt(2, dto.getPw());
+			pstmt.setString(3, dto.getTitle());
+			pstmt.setString(4, dto.getContent());
+			
+			pstmt.setInt(5, 0);
+			pstmt.setInt(6, 0);
+			
+			// 원래글의 repRoot: num
+			// 답글의 repRoot: 원래글의 repRoot
+			
+			// 원래글의 repStep: 0
+			// 답글의 repStep: 복잡함
+			
+			// 원래글의 repIndent: 0
+			// 답글의 repIndent:
+			// 1차 답글: 원래글의 repIndent + 1
+			// 2차 답글: 1차 답글의 repIndent + 1
+			
+			pstmt.executeUpdate();
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			closeAll(null, pstmt, conn);
+		}
+	}
+
+}
+
+---------------- + "(?, ?, ?, ?, ?, ?, ?, ?)"; 에서 물음표 1번째와 6번째 수정하기
+		1번째는 seq_board_num.NEXTVAL 입력
+		6번째는 seq_board_num.CURRVAL 입력		
+			
+			pstmt.setInt(1, dto.getNum());     ----------삭제하기
+			pstmt.setString(2, dto.getAuthor());
+			pstmt.setInt(3, dto.getPw());
+			pstmt.setString(4, dto.getTitle());
+			pstmt.setString(5, dto.getContent());
+			pstmt.setInt(6, dto.getNum());    ----------삭제하기
+			pstmt.setInt(7, 0);
+			pstmt.setInt(8, 0);
+
+		삭제하면 순서가 바뀌기 때문에 
+			pstmt.setString(1, dto.getAuthor());
+			pstmt.setInt(2, dto.getPw());
+			pstmt.setString(3, dto.getTitle());
+			pstmt.setString(4, dto.getContent());
+			
+			pstmt.setInt(5, 0);
+			pstmt.setInt(6, 0);     바꿔준다.
+
+* NEXTVAL 및 CURRVAL을 사용할 수 있는 경우
+ - 서브쿼리가 아닌 SELECT문
+ - INSERT문의 SELECT절
+ - INSERT문의 VALUE절
+ - UPDATE문의 SET절
+
+* NEXTVAL 및 CURRVAL을 사용할 수 없는 경우
+ - VIEW의 SELECT절
+ - DISTINCT 키워드가 있는 SELECT문
+ - GROUP BY, HAVING, ORDER BY절이 있는 SELECT문
+ - SELECT, DELETE, UPDATE의 서브쿼리
+ - CREATE TABLE, ALTER TABLE 명령의 DEFAULT값
+
+- NEXTVAL는 현재 시퀀스의 다음 값을 불러온다.
+- CURRVAL은 현재 시퀀스가 몇 번째에 있는지 알려주는 명령어다.
+
+
+==========================
+< webapp 폴더에 board 폴더에 list.jsp jsp파일 수정 >
+---title 클릭할 수 있게 수정---
+<td><a href="/board/read.do?num=${dto.num}">${dto.title}</a></td>
+
+
+==========================
+< kr.co.command 패키지에 Board_ReadCommand 클래스 자동생성 >
+package kr.co.command;
+
+import java.io.IOException;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import kr.co.domain.BoardDTO;
+import kr.co.domain.CommandAction;
+import kr.co.repository.BoardDAO;
+
+public class Board_ReadCommand implements Command {
+
+	@Override
+	public CommandAction execute(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+		
+		String snum = request.getParameter("num");
+		int num = Integer.parseInt(snum);
+		
+		BoardDAO dao = new BoardDAO();
+		BoardDTO dto = dao.read(num);
+		
+		request.setAttribute("dto", dto);
+		
+		return new CommandAction(false, "/jsp/board/read.jsp");
+	}
+
+}
+
+==========================
+DAO에 read 작성하러 가기
+	public BoardDTO read(int num) {
+		BoardDTO dto = null;
+		
+		Connection conn = null;
+		PreparedStatement pstmt = null;
+		String sql = "SELECT * FROM tbl_board WHERE num = ?";
+		ResultSet rs = null;
+		
+		try {
+			conn = DriverManager.getConnection(
+					BoardDAO.URL, BoardDAO.USERNAME, BoardDAO.PASSWORD);
+			pstmt = conn.prepareStatement(sql);
+			pstmt.setInt(1, num);
+			
+			rs = pstmt.executeQuery();
+			
+			if (rs.next()) {
+				String author = rs.getString("author");
+				String title = rs.getString("title");
+				String content = rs.getString("content");
+				content = content.replace("\n", "<br>");
+				// 글내용을 입력하면 줄바꿈이 적용되도록하는 코드임.
+				
+				String writeday = rs.getString("writeday");
+				int readcnt = rs.getInt("readcnt");			
+				
+				dto = new BoardDTO(num, author, title, content, -1, writeday, readcnt, -1, -1, -1);
+			}
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			closeAll(rs, pstmt, conn);
+		}
+		
+		
+		return dto;
+	}
+
+==========================
+< webapp 폴더에 board 폴더에 read.jsp jsp파일 생성 >
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8" session="false"%>
+    
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>  
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>게시글 자세히 보기</title>
+</head>
+<body>
+	<h1>게시글 자세히 보기</h1>
+	
+	글번호 : ${dto.num}<br>
+	작성일 : ${dto.writeday}<br>
+	작성자 : ${dto.author}<br>
+	조회수 : ${dto.readcnt}<br>
+	제 목 : ${dto.title}<br>
+	글내용 : 
+	<p>${dto.content}</p>
+	
+	<br>	
+	<a href="/board/list.do">목록</a> **
+	<a href="/board/updateui.do?num=${dto.num}">수정 화면으로 가기</a> **
+	<a href="/board/deleteui.do?num=${dto.num}">삭제 화면으로 가기</a> **
+	<a href="/board/replyui.do?num=${dto.num}">답글 달기 화면으로 가기</a> 
+
+</body>
+</html>
+
+
+==========================
+DAO에  작성하러 list 에 가서 sql문 수정하기
+String sql = "SELECT num, author, title, To_CHAR(writeday, 'yyyy-mm-dd') writeday, "
+				+ "readcnt, repRoot, repStep, repIndent "
+				+ "FROM tbl_board ORDER BY num DESC";
+
+// To_CHAR(writeday, 'yyyy-mm-dd') writeday --> 앞에 있는 writeday는 원래 변수명이고 뒤에 writeday 는 별칭이다
+// String writeday = rs.getString("writeday"); 코드에서 writeday는 별칭 코드와 같아야한다.
+
+예를들면 To_CHAR(writeday, 'yyyy-mm-dd') aaaa 이면 
+	String writeday = rs.getString("aaaa");  가 되어야한다.
+
+
+
+
+==========================
+< DAO에  작성하러 read 수정하기 >
+public BoardDTO read(int num) {
+		BoardDTO dto = null;
+		
+		Connection conn = null;
+		PreparedStatement pstmt = null;
+		String sql = "SELECT * FROM tbl_board WHERE num = ?";
+		ResultSet rs = null;
+		
+		int result1 = 0;
+		int result2 = 0;
+		int result = 0;
+		
+		try {
+			conn = DriverManager.getConnection(
+					BoardDAO.URL, BoardDAO.USERNAME, BoardDAO.PASSWORD);
+			
+			conn.setAutoCommit(false); // 수동으로 바꾸기
+			
+			result1 = increaseReadcnt(conn, num);
+			
+			pstmt = conn.prepareStatement(sql);
+			pstmt.setInt(1, num);
+			
+			rs = pstmt.executeQuery();
+			
+			if (rs.next()) {
+				String author = rs.getString("author");
+				String title = rs.getString("title");
+				String content = rs.getString("content");
+				content = content.replace("\n", "<br>");
+				// 글내용을 입력하면 줄바꿈이 적용되도록하는 코드임.
+				
+				String writeday = rs.getString("writeday");
+				int readcnt = rs.getInt("readcnt");			
+				
+				dto = new BoardDTO(num, author, title, content, -1, writeday, readcnt, -1, -1, -1);
+			}
+			
+			result2 = 1;
+			
+			result = result1 * result2;
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			commitOrRollback(result, conn);
+			
+			closeAll(rs, pstmt, conn);
+		}		
+		
+		return dto;
+	}
+
+==========================
+< DAO에  increaseReadcnt 자동으로 생성되서 작성하러 가기 >
+private int increaseReadcnt(Connection conn, int num) {
+		int result1 = 0;
+		
+		PreparedStatement pstmt = null;
+		String sql = "UPDATE tbl_board SET readcnt = readcnt + 1 WHERE num = ?";
+		
+		try {
+			pstmt = conn.prepareStatement(sql);
+			
+			pstmt.setInt(1, num);
+			
+			result1 = pstmt.executeUpdate();
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			closeAll(null, pstmt, null);  // conn을 닫아버리면 안되서 null로 해야한다.			
+		}
+		
+		return result1;
+	}
+
+
+==========================
+< kr.co.command 패키지에  Board_UpdateUICommand클래스 자동생성 >
+package kr.co.command;
+
+import java.io.IOException;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import kr.co.domain.BoardDTO;
+import kr.co.domain.CommandAction;
+import kr.co.repository.BoardDAO;
+
+public class Board_UpdateUICommand implements Command {
+
+	@Override
+	public CommandAction execute(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+		
+		String snum = request.getParameter("num");
+		int num = Integer.parseInt(snum);
+		
+		BoardDAO dao = new BoardDAO();
+		BoardDTO dto = dao.updateui(num);
+		
+		request.setAttribute("dto", dto);
+		
+		return new CommandAction(false, "/jsp/board/update.jsp");
+	}
+
+}
+
+
+==========================
+< DAO에 updateui 작성하러 가기 >
+public BoardDTO updateui(int num) {
+		BoardDTO dto = null;
+		
+		Connection conn = null;
+		PreparedStatement pstmt = null;
+		String sql = "SELECT * FROM tbl_board WHERE num = ?";
+		ResultSet rs = null;		
+		
+		try {
+			conn = DriverManager.getConnection(
+					BoardDAO.URL, BoardDAO.USERNAME, BoardDAO.PASSWORD);		
+			
+			pstmt = conn.prepareStatement(sql);
+			pstmt.setInt(1, num);
+			
+			rs = pstmt.executeQuery();
+			
+			if (rs.next()) {
+				String author = rs.getString("author");
+				String title = rs.getString("title");
+				String content = rs.getString("content");
+				
+				String writeday = rs.getString("writeday");
+				int readcnt = rs.getInt("readcnt");			
+				
+				dto = new BoardDTO(num, author, title, content, -1, writeday, readcnt, -1, -1, -1);
+			}		
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {		
+			closeAll(rs, pstmt, conn);
+		}		
+		
+		return dto;
+	}
+
+
+
+==========================
+< webapp 폴더에 board 폴더에 update.jsp jsp파일 생성 >
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8" session="false"%>
+    
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>  
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>게시글 수정</title>
+</head>
+<body>
+<h1>게시글 수정</h1>
+<form action="/board/update.do" method="post">
+	num : <input name="name" value="${dto.num}" readonly><br>
+	author : <input name="author" required value="${dto.author}"><br>
+	pw : <input name="pw" type="password" required><br>
+	title : <input name="title" required value="${dto.title}"><br>
+	
+	content<br>
+	<textarea rows="10" name="content" required>${dto.content}</textarea>
+	<br>
+	
+	<input type="submit" value="수정">
+
+</form>
+
+</body>
+</html>
+
+
+==========================
+< kr.co.command 패키지에  Board_UpdateCommand 클래스 자동생성 >
+package kr.co.command;
+
+import java.io.IOException;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import kr.co.domain.BoardDTO;
+import kr.co.domain.CommandAction;
+import kr.co.repository.BoardDAO;
+
+public class Board_UpdateCommand implements Command {
+
+	@Override
+	public CommandAction execute(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+		
+		String snum = request.getParameter("num");
+		int num = Integer.parseInt(snum);
+		
+		String author = request.getParameter("author");
+		
+		String spw = request.getParameter("pw");
+		int pw = Integer.parseInt(spw);
+		
+		String title = request.getParameter("title");
+		
+		String content = request.getParameter("content");
+		
+		BoardDTO dto = new BoardDTO(num, author, title, content, pw, null, -1, -1, -1, -1);
+		
+		BoardDAO dao = new BoardDAO();
+		dao.update(dto);
+				
+		return new CommandAction(true, "/board/read.do?num="+num);
+	}
+
+}
+
+
+==========================
+< DAO에  update 작성하러 가기 >
+public void update(BoardDTO dto) {
+		Connection conn = null;
+		PreparedStatement pstmt = null;
+		String sql = "UPDATE tbl_board SET author = ?, title = ?, content = ? "
+				+ "WHERE num = ? AND pw = ?";
+		
+		try {
+			conn = DriverManager.getConnection(
+					BoardDAO.URL, BoardDAO.USERNAME, BoardDAO.PASSWORD);
+			pstmt = conn.prepareStatement(sql);
+			
+			pstmt.setString(1, dto.getAuthor());
+			pstmt.setString(2, dto.getTitle());
+			pstmt.setString(3, dto.getContent());
+			pstmt.setInt(4, dto.getNum());
+			pstmt.setInt(5, dto.getPw());
+			
+			pstmt.executeUpdate();
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			closeAll(null, pstmt, conn);
+		}
+		
+	}
+
+==========================
+< webapp 폴더에 board 폴더에 read.jsp jsp파일 수정 및 삭제 >
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8" session="false"%>
+    
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>  
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>게시글 자세히 보기</title>
+</head>
+<body>
+	<h1>게시글 자세히 보기</h1>
+	
+	글번호 : ${dto.num}<br>
+	작성일 : ${dto.writeday}<br>
+	작성자 : ${dto.author}<br>
+	조회수 : ${dto.readcnt}<br>
+	제 목 : ${dto.title}<br>
+	글내용 : 
+	<p>${dto.content}</p>
+	
+	<br>	
+	<a href="/board/list.do">목록</a> **
+	<a href="/board/updateui.do?num=${dto.num}">수정</a> **
+	<a href="#" onclick="deleteBoard()">삭제</a> **
+	<a href="/board/replyui.do?num=${dto.num}">답글 달기 화면으로 가기</a> 
+	
+	<form action="/board/delete.do" method="post" id="mform">
+		<input type="hidden" name="num" value="${dto.num}">
+	</form>
+	<script type="text/javascript">
+		function deleteBoard() {
+			document.getElementById("mform").submit();
+		}
+	</script>
+</body>
+</html>
+
+
+
+==========================
+< kr.co.command 패키지에  Board_DeleteCommand 클래스 자동생성 >
+package kr.co.command;
+
+import java.io.IOException;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import kr.co.domain.CommandAction;
+import kr.co.repository.BoardDAO;
+
+public class Board_DeleteCommand implements Command {
+
+	@Override
+	public CommandAction execute(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+		
+		String snum = request.getParameter("num");
+		int num = Integer.parseInt(snum);
+		
+		String spw = request.getParameter("pw");
+		int pw = Integer.parseInt(spw);
+		
+		BoardDAO dao = new BoardDAO();
+		int result = dao.delete(num, pw);
+		
+		if (result > 0) {
+			return new CommandAction(true, "/board/list.do");
+		} else {
+			return new CommandAction(true, "/board/read.do?num="+num);
+		}
+		
+	}
+
+}
+
+
+
+==========================
+< DAO에  Delete 작성하러 가기 >
+public int delete(int num, int pw) {
+		Connection conn = null;
+		PreparedStatement pstmt = null;
+		String sql = "DELETE FROM tbl_board WHERE num = ? AND pw = ?";
+		int result = 0;
+		
+		try {
+			conn = DriverManager.getConnection(
+					BoardDAO.URL, BoardDAO.USERNAME, BoardDAO.PASSWORD);
+			pstmt = conn.prepareStatement(sql);
+			
+			pstmt.setInt(1, num);
+			pstmt.setInt(2, pw);
+			
+			result = pstmt.executeUpdate();
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			closeAll(null, pstmt, conn);
+		}
+		
+		return result;
+	}
+
+
+
+==========================
+< webapp 폴더에 board 폴더에 read.jsp jsp파일 수정 및 삭제 >
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8" session="false"%>
+    
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>  
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>게시글 자세히 보기</title>
+</head>
+<body>
+	<h1>게시글 자세히 보기</h1>
+	
+	글번호 : ${dto.num}<br>
+	작성일 : ${dto.writeday}<br>
+	작성자 : ${dto.author}<br>
+	조회수 : ${dto.readcnt}<br>
+	제 목 : ${dto.title}<br>
+	글내용 : 
+	<p>${dto.content}</p>
+	
+	<br>	
+	<a href="/board/list.do">목록</a> **
+	<a href="/board/updateui.do?num=${dto.num}">수정</a> **
+	<a href="#" onclick="deleteBoard()">삭제</a> **
+	<a href="/board/replyui.do?orgNum=${dto.num}">답글 달기 화면으로 가기</a> 
+	
+	<form action="/board/delete.do" method="post" id="mform">
+		<input type="hidden" name="num" value="${dto.num}">
+	</form>
+	<script type="text/javascript">
+		function deleteBoard() {
+			let pw = prompt("비밀번호를 입력하세요.");
+			
+			let pwt = document.createElement("input");
+			pwt.setAttribute("type", "password");
+			pwt.setAttribute("name", "pw");
+			pwt.setAttribute("value", pw);
+			
+			document.getElementById("mform").appendChild(pwt);
+			
+			document.getElementById("mform").submit();
+		}
+	</script>
+</body>
+</html>
+
+
+
+==========================
+< kr.co.command 패키지에 Board_ReplyUICommand 클래스 자동생성 >
+package kr.co.command;
+
+import java.io.IOException;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import kr.co.domain.CommandAction;
+
+public class Board_ReplyUICommand implements Command {
+
+	@Override
+	public CommandAction execute(HttpServletRequest request, HttpServletResponse response)
+			throws IOException, ServletException {
+		String sorgNum = request.getParameter("orgNum");
+		// orgNum 오리지널넘버(원래글)
+		int orgNum = Integer.parseInt(sorgNum);
+		
+		request.setAttribute("orgNum", orgNum);
+		
+		return new CommandAction(false, "/jsp/board/reply.jsp");
+	}
+
+}
+
+
+
+==========================
+< webapp 폴더에 board 폴더에 reply.jsp jsp파일 생성 >
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8" session="false"%>
+    
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>    
+    
+    
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>답글 작성</title>
+</head>
+<body>
+	<h1>답글 작성</h1>
+	
+<form action="/board/reply.do" method="post">
+	<input type="hidden" name="orgNum" value="${orgNum}">
+	author: <input name="author" required><br>
+	pw : <input name="pw" required><br>
+	title: <input name="title" required><br>
+	
+	content<br>
+	<textarea rows="10" name="content" required></textarea>
+	<br>
+	
+	<input type="submit" value="답글 등록">
+	
+
+
+</form>
+	
+	
+</body>
+</html>
+
+
+
+==========================
+< kr.co.command 패키지에 Board_ReplyCommand 클래스 자동생성 >
+package kr.co.command;
+
+import java.io.IOException;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import kr.co.domain.BoardDTO;
+import kr.co.domain.CommandAction;
+import kr.co.repository.BoardDAO;
+
+public class Board_ReplyCommand implements Command {
+
+	@Override
+	public CommandAction execute(HttpServletRequest request, HttpServletResponse response)
+			throws IOException, ServletException {
+		String sorgNum = request.getParameter("orgNum");
+		int orgNum = Integer.parseInt(sorgNum);
+		
+		String author = request.getParameter("author");
+		
+		String spw = request.getParameter("pw");
+		int pw = Integer.parseInt(spw);
+		
+		String title = request.getParameter("title");
+		
+		String content = request.getParameter("content");
+		
+		BoardDTO dto = new BoardDTO(-1, author, 
+				title, content, pw, null, -1, -1, -1, -1);
+		
+		BoardDAO dao = new BoardDAO();
+		dao.reply(orgNum, dto);	
+		
+
+		
+		return new CommandAction(true, "/board/list.do");
+	}
+
+}
+
+
+==========================
+< DAO에  reply 작성하러 가기 >
+	public void reply(int orgNum, BoardDTO dto) {
+		Connection conn = null;
+		PreparedStatement pstmt = null;
+		String sql = "INSERT INTO tbl_board (num, author, "
+				+ "title, content, pw, repRoot, repStep, repIndent) "
+				+ "VALUES (seq_board_num.NEXTVAL, ?, ?, ?, ?, ?, ?, ?) ";
+		
+		try {
+			conn = DriverManager.getConnection(BoardDAO.URL, 
+					BoardDAO.USERNAME, BoardDAO.PASSWORD);
+			
+			 BoardDTO orgDto = getOrgBoard(conn, orgNum);
+			 
+			 
+			 
+			 
+			 
+			 pstmt = conn.prepareStatement(sql);
+			 
+			 pstmt.setString(1, dto.getAuthor());
+			 pstmt.setString(2, dto.getTitle());
+			 pstmt.setString(3, dto.getContent());
+			 pstmt.setInt(4, dto.getPw());
+			 
+			 pstmt.setInt(5, orgDto.getRepRoot());
+			 pstmt.setInt(6, orgDto.getRepStep()+1);
+			 pstmt.setInt(7, orgDto.getRepIndent()+1);
+			 
+			 pstmt.executeUpdate();
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			closeAll(null, pstmt, conn);
+		}
+		
+	}
+
+
+==========================
+< DAO에 getOrgBoard 자동생성되서 작성하러 가기 >
+	private BoardDTO getOrgBoard(Connection conn, int orgNum) {
+		BoardDTO orgDto = null;
+		
+		PreparedStatement pstmt = null;
+		String sql = "SELECT * FROM tbl_board WHERE num = ?";
+		ResultSet rs = null;
+		
+		try {
+			pstmt = conn.prepareStatement(sql);
+			pstmt.setInt(1, orgNum);
+			
+			rs = pstmt.executeQuery();
+			
+			if(rs.next()) {
+				int repRoot = rs.getInt("repRoot");
+				int repStep = rs.getInt("repStep");
+				int repIndent = rs.getInt("repIndent");
+				
+				orgDto = new BoardDTO(orgNum, null, null, null, -1, 
+						repRoot, repStep, repIndent);
+			}
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			closeAll(rs, pstmt, null);
+		}
+		
+		
+		return orgDto;
+	}
+
+==========================
+< DAO에  list 수정 >
+String sql = "SELECT num, author, title, To_CHAR(writeday, 'yyyy-mm-dd') writeday, "
+				+ "readcnt, repRoot, repStep, repIndent "
+				+ "FROM tbl_board ORDER BY repRoot DESC, repStep ASC";
+
+
+
+
+
+reply( ) 메서드에 구현하지 않은게 있음.
+
+원래글의 repStep과 
+repRoot가 기존 답글의 repStep을 비교해서
+repRoot가 기존 답글의 repStep이 더 크면
+repRoot가 기존 답글의 repStep = repStep +1
+
+원래글과 답글이 붙어있게 하기 위해서
+어떤 컬럼을 사용했죠?
+repRoot 컬럼을 이용했음.
+ORDER BY repRoot desc,
+
+답글들끼리의 정렬을 위해서
+특히
+답글과 [답글의답글]이 떨어져서 존재하는 모습을 보였죠..
+아직 구현을 안 했는데,
+엑셀에서 답글과 [답글의답글]이 붙어 있게 하는 모습을 보여줬음.
+
+답글이 달리면,
+repRoot: 새로운 답글의 repRoot는 그 답글의 원래글의 repRoot값
+repStep: 새로운 답글의 repStep은 답글의 원래글의 repStep + 1
+	+(repRoot값이 같은 기존 답글들 중에서 새로운 답글의 원래글의 repStep값보다 큰 repStep값을 갖고 있는 기존 답글들의
+	repStep을 +1 해줌.)
+
+답글이 있는 여부 확인
+답글이 있는데
+기존 답글 중에
+새 답글의 부모 답글보다 repStep
+
+페이징 작업을 합니다.
+그러려면 데이터가 많이 있어어야 합니다.
+125개 추가 할게요.
+
+
+==========================
+< DAO에  reply 수정하러 가기 >
+	public void reply(int orgNum, BoardDTO dto) {
+		Connection conn = null;
+		PreparedStatement pstmt = null;
+		String sql = "INSERT INTO tbl_board (num, author, title, content, pw, repRoot, repStep, repIndent) "
+				+ "VALUES (seq_board_num.NEXTVAL, ?, ?, ?, ?, ?, ?, ?)";
+		
+		int result = 0;
+		int result1 = 0;
+		int result2 = 0;
+		
+		try {
+			conn = DriverManager.getConnection(
+					BoardDAO.URL, BoardDAO.USERNAME, BoardDAO.PASSWORD);
+			conn.setAutoCommit(false);
+			
+			BoardDTO orgDto = getOrgBoard(conn, orgNum);
+			
+			// 기존 답글이 있는지 확인하는 작업
+			boolean isExists = isExistsAnotherReply(conn, orgDto);						
+			
+			if (isExists) {
+				result1 = increaseRepStep(conn, orgDto);
+			} else {
+				result1 = 1;
+			}
+			
+			pstmt = conn.prepareStatement(sql);
+			
+			pstmt.setString(1, dto.getAuthor());
+			pstmt.setString(2, dto.getTitle());
+			pstmt.setString(3, dto.getContent());
+			pstmt.setInt(4, dto.getPw());
+			
+			pstmt.setInt(5, orgDto.getRepRoot());
+			pstmt.setInt(6, orgDto.getRepStep()+1);
+			pstmt.setInt(7, orgDto.getRepIndent()+1);
+			
+			result2 =  pstmt.executeUpdate();
+			
+			result = result1 * result2;
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			commitOrRollback(result, conn);
+			
+			closeAll(null, pstmt, conn);
+		}
+		
+		
+	}
+
+==========================
+< DAO에  increaseRepStep 자동생성된거 작성하러 가기 >
+	private int increaseRepStep(Connection conn, BoardDTO orgDto) {
+		int result1 = 0;
+		PreparedStatement pstmt = null;
+		String sql = "UPDATE tbl_board SET repStep = repStep + 1 WHERE repRoot = ? "
+				+ "AND repStep > ?";
+		try {
+			pstmt = conn.prepareStatement(sql);
+			
+			pstmt.setInt(1, orgDto.getRepRoot());
+			pstmt.setInt(2, orgDto.getRepStep());
+			
+			result1 = pstmt.executeUpdate();
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			closeAll(null, pstmt, null);
+		}
+		
+		return result1;
+		
+	}
+
+
+==========================
+< DAO에  isExistsAnotherReply 자동생성된거 작성하러 가기 >
+	// 기존 답글 존재여부 확인
+	private boolean isExistsAnotherReply(Connection conn, BoardDTO orgDto) {
+		boolean isExists = false;
+		
+		PreparedStatement pstmt = null;
+		String sql = "SELECT MAX(repStep) FROM tbl_board WHERE repRoot = ? AND repStep > ?";
+		ResultSet rs = null;
+		
+		try {
+			pstmt = conn.prepareStatement(sql);
+			
+			pstmt.setInt(1, orgDto.getRepRoot());
+			pstmt.setInt(2, orgDto.getRepStep());
+			
+			rs = pstmt.executeQuery();
+			
+			if (rs.next()) {
+				int maxRepStep = rs.getInt(1);
+				if(maxRepStep > 0) {
+					isExists = true;
+				} else {
+					isExists = false;
+				}
+			}
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			closeAll(rs, pstmt, null);
+		}
+		
+		return isExists;
+	}
+
+
+
+==========================
+< board.sql 에서 기존 데이터 테이블 삭제하기 >
+
+ALTER TABLE tbl_board DROP CONSTRAINT pk_board_num  // 기본키 삭제
+DROP TABLE tbl_board  // 그리고나서 테이블 삭제
+
+delete from tbl_board  // 기존 데이터 삭제
+commit
+
+
+CREATE SEQUENCE seq_board_num
+START WITH 100
+INCREMENT BY 1;
+
+CREATE TABLE tbl_board(
+num NUMBER,
+author VARCHAR2(15) NOT NULL,
+title VARCHAR2(45) NOT NULL,
+content VARCHAR2(3000) NOT NULL,
+pw NUMBER NOT NULL,
+writeday DATE DEFAULT SYSDATE,
+readcnt NUMBER DEFAULT 0,
+
+repRoot NUMBER,
+repStop NUMBER,
+repIndent NUMBER,
+repStep NUMBER,
+CONSTRAINT pk_board_num PRIMARY KEY(num)
+)
+
+
+==========================
+< webapp 폴더에 board 폴더에 list.jsp 수정 및  삭제하기 >
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8" session="false"%>
+    
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>  
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>게시글 보기</title>
+</head>
+<body>
+	<p>
+		안녕하세요. 띄어쓰기는&nbsp;&nbsp;&nbsp;&nbsp;원래 없었는데, 미국인이 제안해서 생긴 문법입니다.
+	</p>
+	<a href="/board/insertui.do">글쓰기 화면으로 가기</a>
+	
+	<table border="1">
+		<thead>
+			<tr>
+				<th>num</th>
+				<th>author</th>
+				<th width="300px">title</th>  // title 넓이조절
+				<th>writeday</th>
+				<th>readcnt</th>
+				
+				<th>repIndent</th>
+			</tr>
+		</thead>
+		
+		<tbody>
+			<c:forEach items="${list}" var="dto">
+			
+				<tr>
+					<td>${dto.num}</td>
+					<td>${dto.author}</td>
+					<td>
+						<c:forEach begin="1" end="${dto.repIndent}">
+							&nbsp;   // 답글의 답글 title 띄워쓰기
+						</c:forEach>
+						<a href="/board/read.do?num=${dto.num}">${dto.title}</a>
+					</td>
+					<td>${dto.writeday}</td>
+					<td>${dto.readcnt}</td>
+					
+					<td>${dto.repIndent}</td>
+				</tr>
+				
+			</c:forEach>
+		</tbody>
+	</table>
+
+</body>
+</html>
+
+
+==========================
+< DAO에  list2작성하러 가기(list복사함) --페이징작업 >
+	public PageTO<BoardDTO> list2(int curPage) {
+		PageTO<BoardDTO> pt = new PageTO<>(curPage);
+		
+		List<BoardDTO> list = new ArrayList<BoardDTO>();
+		
+		Connection conn = null;
+		PreparedStatement pstmt = null;
+		String sql = "SELECT * FROM "
+				+ "(SELECT rownum rnum, num, author, title, To_CHAR(writeday, 'yyyy-mm-dd') writeday, "
+				+ "readcnt, repIndent "
+				+ "FROM " 
+				+ "(SELECT * FROM tbl_board ORDER BY repRoot DESC, repStep ASC)) "
+				+ "WHERE " 
+				+ "rnum BETWEEN ? AND ?";
+		ResultSet rs = null;
+		
+		try {
+			conn = DriverManager.getConnection(
+					BoardDAO.URL, BoardDAO.USERNAME, BoardDAO.PASSWORD);
+			
+			int amount = getAmount(conn);
+			
+			pt.setAmount(amount);
+			
+			int startNum = pt.getStartNum();
+			int endNum = pt.getEndNum();			
+			
+			pstmt = conn.prepareStatement(sql);
+			
+			pstmt.setInt(1, startNum);
+			pstmt.setInt(2, endNum);
+			
+			rs = pstmt.executeQuery();
+			
+			while (rs.next()) {
+				int num = rs.getInt("num");
+				String author = rs.getString("author");
+				String title = rs.getString("title");
+				String writeday = rs.getString("writeday");
+				int readcnt = rs.getInt("readcnt");								
+				int repIndent = rs.getInt("repIndent");
+				
+				BoardDTO dto = new BoardDTO(num, author, title, writeday, 
+										readcnt, -1, -1, repIndent);
+				list.add(dto);
+				
+			}
+			
+			pt.setList(list);   // 반드시 넣어줘야한다.
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			closeAll(rs, pstmt, conn);
+		}
+		
+		return pt;
+	}
+
+
+==========================
+< board.sql 에서 기존 데이터 추가하기 --  list2의 페이징작업 >
+SELECT * FROM tbl_board ORDER BY repRoot DESC, repStep ASC
+
+SELECT * FROM
+(SELECT rownum rnum, num, author, title, To_CHAR(writeday, 'yyyy-mm-dd') writeday, readcnt, repIndent
+FROM 
+(SELECT * FROM tbl_board ORDER BY repRoot DESC, repStep ASC))
+WHERE 
+rnum BETWEEN 21 AND 30    // 21페이지부터 30페이지라는 의미
+
+
+ALTER TABLE tbl_board DROP CONSTRAINT pk_board_num
+DROP TABLE tbl_board
+
+delete from tbl_board
+commit
+
+
+CREATE SEQUENCE seq_board_num
+START WITH 100
+INCREMENT BY 1;
+
+CREATE TABLE tbl_board(
+num NUMBER,
+author VARCHAR2(15) NOT NULL,
+title VARCHAR2(45) NOT NULL,
+content VARCHAR2(3000) NOT NULL,
+pw NUMBER NOT NULL,
+writeday DATE DEFAULT SYSDATE,
+readcnt NUMBER DEFAULT 0,
+
+repRoot NUMBER,
+repStop NUMBER,
+repIndent NUMBER,
+repStep NUMBER,
+CONSTRAINT pk_board_num PRIMARY KEY(num)
+)
+
+
+
+===========================
+페이징 처리에 필요한 지식들...
+
+1. perPage : 한 페이지당 최대로 표현하할 수 있는 게시글의 수 --- 10으로 가정하여 코드를 작성함.
+
+2. amount : 게시글 총 수
+
+3. totalPage : 페이징의 최댓값..
+-  totalPage = ((amount-1)/perPage) + 1 
+
+   amount = 1이면, totalPage = 1
+   amount = 2이면, totalPage = 1
+   amount = 3이면, totalPage = 1
+   amount = 9이면, totalPage = 1
+   amount = 10이면, totalPage = 1
+
+   amount = 11이면, totalPage = 2
+   amount = 12이면, totalPage = 2
+   amount = 13이면, totalPage = 2
+   amount = 19이면, totalPage = 2
+   amount = 20이면, totalPage = 2
+
+4. curPage : 현재 페이지
+
+5. startNum : 
+01~   --1페이지일때
+11~   --2페이지일때
+21~   --3페이지일때
+31~   --4페이지일때
+41~   --5페이지일때
+startNum = (curPage-1)*perPage + 1
+
+6. endNum :
+endNum = curPage * perPage
+만약 endNum = 50
+그런데 게시글의 총 수(amount)가 43개라면..
+if(endNum > amount){
+	endNum = amount;
+}
+
+7. lineMax : 페이징 최대 표현 수 ----- 10로 가정하고 코드를 작성함.
+
+8. beginPageNum
+beginPageNum = ((curPage-1) / lineMax) * lineMax +1
+
+curPage = 1
+a. 01~
+b. 11~
+c. 21~
+d. 31~
+e. 41~
+
+9. finishPageNum
+finishPageNum = ((curPage-1) / lineMax) + 1) * lineMax
+
+~10 = 10
+~20 = 20
+~30 = 30
+~40 = 40
+
+10. list
+
+
+==========================
+< kr.co.domain 패키지에  PageTO 클래스 생성 >
+package kr.co.domain;
+
+import java.util.List;
+
+public class PageTO<T> {
+	// 독립변수
+	private int perPage = 10;  // 한 페이지당 최대로 표현하할 수 있는 게시글의 수
+	private int amount;        // 게시글 총 수
+	private int curPage;	   // 현재 페이지
+	private int lineMax = 10;  //  페이징 최대 표현 수
+	
+	// 종속변수
+	private int totalPage;  // 페이징의 최댓값
+	private int startNum;   
+	private int endNum;		
+	
+	// 종속변수
+	private List<T> list;
+	
+	// 종속변수
+	private int beginPageNum;  // 시작페이지수
+	private int finishPageNum; // 끝페이지수
+	
+	// 디폴트 생성자
+	public PageTO() {
+		curPage = 1;
+		
+		execute();
+	}
+	
+	// 사용자 생성자 curPage만 체크
+	public PageTO(int curPage) {
+		super();
+		this.curPage = curPage;
+		
+		execute();
+	}
+
+	public int getPerPage() {
+		return perPage;
+	}
+
+	public void setPerPage(int perPage) {
+		this.perPage = perPage;
+		
+		execute();
+	}
+
+	public int getAmount() {
+		return amount;
+	}
+
+	public void setAmount(int amount) {
+		this.amount = amount;
+		
+		execute();
+	}
+
+	public int getCurPage() {
+		return curPage;
+	}
+
+	public void setCurPage(int curPage) {
+		this.curPage = curPage;
+		
+		execute();
+	}
+
+	public int getLineMax() {
+		return lineMax;
+	}
+
+	public void setLineMax(int lineMax) {
+		this.lineMax = lineMax;
+		
+		execute();
+	}
+
+	public int getTotalPage() {
+		return totalPage;
+	}
+
+	public void setTotalPage(int totalPage) {
+		this.totalPage = totalPage;
+	}
+
+	public int getStartNum() {
+		return startNum;
+	}
+
+	public void setStartNum(int startNum) {
+		this.startNum = startNum;
+	}
+
+	public int getEndNum() {
+		return endNum;
+	}
+
+	public void setEndNum(int endNum) {
+		this.endNum = endNum;
+	}
+
+	public List<T> getList() {
+		return list;
+	}
+
+	public void setList(List<T> list) {
+		this.list = list;
+	}
+
+	public int getBeginPageNum() {
+		return beginPageNum;
+	}
+
+	public void setBeginPageNum(int beginPageNum) {
+		this.beginPageNum = beginPageNum;
+	}
+
+	public int getFinishPageNum() {
+		return finishPageNum;
+	}
+
+	public void setFinishPageNum(int finishPageNum) {
+		this.finishPageNum = finishPageNum;
+	}
+	
+	private void execute() {
+		totalPage = ((amount-1) / perPage) + 1;
+		startNum = (curPage-1) * perPage + 1;
+		endNum = curPage * perPage;
+		if(endNum > amount){
+			endNum = amount;
+		}
+		
+		beginPageNum = ((curPage - 1) / lineMax) * lineMax + 1;
+		finishPageNum = (((curPage-1) / lineMax) + 1) * lineMax;		
+		if (finishPageNum > totalPage) {
+			finishPageNum = totalPage;
+		}
+	}
+
+}
+
+
+==========================
+< DAO에  list2작성하러 가기 수정 및 추가 > 
+	public PageTO<BoardDTO> list2(int curPage) {
+		PageTO<BoardDTO> pt = new PageTO<>(curPage);
+		
+		List<BoardDTO> list = new ArrayList<BoardDTO>();
+		
+		Connection conn = null;
+		PreparedStatement pstmt = null;
+		String sql = "SELECT * FROM "
+				+ "(SELECT rownum rnum, num, author, title, To_CHAR(writeday, 'yyyy-mm-dd') writeday, "
+				+ "readcnt, repIndent "
+				+ "FROM " 
+				+ "(SELECT * FROM tbl_board ORDER BY repRoot DESC, repStep ASC)) "
+				+ "WHERE " 
+				+ "rnum BETWEEN ? AND ?";
+		ResultSet rs = null;
+		
+		try {
+			conn = DriverManager.getConnection(
+					BoardDAO.URL, BoardDAO.USERNAME, BoardDAO.PASSWORD);
+			
+			int amount = getAmount(conn);
+			
+			pt.setAmount(amount);
+			
+			int startNum = pt.getStartNum();
+			int endNum = pt.getEndNum();			
+			
+			pstmt = conn.prepareStatement(sql);
+			
+			pstmt.setInt(1, startNum);
+			pstmt.setInt(2, endNum);
+			
+			rs = pstmt.executeQuery();
+			
+			while (rs.next()) {
+				int num = rs.getInt("num");
+				String author = rs.getString("author");
+				String title = rs.getString("title");
+				String writeday = rs.getString("writeday");
+				int readcnt = rs.getInt("readcnt");								
+				int repIndent = rs.getInt("repIndent");
+				
+				BoardDTO dto = new BoardDTO(num, author, title, writeday, 
+										readcnt, -1, -1, repIndent);
+				list.add(dto);
+				
+			}
+			
+			pt.setList(list);   // 반드시 넣어줘야한다.
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			closeAll(rs, pstmt, conn);
+		}
+		
+		return pt;
+	}
+
+==========================
+< DAO에  getAmount작성하러가기 자동생성 >
+	private int getAmount(Connection conn) {
+		int amount = 0;
+		
+		PreparedStatement pstmt = null;
+		String sql = "SELECT COUNT(num) FROM tbl_board";
+		ResultSet rs = null;
+		
+		try {
+			pstmt = conn.prepareStatement(sql);
+			rs = pstmt.executeQuery();
+			if (rs.next()) {
+				amount = rs.getInt(1);
+			}
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			closeAll(rs, pstmt, null);
+		}
+		
+		return amount;
+	}
+
+
+==========================
+< kr.co.command 패키지에  Board_ListCommand 클래스 수정하기 >
+package kr.co.command;
+
+import java.io.IOException;
+import java.util.List;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import kr.co.domain.BoardDTO;
+import kr.co.domain.CommandAction;
+import kr.co.domain.PageTO;
+import kr.co.repository.BoardDAO;
+
+public class Board_ListCommand implements Command {
+
+	@Override
+	public CommandAction execute(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+		int curPage = 1;
+		
+		String scurPage = request.getParameter("curPage");
+		
+		if (scurPage != null) {
+			curPage = Integer.parseInt(scurPage);
+		} 
+		
+		BoardDAO dao = new BoardDAO();
+//		List<BoardDTO> list = dao.list();		
+//		request.setAttribute("list", list);
+		
+		PageTO<BoardDTO> pt = dao.list2(curPage);
+		request.setAttribute("pt", pt);
+		
+		return new CommandAction(false, "/jsp/board/list.jsp");
+	}
+
+}
+
+
+
+==========================
+< webapp 폴더에 board 폴더에 list.jsp 수정하기 >
+
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8" session="false"%>
+    
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>  
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>게시글 보기</title>
+</head>
+<body>
+	<p>
+		안녕하세요. 띄어쓰기는&nbsp;&nbsp;&nbsp;&nbsp;원래 없었는데, 미국인이 제안해서 생긴 문법입니다.
+	</p>
+	<a href="/board/insertui.do">글쓰기 화면으로 가기</a>
+	
+	<table border="1">
+		<thead>
+			<tr>
+				<th>num</th>
+				<th>author</th>
+				<th width="300px">title</th>
+				<th>writeday</th>
+				<th>readcnt</th>		
+			</tr>
+		</thead>
+		
+		<tbody>
+			<c:forEach items="${pt.list}" var="dto">  // 이부분 수정함
+			
+				<tr>
+					<td>${dto.num}</td>
+					<td>${dto.author}</td>
+					<td>
+						<c:forEach begin="1" end="${dto.repIndent}">
+							&nbsp;
+						</c:forEach>
+						<a href="/board/read.do?num=${dto.num}">${dto.title}</a>
+					</td>
+					<td>${dto.writeday}</td>
+					<td>${dto.readcnt}</td>
+				</tr>
+				
+			</c:forEach>
+		</tbody>
+	</table>
+
+</body>
+</html>
+
+
+
+==========================
+< webapp 폴더에 board 폴더에 part_page jsp파일 생성 >
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8" session="false"%>
+    
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>  
+
+<c:if test="${pt.curPage > 1}" >
+	<a href="/board/list.do?curPage=${pt.curPage-1}">&lt;</a>
+</c:if>
+
+<c:forEach begin="1" end="${pt.totalPage}" var="i">
+	<c:if test="${i != pt.curPage}" >
+		<a href="/board/list.do?curPage=${i}">${i}</a> // 페이지 수를 나타냄
+	</c:if>
+	
+	<c:if test="${i ==  pt.curPage}" >
+		<a style="color:red;" href="/board/list.do?curPage=${i}">${i}</a>  // 현재페이지에 빨간색으로 표시함
+	</c:if>
+</c:forEach>
+
+<c:if test="${pt.curPage < pt.totalPage}" >
+	<a href="/board/list.do?curPage=${pt.curPage+1}">&gt;</a>
+</c:if>
+
+
+==========================
+< kr.co.domain 패키지에  PageTO 클래스 수정 및 추가 >
+package kr.co.domain;
+
+import java.util.List;
+
+public class PageTO<T> {
+	// 독립변수
+	private int perPage = 10;  // 한 페이지당 최대로 표현하할 수 있는 게시글의 수
+	private int amount;        // 게시글 총 수
+	private int curPage;	   // 현재 페이지
+	private int lineMax = 10;  //  페이징 최대 표현 수
+	
+	// 종속변수
+	private int totalPage;  // 페이징의 최댓값
+	private int startNum;   
+	private int endNum;		
+	
+	// 종속변수
+	private List<T> list;
+	
+	// 종속변수
+	private int beginPageNum;  // 시작페이지수
+	private int finishPageNum; // 끝페이지수
+	
+	// 디폴트 생성자
+	public PageTO() {
+		curPage = 1;
+		
+		execute();
+	}
+	
+	// 사용자 생성자 curPage만 체크
+	public PageTO(int curPage) {
+		super();
+		this.curPage = curPage;
+		
+		execute();
+	}
+
+	public int getPerPage() {
+		return perPage;
+	}
+
+	public void setPerPage(int perPage) {
+		this.perPage = perPage;
+		
+		execute();
+	}
+
+	public int getAmount() {
+		return amount;
+	}
+
+	public void setAmount(int amount) {
+		this.amount = amount;
+		
+		execute();
+	}
+
+	public int getCurPage() {
+		return curPage;
+	}
+
+	public void setCurPage(int curPage) {
+		this.curPage = curPage;
+		
+		execute();
+	}
+
+	public int getLineMax() {
+		return lineMax;
+	}
+
+	public void setLineMax(int lineMax) {
+		this.lineMax = lineMax;
+		
+		execute();
+	}
+
+	public int getTotalPage() {
+		return totalPage;
+	}
+
+	public void setTotalPage(int totalPage) {
+		this.totalPage = totalPage;
+	}
+
+	public int getStartNum() {
+		return startNum;
+	}
+
+	public void setStartNum(int startNum) {
+		this.startNum = startNum;
+	}
+
+	public int getEndNum() {
+		return endNum;
+	}
+
+	public void setEndNum(int endNum) {
+		this.endNum = endNum;
+	}
+
+	public List<T> getList() {
+		return list;
+	}
+
+	public void setList(List<T> list) {
+		this.list = list;
+	}
+
+	public int getBeginPageNum() {
+		return beginPageNum;
+	}
+
+	public void setBeginPageNum(int beginPageNum) {
+		this.beginPageNum = beginPageNum;
+	}
+
+	public int getFinishPageNum() {
+		return finishPageNum;
+	}
+
+	public void setFinishPageNum(int finishPageNum) {
+		this.finishPageNum = finishPageNum;
+	}
+	
+	private void execute() {
+		totalPage = ((amount-1) / perPage) + 1;
+		startNum = (curPage-1) * perPage + 1;
+		endNum = curPage * perPage;
+		if(endNum > amount){
+			endNum = amount;
+		}
+		
+		beginPageNum = ((curPage - 1) / lineMax) * lineMax + 1;
+		finishPageNum = (((curPage-1) / lineMax) + 1) * lineMax;		
+		if (finishPageNum > totalPage) {
+			finishPageNum = totalPage;
+		}
+	}
+
+}
+
+
+==========================
+< webapp 폴더에 board 폴더에 part_page jsp파일 수정 및 추가 >
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8" session="false"%>
+    
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>  
+
+<c:if test="${pt.curPage > 1}" >
+	<a href="/board/list.do?curPage=${pt.curPage-1}">&lt;</a>  // 현재페이지가 1보다 작으면 브라우저에 <표시 나오지 않게함
+</c:if>
+
+<c:forEach begin="${pt.beginPageNum}" end="${pt.finishPageNum}" var="i">
+	<c:if test="${i != pt.curPage}" >
+		<a href="/board/list.do?curPage=${i}">${i}</a>
+	</c:if>
+	
+	<c:if test="${i == pt.curPage}" >
+		<a style="color:red;" href="/board/list.do?curPage=${i}">${i}</a>
+	</c:if>
+</c:forEach>
+
+<c:if test="${pt.curPage < pt.totalPage}" >
+	<a href="/board/list.do?curPage=${pt.curPage+1}">&gt;</a> // 현재페이지가 총토탈페이지 보다 작으면 브라우저에 >표시 나오지 않게함
+</c:if>
+
+
+
+=========================
+< Servers에   context.xml 파일 선택>
+맨 아래쪽에 리소스 추가하기
+    <Manager pathname="" />
+    -->
+    <Resource
+    	name ="jdbc/Oracle11g"
+    	auth = "Container"
+    	type = "javax.sql.DataSource"
+    	maxTotal = "4"            // 예를들어 동시접속자가 천명이 한번에 접속한다면 최대4명까지 접속하고 5초간 대기시킨다는 의미임
+    	maxWaitMillis = "5000"   // 5초임
+    	driverClassName="oracle.jdbc.OracleDriver"
+    	url = "jdbc:oracle:thin:@localhost:1521:xe"
+    	username = "dw1"
+    	password = "dw1"
+    />
+</Context>
+이 리소스를 추가하므로써 
+DriverManager.getConnection(BoardDAO.URL, BoardDAO.USERNAME, BoardDAO.PASSWORD);
+코드를 반복해서 사용안하고 간결하게 쓸수 있도록 설정한것이다.
+
+
+==========================
+< DAO에  코드 추가하기 >
+	public static final String DIRVER = "oracle.jdbc.OracleDriver";
+	public static final String URL = "jdbc:oracle:thin:@localhost:1521:xe";
+	public static final String USERNAME = "dw1";
+	public static final String PASSWORD = "dw1";
+
+	private DataSource dataFactory;	---- 여기서부터 코드 추가	 
+	
+	// 디폴트 생성자   
+	public BoardDAO() {
+	    try {
+	       Context ctx = new InitialContext();
+	       dataFactory = (DataSource) ctx.lookup("java:comp/env/jdbc/Oracle11g");
+	    } catch (NamingException e) {
+	       // TODO Auto-generated catch block
+	       e.printStackTrace();
+	    }
+	}
+
+그리고
+conn = DriverManager.getConnection(BoardDAO.URL, BoardDAO.USERNAME, BoardDAO.PASSWORD); 
+코드를 아래 코드로 
+conn = dataFactory.getConnection(); 전부다 변경하기
+
+
+
+==========================
+< webapp 폴더에 board 폴더에 list.jsp 수정 및 추가하기 >
+					<td>${dto.num}</td>
+					<td>${dto.author}</td>
+					<td>
+						<c:forEach begin="1" end="${dto.repIndent}">
+							&nbsp;
+						</c:forEach>
+						<a href="/board/read.do?num=${dto.num}&curPage=${pt.curPage}">${dto.title}</a>
+					</td>
+					<td>${dto.writeday}</td>
+					<td>${dto.readcnt}</td>
+
+
+
+
+==========================
+< kr.co.command 패키지에 Board_ReadCommand 클래스 수정 및 추가하기 >
+	public CommandAction execute(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+		
+		String snum = request.getParameter("num");
+		int num = Integer.parseInt(snum);
+		
+		String scurPage = request.getParameter("curPage");
+		int curPage = Integer.parseInt(scurPage);
+		
+		BoardDAO dao = new BoardDAO();
+		BoardDTO dto = dao.read(num);
+		
+		request.setAttribute("dto", dto);
+		request.setAttribute("curPage", curPage);
+		 
+		
+		return new CommandAction(false, "/jsp/board/read.jsp");
+	}
+
+
+
+==========================
+< webapp 폴더에 board 폴더에 read.jsp 수정 및 추가하기 >
+	<a href="/board/list.do?curPage=${curPage}">목록</a> **
+	<a href="/board/updateui.do?num=${dto.num}&curPage=${curPage}">수정</a> **
+	<a href="#" onclick="deleteBoard()">삭제</a> **
+	<a href="/board/replyui.do?orgNum=${dto.num}&curPage=${curPage}">답글 달기 화면으로 가기</a> 
+	
+	<form action="/board/delete.do" method="post" id="mform">
+		<input type="hidden" name="num" value="${dto.num}">
+		<input type="hidden" name="curPage" value="${curPage}">
+	</form>
+	<script type="text/javascript">
+
+
+
+
+==========================
+< kr.co.command 패키지에 Board_UpdateUICommand 클래스 수정 및 추가하기 >
+	public CommandAction execute(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+		
+		String snum = request.getParameter("num");
+		int num = Integer.parseInt(snum);
+		
+		String scurPage = request.getParameter("curPage");
+		int curPage = Integer.parseInt(scurPage);
+		
+		BoardDAO dao = new BoardDAO();
+		BoardDTO dto = dao.updateui(num);
+		
+		request.setAttribute("dto", dto);
+		request.setAttribute("curPage", curPage);
+		
+		return new CommandAction(false, "/jsp/board/update.jsp");
+	}
+
+==========================
+< webapp 폴더에 board 폴더에 update.jsp 수정 및 추가하기 >
+<h1>게시글 수정</h1>
+<form action="/board/update.do" method="post">
+	<input type="hidden" name="curPage" value="${curPage}">
+	num : <input name="num" value="${dto.num}" readonly><br>
+	author : <input name="author" required value="${dto.author}"><br>
+	pw : <input name="pw" required><br>
+	title : <input name="title" required value="${dto.title}"><br>
+	
+	content<br>
+	<textarea rows="10" name="content" required>${dto.content}</textarea>
+	<br>
+	
+	<input type="submit" value="수정">
+
+</form>
+
+
+
+==========================
+< kr.co.command 패키지에 Board_UpdateCommand 클래스 수정 및 추가하기 >
+	public CommandAction execute(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+		
+		String snum = request.getParameter("num");
+		int num = Integer.parseInt(snum);
+		
+		String scurPage = request.getParameter("curPage");
+		int curPage = Integer.parseInt(scurPage);
+		
+		String author = request.getParameter("author");
+		
+		String spw = request.getParameter("pw");
+		int pw = Integer.parseInt(spw);
+		
+		String title = request.getParameter("title");
+		
+		String content = request.getParameter("content");
+		
+		BoardDTO dto = new BoardDTO(num, author, title, content, pw, null, -1, -1, -1, -1);
+		
+		BoardDAO dao = new BoardDAO();
+		dao.update(dto);
+				
+		return new CommandAction(true, "/board/read.do?num="+num+"&curPage="+curPage);
+	}
+
+==========================
+< kr.co.command 패키지에 Board_DeleteCommand 클래스 수정 및 추가하기 >
+	public CommandAction execute(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+		
+		String snum = request.getParameter("num");
+		int num = Integer.parseInt(snum);
+		
+		String spw = request.getParameter("pw");
+		int pw = Integer.parseInt(spw);
+		
+		String scurPage = request.getParameter("curPage");
+		int curPage = Integer.parseInt(scurPage);
+		
+		BoardDAO dao = new BoardDAO();
+		int result = dao.delete(num, pw);
+		
+		if (result > 0) {
+			return new CommandAction(true, "/board/list.do?curPage="+curPage);
+		} else {
+			return new CommandAction(true, "/board/read.do?num="+num+"&curPage="+curPage);
+		}
+
+
+==========================
+< kr.co.command 패키지에 Board_ReplyUICommand 클래스 수정 및 추가하기 >
+	public CommandAction execute(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+		
+		String sorgNum = request.getParameter("orgNum");
+		// orgNum 오리지널넘버(원래글)
+		int orgNum = Integer.parseInt(sorgNum);
+		
+		String scurPage = request.getParameter("curPage");
+		int curPage = Integer.parseInt(scurPage);
+		
+		request.setAttribute("orgNum", orgNum);
+		request.setAttribute("curPage", curPage);
+		
+		return new CommandAction(false, "/jsp/board/reply.jsp");
+	}
+
+==========================
+< webapp 폴더에 board 폴더에 reply.jsp 수정 및 추가하기 >
+<form action="/board/reply.do" method="post">
+	<input type="hidden" name="orgNum" value="${orgNum}">
+	<input type="hidden" name="curPage" value="${curPage}">
+	author : <input name="author" required><br>
+	pw : <input name="pw" type="password" required><br>
+	title : <input name="title" required><br>
+	
+	content<br>
+	<textarea rows="10" name="content" required></textarea>
+	<br>
+	
+	<input type="submit" value="답글 등록">
+
+</form>
+
+
+==========================
+< kr.co.command 패키지에 Board_ReplyCommand 클래스 수정 및 추가하기 >
+	public CommandAction execute(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+		
+		String sorgNum = request.getParameter("orgNum");
+		int orgNum = Integer.parseInt(sorgNum);
+		
+		String scurPage = request.getParameter("curPage");
+		int curPage = Integer.parseInt(scurPage);
+		
+		String author = request.getParameter("author");
+		
+		String spw = request.getParameter("pw");
+		int pw = Integer.parseInt(spw);
+		
+		String title = request.getParameter("title");
+		
+		String content = request.getParameter("content");
+		
+		BoardDTO dto = new BoardDTO(-1, author, title, content, pw, null, -1, -1, -1, -1);
+		
+		BoardDAO dao = new BoardDAO();
+		dao.reply(orgNum, dto);
+		
+		
+		return new CommandAction(true, "/board/list.do?curPage="+curPage);
+	}
+
+
+==========================  검색추가
+< webapp 폴더에 board 폴더에 list.jsp 수정 및 추가하기 >
+<body>
+	<p>
+		안녕하세요. 띄어쓰기는&nbsp;&nbsp;&nbsp;&nbsp;원래 없었는데, 미국인이 제안해서 생긴 문법입니다.
+	</p>
+	<a href="/board/insertui.do">글쓰기 화면으로 가기</a>
+	
+	<jsp:include page="part_search.jsp"/>
+	
+	<table border="1">
+		<thead>
+			<tr>
+				<th>num</th>
+				<th>author</th>
+				<th width="300px">title</th>
+				<th>writeday</th>
+				<th>readcnt</th>		
+			</tr>
+		</thead>
+
+========================== 
+criteria
+제목: 서울대학교 축제
+작성자: 윤하
+내용: 사건의 지평선이라는 노래가 인기가 있습니다.
+
+< webapp 폴더에 board 폴더에 part_search jsp파일 생성 >
+colspan="3"  3개를 통합시키겟다라는 의미 ---- 하려다가 안하심
+
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8" session="false"%>
+    
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>  
+
+<style type="text/css">
+	.search{
+		border: 1px solid gray;
+		margin: 5px;
+		padding: 5px;
+	}
+</style>
+
+<div class="search">
+	<form action="/board/search.do" method="get">
+		<select name="criteria">
+			<option value="title">제목</option>
+			<option value="author">작성자</option>
+			<option value="content">내용</option>
+			<option value="title&content">제목+내용</option>
+		</select>
+		<input name="keyword" placeholder="검색어를 입력하세요.">
+		<input type="submit" value="검색">
+	</form>
+</div>
+
+
+==========================
+< kr.co.controller 패키지에 FrontController 클래스 추가입력하기 >
+
+menus.put("/board/search.do", new SearchCommand());
+
+
+==========================
+< kr.co.command 패키지에  SearchCommand 클래스 자동생성 >
+package kr.co.command;
+
+import java.io.IOException;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import kr.co.domain.BoardDTO;
+import kr.co.domain.CommandAction;
+import kr.co.domain.SearchPageTO;
+import kr.co.repository.BoardDAO;
+
+public class SearchCommand implements Command {
+
+	@Override
+	public CommandAction execute(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+		int curPage = 1;
+		
+		String scurPage = request.getParameter("curPage");
+		
+		if(scurPage != null) {
+			curPage = Integer.parseInt(scurPage);
+		}
+		
+		String criteria = request.getParameter("criteria");
+		String keyword = request.getParameter("keyword");		
+		
+		BoardDAO dao = new BoardDAO();
+		SearchPageTO<BoardDTO> pt = dao.search(curPage, criteria, keyword);
+		
+		request.setAttribute("pt", pt);
+		
+		return new CommandAction(false, 
+				"/jsp/board/search.jsp?criteria="+criteria+"&keyword="+keyword);
+	}
+
+}
+
+
+==========================
+< kr.co.domain 패키지에  SearchPageTO 클래스 생성 >
+package kr.co.domain;
+
+public class SearchPageTO<T> extends PageTO<T>{
+	
+	private String criteria;
+	private String keyword;
+	
+	public SearchPageTO() {
+		// TODO Auto-generated constructor stub
+	}	
+
+	public SearchPageTO(String criteria, String keyword) {
+		super(1);
+		this.criteria = criteria;
+		this.keyword = keyword;
+	}
+
+	public SearchPageTO(int curPage, String criteria, String keyword) {
+		super(curPage);          // int curPage 사용자 생성자에 추가
+		this.criteria = criteria;
+		this.keyword = keyword;
+	}
+
+	public String getCriteria() {
+		return criteria;
+	}
+
+	public void setCriteria(String criteria) {
+		this.criteria = criteria;
+	}
+
+	public String getKeyword() {
+		return keyword;
+	}
+
+	public void setKeyword(String keyword) {
+		this.keyword = keyword;
+	}
+	
+	
+}
+
+
+
+==========================
+< board.sql 추가 입력 >
+SELECT COUNT(num) FROM tbl_board WHERE title LIKE '%kim%'
+
+SELECT * FROM
+(SELECT rownum rnum, num, author, title, TO_CHAR(writeday, 'yyyy-mm-dd') writeday, readcnt, repIndent FROM
+(SELECT * FROM tbl_board WHERE title LIKE '%kim%' ORDER BY repRoot DESC, repStep ASC))
+WHERE rnum BETWEEN 1 AND 10
+
+
+==========================
+< DAO에  search작성하러가기 자동생성 >
+	public SearchPageTO<BoardDTO> search(int curPage, String criteria, String keyword) {
+		SearchPageTO<BoardDTO> spt = new SearchPageTO<BoardDTO>(curPage, criteria, keyword);
+		
+		List<BoardDTO> list = new ArrayList<BoardDTO>();		
+		Connection conn = null;
+		PreparedStatement pstmt = null;
+		String sql = "SELECT * FROM "
+				+ "(SELECT rownum rnum, num, author, title, "
+				+ "TO_CHAR(writeday, 'yyyy-mm-dd') writeday, "
+				+ "readcnt, repIndent FROM "
+				+ "(SELECT * FROM tbl_board  "
+				+ "WHERE "+criteria+" LIKE ? "
+				+ "ORDER BY repRoot DESC, repStep ASC)) "
+				+ "WHERE rnum BETWEEN ? AND ?";
+		ResultSet rs = null;
+		
+		try {
+			conn = dataFactory.getConnection();
+			
+			int amount = getAmountForSearch(conn, criteria, keyword);
+			spt.setAmount(amount);
+			
+			int startNum = spt.getStartNum();
+			int endNum = spt.getEndNum();
+			
+			pstmt = conn.prepareStatement(sql);
+			pstmt.setString(1, "%"+keyword+"%");
+			pstmt.setInt(2, startNum);
+			pstmt.setInt(3, endNum);
+			
+			rs = pstmt.executeQuery();
+			
+			while (rs.next()) {
+				int num = rs.getInt("num");
+				String author = rs.getString("author");
+				String title = rs.getString("title");
+				String writeday = rs.getString("writeday");
+				int readcnt = rs.getInt("readcnt");								
+				int repIndent = rs.getInt("repIndent");
+				
+				BoardDTO dto = new BoardDTO(num, author, title, writeday, 
+										readcnt, -1, -1, repIndent);
+				
+				list.add(dto);
+			}
+			
+			spt.setList(list);
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			closeAll(rs, pstmt, conn);
+		}
+				
+		return spt;
+	}
+
+==========================
+< DAO에  getAmountForSearch 작성하러가기 자동생성 >
+	private int getAmountForSearch(Connection conn, String criteria, String keyword) {
+		int amount = 0;
+		
+		PreparedStatement pstmt = null;
+		String sql = "SELECT COUNT(num) FROM tbl_board WHERE "+criteria+" LIKE ?";
+		ResultSet rs = null;
+		
+		try {
+			pstmt = conn.prepareStatement(sql);
+			pstmt.setString(1, "%"+keyword+"%");
+			rs = pstmt.executeQuery();
+			
+			if (rs.next()) {
+ 				amount = rs.getInt(1);
+			}
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			closeAll(rs, pstmt, null);
+		}
+		
+		return amount;
+	}
+
+==========================
+< kr.co.command 패키지에 SearchCommand 클래스 추가입력하기 >
+	public CommandAction execute(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+		int curPage = 1;
+		
+		String scurPage = request.getParameter("curPage");
+		
+		if(scurPage != null) {
+			curPage = Integer.parseInt(scurPage);
+		}
+		
+		String criteria = request.getParameter("criteria");
+		String keyword = request.getParameter("keyword");		
+		
+		BoardDAO dao = new BoardDAO();
+		SearchPageTO<BoardDTO> pt = dao.search(curPage, criteria, keyword);
+		
+		request.setAttribute("pt", pt);
+		
+		return new CommandAction(false, 
+				"/jsp/board/search.jsp?criteria="+criteria+"&keyword="+keyword);
+	}
+
+
+
+
+==========================
+< webapp 폴더에 board 폴더에 part_page jsp파일 수정 >
+<c:if test="${pt.curPage > 1}" >
+	<a href="/board/list.do?curPage=${pt.curPage-1}">&lt;</a>
+</c:if>
+
+<c:forEach begin="${pt.beginPageNum}" end="${pt.finishPageNum}" var="i">
+	<c:if test="${i != pt.curPage}" >
+		<a href="/board/list.do?curPage=${i}">${i}</a>
+	</c:if>
+	
+	<c:if test="${i == pt.curPage}" >
+		<a style="color:red;" href="/board/list.do?curPage=${i}">${i}</a>
+	</c:if>
+</c:forEach>
+
+<c:if test="${pt.curPage < pt.totalPage}" >
+	<a href="/board/list.do?curPage=${pt.curPage+1}">&gt;</a>
+</c:if>
+
+==========================
+< kr.co.command 패키지에 Board_ReadCommand 클래스 추가입력하기 >
+	@Override
+	public CommandAction execute(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+		
+		String snum = request.getParameter("num");
+		int num = Integer.parseInt(snum);
+		
+		String scurPage = request.getParameter("curPage");
+		int curPage = Integer.parseInt(scurPage);
+		
+		String criteria = request.getParameter("criteria");
+		String keyword = request.getParameter("keyword");
+		
+		BoardDAO dao = new BoardDAO();
+		BoardDTO dto = dao.read(num);
+		
+		request.setAttribute("dto", dto);
+		request.setAttribute("curPage", curPage);
+		request.setAttribute("criteria", criteria);
+		request.setAttribute("keyword", keyword);
+		 
+		
+		return new CommandAction(false, "/jsp/board/read.jsp");
+	}
+
+==========================
+< webapp 폴더에 board 폴더에 read jsp파일 수정 >
+	<h1>게시글 자세히 보기</h1>
+	
+	글번호 : ${dto.num}<br>
+	작성일 : ${dto.writeday}<br>
+	작성자 : ${dto.author}<br>
+	조회수 : ${dto.readcnt}<br>
+	제 목 : ${dto.title}<br>
+	글내용 : 
+	<p>${dto.content}</p>
+	
+	<br>
+	<c:if test="${empty keyword}">
+		<a href="/board/list.do?curPage=${curPage}">목록</a>
+	</c:if>
+	
+	<c:if test="${not empty keyword}">
+		<a href="/board/search.do?curPage=${curPage}&criteria=${criteria}&keyword=${keyword}">목록</a>
+	</c:if> |
+		
+	<a href="/board/list.do?curPage=${curPage}">목록</a> **
+	<a href="/board/updateui.do?num=${dto.num}&curPage=${curPage}">수정</a> **
+	<a href="#" onclick="deleteBoard()">삭제</a> **
+	<a href="/board/replyui.do?orgNum=${dto.num}&curPage=${curPage}">답글 달기 화면으로 가기</a> 
+	
+	<form action="/board/delete.do" method="post" id="mform">
+		<input type="hidden" name="num" value="${dto.num}">
+		<input type="hidden" name="curPage" value="${curPage}">
+	</form>
+	<script type="text/javascript">
+		function deleteBoard() {
+			let pw = prompt("비밀번호를 입력하세요.");
+			
+			let pwt = document.createElement("input");
+			pwt.setAttribute("type", "password");
+			pwt.setAttribute("name", "pw");
+			pwt.setAttribute("value", pw);
+			
+			document.getElementById("mform").appendChild(pwt);
+			
+			document.getElementById("mform").submit();
+		}
+	</script>
+
+
+==========================
+< webapp 폴더에 board 폴더에 search jsp파일 생성 >
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8" session="false"%>
+    
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>  
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>게시글 검색 결과</title>
+</head>
+<body>
+	<h1>게시글 검색 결과</h1>
+	
+	<a href="/board/list.do">전체 목록</a>	
+	
+	<table border="1">
+		<thead>
+			<tr>
+				<th>num</th>
+				<th>author</th>
+				<th width="300px">title</th>
+				<th>writeday</th>
+				<th>readcnt</th>		
+			</tr>
+		</thead>
+		
+		<tbody>
+			<c:forEach items="${pt.list}" var="dto">
+			
+				<tr>
+					<td>${dto.num}</td>
+					<td>${dto.author}</td>
+					<td>
+						<c:forEach begin="1" end="${dto.repIndent}">
+							&nbsp;
+						</c:forEach>
+						<a href="/board/read.do?num=${dto.num}&curPage=${pt.curPage}&criteria=${pt.criteria}&keyword=${pt.keyword}">${dto.title}</a>
+					</td>
+					<td>${dto.writeday}</td>
+					<td>${dto.readcnt}</td>
+				</tr>
+				
+			</c:forEach>
+		</tbody>
+	</table>
+	
+	<jsp:include page="part_page.jsp"/>
+</body>
+</html>
+
+
+========================= 대대적인 공사 ==================
+< MyBoard 다이나믹프로젝트를 복사해서 MyBoard200 다이나믹프로젝트 생성 >
+
+
+< kr.co.command 패키지에 Board_ListCommand 클래스 수정 및 추가 입력하기 >
+package kr.co.command;
+
+import java.io.IOException;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import kr.co.domain.BoardDTO;
+import kr.co.domain.CommandAction;
+import kr.co.domain.PageTO;
+import kr.co.domain.SearchPageTO;
+import kr.co.repository.BoardDAO;
+
+public class Board_ListCommand implements Command {
+
+	@Override
+	public CommandAction execute(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+		String title = "검색 결과";
+		
+		int curPage = 1;
+		
+		String scurPage = request.getParameter("curPage");
+		
+		if (scurPage != null) {
+			curPage = Integer.parseInt(scurPage);
+		}
+		
+		String criteria = request.getParameter("criteria");
+		if(criteria == null) {
+			criteria = "title";
+		}
+		
+		String keyword = request.getParameter("keyword");
+		if(keyword == null) {
+			keyword = "";  //전체목록을 가져올수 있다.
+			title = "게시글 목록";
+		}
+		
+		
+		
+		BoardDAO dao = new BoardDAO();
+//		List<BoardDTO> list = dao.list();		
+//		request.setAttribute("list", list);
+		
+		SearchPageTO<BoardDTO> pt = dao.list(curPage, criteria, keyword);
+		request.setAttribute("pt", pt);
+		request.setAttribute("title", title);
+		
+		return new CommandAction(false, "/jsp/board/list.jsp");
+	}
+
+}
+
+
+==========================
+< DAO에 SearchPageTO<BoardDTO> 작성한거 수정가기 >
+public SearchPageTO<BoardDTO> list(int curPage, String criteria, String keyword) {
+search 였는데 list로 변경
+
+==========================
+< webapp 폴더에 board 폴더에 list jsp파일 수정및추가하기 >
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8" session="false"%>
+    
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>  
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>${title}</title>
+
+</head>
+<body>
+	<h1>${title}</h1>
+	
+	<a href="/board/insertui.do">글쓰기 화면으로 가기</a>
+	
+	<jsp:include page="part_search.jsp"/>
+	
+	<table border="1">
+		<thead>
+			<tr>
+				<th>num</th>
+				<th>author</th>
+				<th width="300px">title</th>
+				<th>writeday</th>
+				<th>readcnt</th>		
+			</tr>
+		</thead>
+		
+		<tbody>
+			<c:forEach items="${pt.list}" var="dto">
+			
+				<tr>
+					<td>${dto.num}</td>
+					<td>${dto.author}</td>
+					<td>
+						<c:forEach begin="1" end="${dto.repIndent}">
+							&nbsp;
+						</c:forEach>
+						<a href="/board/read.do?num=${dto.num}&curPage=${pt.curPage}&criteria=${pt.criteria}&keyword=${pt.keyword}">${dto.title}</a>
+					</td>
+					<td>${dto.writeday}</td>
+					<td>${dto.readcnt}</td>
+				</tr>
+				
+			</c:forEach>
+		</tbody>
+	</table>
+	
+	<jsp:include page="part_page.jsp"/>
+</body>
+</html>
+
+==========================
+< kr.co.command 패키지에 Board_ReadCommand 클래스 수정 및 추가 입력하기 >
+package kr.co.command;
+
+import java.io.IOException;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import kr.co.domain.BoardDTO;
+import kr.co.domain.CommandAction;
+import kr.co.repository.BoardDAO;
+
+public class Board_ReadCommand implements Command {
+
+	@Override
+	public CommandAction execute(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+		
+		String snum = request.getParameter("num");
+		int num = Integer.parseInt(snum);
+		
+		String scurPage = request.getParameter("curPage");
+		int curPage = Integer.parseInt(scurPage);
+		
+		String criteria = request.getParameter("criteria");
+		if(criteria == null) {
+			criteria = "title";
+		}
+		
+		String keyword = request.getParameter("keyword");
+		if(keyword == null) {
+			keyword = "";  			
+		}
+		
+		BoardDAO dao = new BoardDAO();
+		BoardDTO dto = dao.read(num);
+		
+		request.setAttribute("dto", dto);
+		request.setAttribute("curPage", curPage);
+		request.setAttribute("criteria", criteria);
+		request.setAttribute("keyword", keyword);
+		 
+		
+		return new CommandAction(false, "/jsp/board/read.jsp");
+	}
+
+}
+
+==========================
+< webapp 폴더에 board 폴더에 read jsp파일 수정및추가하기 >
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8" session="false"%>
+    
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>  
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>게시글 자세히 보기</title>
+</head>
+<body>
+	<h1>게시글 자세히 보기</h1>
+	
+	글번호 : ${dto.num}<br>
+	작성일 : ${dto.writeday}<br>
+	작성자 : ${dto.author}<br>
+	조회수 : ${dto.readcnt}<br>
+	제 목 : ${dto.title}<br>
+	글내용 : 
+	<p>${dto.content}</p>
+	
+	<br>
+		
+	<a href="/board/list.do?curPage=${curPage}&criteria=${criteria}&keyword=${keyword}">목록</a> **
+	<a href="/board/updateui.do?num=${dto.num}&curPage=${curPage}&criteria=${criteria}&keyword=${keyword}">수정</a> **
+	<a href="#" onclick="deleteBoard()">삭제</a> **
+	<a href="/board/replyui.do?orgNum=${dto.num}&curPage=${curPage}&criteria=${criteria}&keyword=${keyword}">답글</a> 
+	
+	<form action="/board/delete.do" method="post" id="mform">
+		<input type="hidden" name="num" value="${dto.num}">
+		<input type="hidden" name="curPage" value="${curPage}">
+		<input type="hidden" name="criteria" value="${criteria}">
+		<input type="hidden" name="keyword" value="${keyword}">
+	</form>
+	<script type="text/javascript">
+		function deleteBoard() {
+			let pw = prompt("비밀번호를 입력하세요.");
+			
+			let pwt = document.createElement("input");
+			pwt.setAttribute("type", "password");
+			pwt.setAttribute("name", "pw");
+			pwt.setAttribute("value", pw);
+			
+			document.getElementById("mform").appendChild(pwt);
+			
+			document.getElementById("mform").submit();
+		}
+	</script>
+</body>
+</html>
+
+
+==========================
+< kr.co.command 패키지에 Board_UpdateUICommand 클래스 수정 및 추가 입력하기 >
+package kr.co.command;
+
+import java.io.IOException;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import kr.co.domain.BoardDTO;
+import kr.co.domain.CommandAction;
+import kr.co.repository.BoardDAO;
+
+public class Board_UpdateUICommand implements Command {
+
+	@Override
+	public CommandAction execute(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+		
+		String snum = request.getParameter("num");
+		int num = Integer.parseInt(snum);
+		
+		String scurPage = request.getParameter("curPage");
+		int curPage = Integer.parseInt(scurPage);
+		
+		String criteria = request.getParameter("criteria");
+		if(criteria == null) {
+			criteria = "title";
+		}
+		
+		String keyword = request.getParameter("keyword");
+		if(keyword == null) {
+			keyword = "";  			
+		}
+		
+		BoardDAO dao = new BoardDAO();
+		BoardDTO dto = dao.updateui(num);
+		
+		request.setAttribute("dto", dto);
+		request.setAttribute("curPage", curPage);
+		
+		request.setAttribute("criteria", criteria);
+		request.setAttribute("keyword", keyword);
+		
+		
+		return new CommandAction(false, "/jsp/board/update.jsp");
+	}
+
+}
+
+
+==========================
+< webapp 폴더에 board 폴더에 part_page jsp파일 수정및추가하기 >
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8" session="false"%>
+    
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>  
+
+<c:if test="${pt.curPage > 1}" >
+	<a href="/board/list.do?curPage=${pt.curPage-1}&criteria=${pt.criteria}&keyword=${pt.keyword}">&lt;</a>
+</c:if>
+
+<c:forEach begin="${pt.beginPageNum}" end="${pt.finishPageNum}" var="i">
+	<c:if test="${i != pt.curPage}" >
+		<a href="/board/list.do?curPage=${i}&criteria=${pt.criteria}&keyword=${pt.keyword}">${i}</a>
+	</c:if>
+	
+	<c:if test="${i == pt.curPage}" >
+		<a style="color:red;" href="/board/list.do?curPage=${i}&criteria=${pt.criteria}&keyword=${pt.keyword}">${i}</a>
+	</c:if>
+</c:forEach>
+
+<c:if test="${pt.curPage < pt.totalPage}" >
+	<a href="/board/list.do?curPage=${pt.curPage+1}&criteria=${pt.criteria}&keyword=${pt.keyword}">&gt;</a>
+</c:if>
+
+
+==========================
+< webapp 폴더에 board 폴더에 update jsp파일 수정및추가하기 >
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8" session="false"%>
+    
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>  
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>게시글 수정</title>
+</head>
+<body>
+<h1>게시글 수정</h1>
+<form action="/board/update.do" method="post">
+	<input type="hidden" name="curPage" value="${curPage}">
+	<input type="hidden" name="criteria" value="${criteria}">
+	<input type="hidden" name="keyword" value="${keyword}">
+	
+	num : <input name="num" value="${dto.num}" readonly><br>
+	author : <input name="author" required value="${dto.author}"><br>
+	pw : <input name="pw" required><br>
+	title : <input name="title" required value="${dto.title}"><br>
+	
+	content<br>
+	<textarea rows="10" name="content" required>${dto.content}</textarea>
+	<br>
+	
+	<input type="submit" value="수정">
+
+</form>
+
+</body>
+</html>
+
+==========================
+< kr.co.command 패키지에 Board_UpdateCommand 클래스 수정 및 추가 입력하기 >
+package kr.co.command;
+
+import java.io.IOException;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import kr.co.domain.BoardDTO;
+import kr.co.domain.CommandAction;
+import kr.co.repository.BoardDAO;
+
+public class Board_UpdateCommand implements Command {
+
+	@Override
+	public CommandAction execute(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+		
+		String snum = request.getParameter("num");
+		int num = Integer.parseInt(snum);
+		
+		String scurPage = request.getParameter("curPage");
+		int curPage = Integer.parseInt(scurPage);
+		
+		String author = request.getParameter("author");
+		
+		String spw = request.getParameter("pw");
+		int pw = Integer.parseInt(spw);
+		
+		String title = request.getParameter("title");
+		
+		String content = request.getParameter("content");
+		
+		BoardDTO dto = new BoardDTO(num, author, title, content, pw, null, -1, -1, -1, -1);
+		
+		String criteria = request.getParameter("criteria");  // 검색결과
+		if(criteria == null) {   
+			criteria = "title";   //목록용
+		}
+		
+		String keyword = request.getParameter("keyword");  //검색결과
+		if(keyword == null) {
+			keyword = "";  		//목록용	
+		}
+		
+		BoardDAO dao = new BoardDAO();
+		dao.update(dto);
+		
+		StringBuffer sb = new StringBuffer();
+		sb.append("/board/read.do?num=");
+		sb.append(num);
+		sb.append("&curPage=");
+		sb.append(curPage);
+		sb.append("&criteria=");
+		sb.append(criteria);
+		sb.append("&keyword=");
+		sb.append(keyword);
+		//return에 들어가는 코드가 많아지면 StringBuffer를 이용하면 된다.
+		return new CommandAction(true, sb.toString());
+		// return new CommandAction(true, "/board/read.do?num="+num+"&criteria="+criteria+"&keyword"+keyword);
+	}
+
+}
+
+
+
+==========================
+< kr.co.command 패키지에 Board_ReplyUICommand 클래스 수정 및 추가 입력하기 >
+package kr.co.command;
+
+import java.io.IOException;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import kr.co.domain.CommandAction;
+
+public class Board_ReplyUICommand implements Command {
+
+	@Override
+	public CommandAction execute(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+		
+		String sorgNum = request.getParameter("orgNum");
+		// orgNum 오리지널넘버(원래글)
+		int orgNum = Integer.parseInt(sorgNum);
+		
+		String scurPage = request.getParameter("curPage");
+		int curPage = Integer.parseInt(scurPage);
+		
+		String criteria = request.getParameter("criteria");
+		if(criteria == null) {
+			criteria = "title";
+		}
+		
+		String keyword = request.getParameter("keyword");
+		if(keyword == null) {
+			keyword = "";  			
+		}
+		
+		request.setAttribute("orgNum", orgNum);
+		request.setAttribute("curPage", curPage);
+		request.setAttribute("criteria", criteria);
+		request.setAttribute("keyword", keyword);
+		
+		return new CommandAction(false, "/jsp/board/reply.jsp");
+	}
+
+}
+
+
+==========================
+< webapp 폴더에 board 폴더에 reply jsp파일 수정및추가하기 >
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8" session="false"%>
+    
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>  
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>답글 작성</title>
+</head>
+<body>
+	<h1>답글 작성</h1>
+	
+<form action="/board/reply.do" method="post">
+	<input type="hidden" name="orgNum" value="${orgNum}">
+	<input type="hidden" name="curPage" value="${curPage}">
+	<input type="hidden" name="criteria" value="${criteria}">
+	<input type="hidden" name="keyword" value="${keyword}">
+	
+	author : <input name="author" required><br>
+	pw : <input name="pw" type="password" required><br>
+	title : <input name="title" required><br>
+	
+	content<br>
+	<textarea rows="10" name="content" required></textarea>
+	<br>
+	
+	<input type="submit" value="답글 등록">
+
+</form>
+
+</body>
+</html>
+
+==========================
+< kr.co.command 패키지에 Board_ReplyCommand 클래스 수정 및 추가 입력하기 >
+package kr.co.command;
+
+import java.io.IOException;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import kr.co.domain.BoardDTO;
+import kr.co.domain.CommandAction;
+import kr.co.repository.BoardDAO;
+
+public class Board_ReplyCommand implements Command {
+
+	@Override
+	public CommandAction execute(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+		
+		String sorgNum = request.getParameter("orgNum");
+		int orgNum = Integer.parseInt(sorgNum);
+		
+		String scurPage = request.getParameter("curPage");
+		int curPage = Integer.parseInt(scurPage);
+		
+		String author = request.getParameter("author");
+		
+		String spw = request.getParameter("pw");
+		int pw = Integer.parseInt(spw);
+		
+		String title = request.getParameter("title");
+		
+		String content = request.getParameter("content");
+		
+		BoardDTO dto = new BoardDTO(-1, author, title, content, pw, null, -1, -1, -1, -1);
+		
+		String criteria = request.getParameter("criteria");
+		if(criteria == null) {
+			criteria = "title";
+		}
+		
+		String keyword = request.getParameter("keyword");
+		if(keyword == null) {
+			keyword = "";  			
+		}
+		
+		BoardDAO dao = new BoardDAO();
+		dao.reply(orgNum, dto);
+		
+		
+		return new CommandAction(true, "/board/list.do?curPage="+curPage+"&criteria="+criteria+"&keyword"+keyword);
+	}
+
+}
+
+
+==========================
+< kr.co.command 패키지에 Board_DeleteCommand 클래스 수정 및 추가 입력하기 >
+package kr.co.command;
+
+import java.io.IOException;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import kr.co.domain.CommandAction;
+import kr.co.repository.BoardDAO;
+
+public class Board_DeleteCommand implements Command {
+
+	@Override
+	public CommandAction execute(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+		
+		String snum = request.getParameter("num");
+		int num = Integer.parseInt(snum);
+		
+		String spw = request.getParameter("pw");
+		int pw = Integer.parseInt(spw);
+		
+		String scurPage = request.getParameter("curPage");
+		int curPage = Integer.parseInt(scurPage);
+		
+		String criteria = request.getParameter("criteria");
+		if(criteria == null) {
+			criteria = "title";
+		}
+		
+		String keyword = request.getParameter("keyword");
+		if(keyword == null) {
+			keyword = "";  			
+		}
+		
+		BoardDAO dao = new BoardDAO();
+		int result = dao.delete(num, pw);
+		
+		if (result > 0) {
+			return new CommandAction(true, "/board/list.do?curPage="+curPage+"&criteria="+criteria+"&keyword"+keyword);
+		} else {
+			return new CommandAction(true, "/board/read.do?num="+num+"&curPage="+curPage+"&criteria="+criteria+"&keyword"+keyword);
+		}
+		
+	}
+
+}
+
+
+==========================
+< board.sql 추가 입력 >
+SELECT * FROM tbl_board WHERE UPPER(title) LIKE UPPER('%kim%')
+UPPER -> 대소문자 상관없이 검색결과 나온다
+
+==========================
+< kr.co.command 패키지에  클래스 수정 및 추가 입력하기 >
+
+
+
+
+
+
+
+
+==========================
+< DAO에  작성하러 가기 >
+
+
+==========================
+< webapp 폴더에 board 폴더에 jsp파일 생성 >
+
+
+
+==========================
+< webapp 폴더에 member 폴더 생성 >
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
