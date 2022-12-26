@@ -1,0 +1,371 @@
+git & github
+- git: 개인의 pc에서 형상관리
+- github: 여러 명이 공동작업을 할 수 있게 지원함.
+
+1> git-scm.com에서 git 다운로드
+git다운로드 -> 다운로드 -> 64-bit Git for Windows Setup. -> 실행해서 계속 next 하고 마지막에 install나오는 부분에 아무것도 
+체크하지말고 진행함 -> D드라이브에 workspace_git 폴더생성 -> test1폴더생성 -> 우클릭 git bash here 접속
+
+2> git 작업을 하면, 누가 해당 git 작업을 했는지에 대한 정보를 매번 입력해야 함.
+하지만 환경설정을 하면, 한번만 입력하면 알아서 관련 정보가 입력됨
+git config --global user.name "lee sunyeop"
+git config --global user.email "lssy210@gmail.com"
+
+3> master 브랜치가 아닌 main 브랜치가 생성되도록 하기
+git config --global init.defaultBranch main
+
+잘 들어갔는지 확인작업
+git config --list
+
+4> git 환경설정 삭제하기
+git config --global --unset user.name "lee sunyeop" 잘못입력해서 지우고 싶을때 쓴다
+
+5> test1 폴더에 대해 git 서비스를 시작하기
+git init
+- .git 폴더가 생성됨.
+
+git init -> ls -al 
+실행하면 나옴
+total 4
+drwxr-xr-x 1 admin 197121 0 Dec 26 09:45 ./
+drwxr-xr-x 1 admin 197121 0 Dec 26 09:24 ../
+drwxr-xr-x 1 admin 197121 0 Dec 26 09:45 .git/
+
+6> test1 폴더에 hello.txt 파일 생성하기
+- 마우스 우클릭해서 [새로 만들기-새파일 생성]
+- 또는 리눅스의 명령어 touch를 이용해서 생성하기
+touch ./hello.txt 입력해서 파일 생성함
+ls -al 입력
+total 4
+drwxr-xr-x 1 admin 197121 0 Dec 26 09:49 ./
+drwxr-xr-x 1 admin 197121 0 Dec 26 09:24 ../
+drwxr-xr-x 1 admin 197121 0 Dec 26 09:45 .git/
+-rw-r--r-- 1 admin 197121 0 Dec 26 09:49 hello.txt
+
+7> git status 파일 상태확인 
+- index(staging) 영역에 저장 => git add .
+
+8> header 영역에 저장
+- git commit -m -> vi 에디터로 이동 -> i를 입력해서 편집모드로 들어감 -> 커밋 메시지 입력 ->
+  esc키 누름 -> :wq 입력해서 저장 및 빠져 나오기(만약에 입력한게 없으면 q!를 입력)
+  - git commit -m "커밋 메시지 입력"
+
+9> git log 와 reflog
+내가 작업한 기록이 나옴
+- git log를 통해 되돌리고 싶은 곳의 해시코드값을 확인
+- git reset -hard good.txt 커밋의 해시코드값 입력..
+ -> hello.txt 파일에 대한 commit 취소, add 취소, hello.txt에 입력한 Hello!도 취소됨.
+    -> hello.txt에 입력한 값도 되돌리고...add 원래 상태로 되돌리고...commit 원래 상태로 되돌리고, 
+       -> git reflog를 통해서 되돌리고 싶은 곳의 해시코드값을 확인..
+	git reset --hard c28c4 되돌리고 싶은 곳의 해시코드값 입력
+
+10> git reset을 이용한 되돌리기
+- git log나 git reflog를 이용해서 되돌리고 싶은 곳의 해시코드값을 확인하고
+- commit 작업만 취소 : git reset --soft 확인된 해시코드값
+- add와 commit 작업만 취소 : git reset --mixed 확인된 해시코드값
+- 코드 작업과 add 그리고 commit 작업 취소 : git reset --hard 확인된 해시코드값
+
+11> git log의 결과가 너무 많아서 화면을 넘치면, 스크롤을 통해 하단까지 볼 수 있음.
+그러나 마지막 하단까지 왔다고 해서 log 결과를 빠져나오지 않음.
+이 때 q를 입력하면, 다시 편집모드로 변경됨.
+
+12> branch: 사용자..
+- dev(개발통합권), topic(feature)
+- 현재 있는 브랜치 목록: git branch
+ - 현재 사용하고 있는 브랜치는 git branch 결과 화면에 *가 붙은 브랜치
+- 브랜치 생성: git branch 생성할 브랜치명
+ - git branch dev
+- 브랜치 checkout: 작업할 브랜치를 변경한다는 의미
+ - git checkout dev
+- topic 브랜치를 생성할 건데
+ - 반드시 dev 브랜치 안에서 topic 브랜치가 생성됨.
+ - topic 브랜치명은 topic/기능명으로 지어주세요.
+   topic/insert, topic/read, topic/list, topic/update, topic/detele, topic/search
+- topic/insert 브랜치로 checkout
+ - git checkout topic/insert
+  - 작업하고
+  - git add .
+  - git commit -m"입력 기능 완료"
+ - dev브랜치로 checkout
+  - git merge topic/insert
+
+ - topic/insert 브랜치 삭제
+  - git branch -d topic/insert
+
+ - topic/read 브랜치 생성하고 checkout까지 하세요
+git branch topic/read
+git checkout topic/read
+
+
+ - topic/list 브랜치 생성하고 checkout까지 하세요 (한방에 하는 방법)
+1. git checkout -b topic/list
+2. touch list.txt  텍스트파일 생성
+3. git add .
+4. git commit -m "조회 완료"
+5. git log 해서 잘 들어갔는지 확인
+6. git checkout dev
+7. git merge topic/list  합치기
+8. git branch -d topic/list  합치고나서 기존에 만들거 삭제하기
+
+ - topic/update 브랜치 생성하고 checkout까지 하세요 (한방에 하는 방법)
+1. git checkout -b topic/update
+2. touch update.txt  파일 생성
+3. git add .
+4. update.txt 생성한 파일안에 
+회사에서 1/3일까지 작업하고 제주도로 출장감. 입력하고 저장함
+5. git commit -m "회사에서1/3까지 마무리하고 제주도 출장감"
+6. git log 잘 들어 갔는지 확인
+7. git add .
+8. update.txt 생성한 파일안에
+제주도에 출장와서 세미나 참석했는데 아직 6시가 안 되어서 6시까지 작업했더니
+2/3까지 완성했음. -- 추가문구 넣고 저장함
+9. git commit -m "제주도에서 2/3까지 완성함"
+10. git log 잘 들어 갔는지 확인
+11. git add .
+12. update.txt 생성한 파일안에
+출장 와서 집에 도착하니 아직 6시가 안돼서 6시까지 재택근무함
+수정 기능 완성  -- 추가문구 넣고 저장함
+13. git commit -m "수정 완료"
+14. git log 잘 들어 갔는지 확인
+15. git rebase -i head~3 입력하고 아래에 적어 놓은거대로 작업함
+15. 작업이 완료되기 전에 여러 개의 commit을 했을 때, 그에 대한 commit 관리
+ git rebase -i head~3(3개의 커밋을 통합하겠다는 의미)
+  -> vi 에디터로 들어감
+    -> i를 입력해서 편집 모드로 진입
+       - 가장 앞에 있는 commit만 남겨두고
+         - 나머지 commit에 대해 squash를 진행함. 그냥 s로 바꾸면 됨
+    -> esc를 누른 후
+    -> :wq를 입력함.
+    -> commit 메시지를 확정 짓기 위한 vi 에디터로 들어감.
+      -> 마지막 커밋 메시지만 남겨두고 앞의 커밋은 다 삭제
+	회사에서1/3까지 마무리하고 제주도 출장감  -- 삭제하기
+	제주도에서 2/3까지 완성함  -- 삭제하기
+	수정 완료 -- 그대로 나두기
+         -> esc 누른 후
+            -> :wq 입력함.
+16. git checkout dev
+17. git merge topic/update
+18. git branch -d topic/update
+여기까지 완성
+
+
+13> 작업이 완료되기 전에 여러 개의 commit을 했을 때, 그에 대한 commit 관리
+ git rebase -i head~3(3개의 커밋을 통합하겠다는 의미)
+  -> vi 에디터로 들어감
+    -> i를 입력해서 편집 모드로 진입
+       - 가장 앞에 있는 commit만 남겨두고
+         - 나머지 commit에 대해 squash를 진행함. 그냥 s로 바꾸면 됨
+    -> esc를 누른 후
+    -> :wq를 입력함.
+    -> commit 메시지를 확정 짓기 위한 vi 에디터로 들어감.
+      -> 마지막 커밋 메시지만 남겨두고 앞의 커밋은 다 삭제
+	회사에서1/3까지 마무리하고 제주도 출장감  -- 삭제하기
+	제주도에서 2/3까지 완성함  -- 삭제하기
+	수정 완료 -- 그대로 나두기
+         -> esc 누른 후
+            -> :wq 입력함.
+
+
+ - topic/delete 브랜치 생성하고 checkout까지 하세요 (한방에 하는 방법)
+git checkout -b topic/delete
+
+반절만 작업함
+삭제 완료 
+
+
+
+ - topic/search 브랜치 생성하고 checkout까지 하세요 (한방에 하는 방법)
+git checkout -b topic/search
+touch search.txt
+search.txt     1. 쓰고 저장
+git add .
+git commit -m "1/4완성"
+ 
+search.txt     2. 쓰고 저장
+git add
+git commit -m "2/4완성"
+
+search.txt    3. 쓰고 저장
+git add
+git commit -m "3/4완성"
+
+search.txt    4. 쓰고 저장
+git add
+git commit -m "검색 완료"
+
+git checkout dev
+git merge --squash topic/search
+git log
+git checkout topic/search
+git log
+git rebase -i head~갯수입력
+git checkout dev
+git merge topic/update
+git branch -d topic/update
+git log
+
+git rebase -i head~8
+i 누르고  입력기능 완료에 r 입력한수 esc 누른후 :wq
+git log 
+
+
+14> topic 브랜치에서 commit 통한 작업을 하지 않고 dev에서 merge의 옵션으로 --squash topic/search를 주면
+자동으로 통합이 되는데, commit이 안된 add까지만 작업이 진행된 것으로 나옴. 별도의 commit 작업을 해야 함.
+
+15> 최근 커밋한 작업에 대한 커밋 메시지 수정하기
+ git commit --amend -m "수정하고픈 커밋 메시지"
+
+16> 기존 커밋한 작업에 대한 커밋 메시지 수정하기
+- git log를 이용해서 commit의 해시값을 확인하고,
+수정한 커밋메시지가 최근 커밋으로부터 얼마큼 떨어져 있는지 확인한다.
+이때 최근 커밋이 1이 되고 밑으로 1씩 증가해서 센다
+git rebase -i head~8
+-> vi 에디터로 들어가서 -> i를 입력해서 편집모드로 가고 -> 화살표를 이용해서 해당 커밋을 pick->r로 변경
+-> esc키를 눌러서 명령모드로 나오고 -> :wq로 빠져나오면 -> 커밋 메시지 변경을 위한 vi 에디터로 들어감
+-> i를 입력해서 편집모드로 가고 -> 커밋 메시지 수정 후 -> esc키를 눌러서 명령모드로 나오고 -> :wq로 빠져나온다
+
+*********
+==만약 맨처음에 만들었던 read.txt 파일을 지우고 싶을때 --> 근데 commit 된 것을 삭제할 수 없어서 하나더 생성을 해야한다.
+read.txt 파일에 새롭게 개선 입력후 저장
+git status
+git add .
+git commit -m "글자세히 보기 완료 v1.0.1"  
+
+
+
+===============================
+
+git clone https://github.com/LeeSunYeop/test2.git
+
+ ls -al
+total 8
+drwxr-xr-x 1 admin 197121 0 Dec 26 14:02 ./
+drwxr-xr-x 1 admin 197121 0 Dec 26 09:24 ../
+drwxr-xr-x 1 admin 197121 0 Dec 26 13:04 test1/
+drwxr-xr-x 1 admin 197121 0 Dec 26 14:02 test2/
+
+cd ./test2/
+
+17. github 회원가입
+18. github에서 test2 레파지토리 생성
+19. test2 레파지토리 clone 주소 복사
+20. D:\workspace_git 디렉토리에서 마우스 우클릭 git bash here 클릭
+21. git clone 복사한 test2 레파지토리 clone 주소 붙여넣기
+22. 내 pc에 test2 디렉토리 생성된 것 확인
+23. test2로 이동
+ cd ./test2
+24. main 브랜치 확인
+25. dev 브랜치 생성
+- git checkout -b dev     
+26. github에 dev 브랜치를 생성
+- git push origin dev
+
+27. origin topic으로 push하기 전에
+git checkout dev 후
+git pull origin dev로 동기화
+
+28. git checkout topic/~ 후
+git rebase dev로 topic/~ 동기화
+
+29. git push origin topic/~
+
+30. 팀장에게 pr 요청
+
+31. 팀장의 pr 승인 후 github의 topic/~삭제
+git push --detele origin topic/~
+
+32. git checkout dev
+
+33. git pull origin dev
+
+34. git branch -D topic/~
+
+
+
+test2 폴더 와 test200 폴더 연결하기
+<순서>
+git checkout -b topic/list
+touch list.txt
+git add .
+git commit -m "조회완료"
+git checkout dev
+깃허브 홈피작업 -> dev 체크 -> add file -> new create선택 파일이름 list.txt -> 내용쓰고 Commit new file 에다 조회완료 입력
+git pull origin dev
+git log
+git checkout topic/list
+git rebase dev
+git log
+git push origin topic/list
+팀장에게 pr 요청(깃허브홈페이지에서 작업) -> topic/list 체크 -> pull requsets 클릭 -> new pull request 클릭 ->
+base:dev <- compare: topic/list 선택 -> Create pull request -> 고생했다는 내용 써준다 -> Create pull request -> ??(검색하기)
+git push --delete origin topic/list
+git checkout dev
+git pull origin  dev
+git log
+git branch -d topic/list
+git branch
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
