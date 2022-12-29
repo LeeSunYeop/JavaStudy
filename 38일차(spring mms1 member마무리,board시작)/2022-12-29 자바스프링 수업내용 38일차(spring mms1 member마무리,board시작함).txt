@@ -1,0 +1,2915 @@
+1. D:\java\workspace_spring 생성하시오
+
+2. 이클립스에 spring 관련 기능을 추가함
+- 이클립스 메뉴 중에서 Help로 가세요
+-> 이클립스 marketplace~ 클릭 -> 검색창에 spring 입력 후 검색
+-> spring legacy project: 전통적인 스프링 프로젝트, mvc2 패턴이 그대로 적용됨..mybatis., spring4버전부터는 지원하지 않음.
+			지원할 수 있는 플러그인을 추가합니다.
+-> spring boot: 새로운 스프링 프로젝트.. 스프링재단의 전폭적인 지원
+
+
+검색창에 spring 입력 후 검색 -> spring Tools 3 add-on~ install -> comfirm -> 1번째 선택 -> 창하나뜨면 다 체크하고 하단에 클릭
+-> restart클릭
+
+3. workspace 변경
+- 2번에서 생성한 폴더로 변경: D:\java\workspace_spring
+file -> 스위치 워크스페이스 -> other -> D:\java\workspace_spring 변경
+
+4. perspective: java ee -> spring으로 변경 
+
+5. classpath 변경: 
+윈도우 -> preferences -> java -> installed jres -> search -> D드라이브에 톰갯9 -> bin파일이 보이면 하단에 폴더선택 클릭 
+-> 생성한거 체크 -> apply
+
+6. encoding: 
+윈도우 -> preferences -> web -> css파일, html파일, jsp파일 -> encoding utf-8 로 다 선택
+
+7. cmd창을 열고 dw5 계정을 생성하고 권한을 추가하세요.
+sqlplus system/sys1234
+CREATE USER dw5 IDENTIFIED BY dw5;
+GRANT CONNECT, RESOURCE, DBA TO dw5;
+exit
+
+8. server 생성
+data 소스 -> new -> 오라클 -> 오픈jdk C:\Program Files\ojdkbuild\java-1.8.0-openjdk-1.8.0.332-1\jre\lib\ext -> ojdbc6.jar 선택 
+-> localhost, xe, dw5, dw5로 생성
+
+9. server.xml의 63라인의 <Connector URIEncoding="UTF-8"> 추가입력
+
+
+프로젝트 만들기
+우클릭 -> new -> 스프링 레가시 프로젝트 -> 스프링 MVC 프로젝트 선택하면 주소가 나옴
+https://dist.springsource.com/release/STS/help/org.springframework.templates.mvc-3.2.2.zip 브라우저에 입력 -> 다운 받아서 압축풀고
+-> 파일 -> import -> General -> Existing Pro~ -> 2번째 선택하고 압축푼 파일들어가서 알집선택 하고 finish 한다.
+그러면 projectName 생성됨 -> MMS1로 이름 변경 
+
+
+pom.xml 열고 
+<java-version>1.8</java-version>  -- 11행에 있음
+<org.springframework-version>4.2.1.RELEASE</org.springframework-version> --12행에 있음
+
+maven maven-resources-plugin 구글검색 -> Apache Maven Resources Plugin 사이트 접속 -> 2.6 -> 클릭해서 코드 복사 하면 아래코드가 나옴
+<!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-resources-plugin -->
+<dependency>
+    <groupId>org.apache.maven.plugins</groupId>
+    <artifactId>maven-resources-plugin</artifactId>
+    <version>2.6</version>
+</dependency>  
+복사한걸 이클립스에 가서 18행에 나두고 붙여넣기 해야함
+17행에 <!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-resources-plugin --> 이게 있음
+
+
+<groupId>junit</groupId>
+<artifactId>junit</artifactId>
+<version>4.12</version> --변경 123행에 있음
+
+
+
+<build>
+        <plugins>
+	<plugin> 복사해서 붙여넣기 129행부터 해야됨
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-war-plugin</artifactId>
+                <version>3.3.2</version>
+                
+            </plugin>
+
+2번째 <plugin>
+                    <source>1.8</source>  154행에 수정
+                    <target>1.8</target>
+
+끝나면 저장 
+
+projectName 선택 우클릭 -> 맨아래 proper~ 선택 -> 프로젝트 Facets 클릭 -> java에 1.8선택 -> 오른쪽에 Runtimes -> 체크하기
+apply 클릭
+
+
+overview 에 port Number에 8090으로 변경 하고 모듈에가서 똑같이 / 만 남게 만들기 그리고 저장
+
+
+===========
+pom.xml 파일에 126행에 붙여넣기 
+<!-- https://mvnrepository.com/artifact/org.imgscalr/imgscalr-lib -->
+<dependency>
+<groupId>org.imgscalr</groupId>
+<artifactId>imgscalr-lib</artifactId>
+<version>4.2</version>
+</dependency>
+
+<!-- https://mvnrepository.com/artifact/commons-fileupload/commons-fileupload -->
+<dependency>
+<groupId>commons-fileupload</groupId>
+<artifactId>commons-fileupload</artifactId>
+<version>1.3.1</version>
+</dependency>
+
+<!-- https://mvnrepository.com/artifact/org.mybatis/mybatis -->
+<dependency>
+<groupId>org.mybatis</groupId>
+<artifactId>mybatis</artifactId>
+<version>3.2.8</version>
+</dependency>
+
+<!-- https://mvnrepository.com/artifact/org.mybatis/mybatis-spring -->
+<dependency>
+<groupId>org.mybatis</groupId>
+<artifactId>mybatis-spring</artifactId>
+<version>1.2.2</version>
+</dependency>
+
+<!-- https://mvnrepository.com/artifact/org.springframework/spring-jdbc -->
+<dependency>
+<groupId>org.springframework</groupId>
+<artifactId>spring-jdbc</artifactId>
+<version>${org.springframework-version}</version>
+</dependency>
+
+<!-- https://mvnrepository.com/artifact/org.springframework/spring-test -->
+<dependency>
+<groupId>org.springframework</groupId>
+<artifactId>spring-test</artifactId>
+<version>${org.springframework-version}</version>
+<scope>test</scope>
+</dependency>
+
+<!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind -->
+<dependency>
+<groupId>com.fasterxml.jackson.core</groupId>
+<artifactId>jackson-databind</artifactId>
+<version>2.5.4</version>
+</dependency>
+
+<!-- https://mvnrepository.com/artifact/org.aspectj/aspectjweaver -->
+<dependency>
+<groupId>org.aspectj</groupId>
+<artifactId>aspectjweaver</artifactId>
+<version>1.5.4</version>
+</dependency>
+
+===============
+web.xml 파일에 붙여 넣기- 한글 깨지지 않게 하는 코드
+
+xsi:schemaLocation="http://java.sun.com/xml/ns/javaee https://java.sun.com/xml/ns/javaee/web-app_2_5.xsd">
+다음 줄에 넣기 6행에 있음
+ <filter>
+  <filter-name>encoding</filter-name>
+  <filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>
+  <init-param>
+   <param-name>encoding</param-name>
+   <param-value>UTF-8</param-value>
+  </init-param>
+  <init-param>
+ <param-name>forceEncoding</param-name>
+ <param-value>true</param-value>
+ </init-param>
+ </filter>
+
+ <filter-mapping>
+  <filter-name>encoding</filter-name>
+  <url-pattern>/*</url-pattern>
+ </filter-mapping>
+
+
+============
+src/main/java 에 패키지 생성
+kr.co.member.domain
+kr.co.member.controller
+kr.co.member.repository
+kr.co.member.service
+
+
+
+appServlet폴더에 root-context.xml 에 2번째 탭
+aop, context, jdbc, mybatis, tx 체크하기
+
+소스코드 1번째 탭에
+<!-- Root Context: defines shared resources visible to all other web components -->
+그 다음 줄에 입력하기
+// bean은 자동생성이라는 코드이다
+	<aop:aspectj-autoproxy></aop:aspectj-autoproxy>
+	
+	<bean class="org.springframework.jdbc.datasource.DriverManagerDataSource" id="dataSource">
+		<property name="driverClassName" value="oracle.jdbc.OracleDriver"></property>
+		<property name="url" value="jdbc:oracle:thin:@localhost:1521:xe"></property>
+		<property name="username" value="dw5"></property>
+		<property name="password" value="dw5"></property>
+	</bean>
+	
+	<bean class="org.mybatis.spring.SqlSessionFactoryBean" id="sqlSessionFactory">
+		<property name="dataSource" ref="dataSource"></property>
+		<property name="configLocation" value="classpath:/mybatis-config.xml"></property>
+		<property name="mapperLocations" value="classpath:mappers/**/*Mapper.xml"></property>	
+	</bean>
+
+	<bean class="org.mybatis.spring.SqlSessionTemplate" id="sqlSession" destroy-method="clearCache">
+		<constructor-arg name="sqlSessionFactory" ref="sqlSessionFactory"></constructor-arg>
+	</bean>
+=====
+src/main/resources 에 xml 파일 생성 
+파일명은 mybatis-config
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration
+  PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+	<typeAliases>
+		<package name="kr.co.member.domain"/>
+	</typeAliases>  
+</configuration>
+
+
+src/main/resources 에 mappers 폴더 생성하기
+
+
+
+servlet-context.xml 파일 열고
+</beans:bean> 다음줄에 추가하기 
+	<beans:bean class="org.springframework.web.multipart.commons.CommonsMultipartResolver" id="multipartResolver">
+		<beans:property name="maxUploadSize" value="10485760"></beans:property>		
+	</beans:bean>
+
+==================================
+< 작업 순서 >
+1. table
+2. dto
+3. controller(mvc 핸들러 생성)
+4. service
+5. dao
+6. mapper
+7. jsp
+
+----
+1. controller insert( ) 구현
+2. insert.jsp 구현
+3. controller insert(dto) 구현
+4. service 인터페이서 insert(dto) 구현
+5. serviceImpl 클래스에서 insert(dto) 구현
+6. root-context.xml 에 component-scan 등록
+7. dao 인터페이스 insert(dto) 구현
+8. dao 클래스 insert(dto) 구현
+9. mapper
+
+=================================
+< mms1 프로젝트에  member sql 생성 >
+CREATE TABLE tbl_member(
+id VARCHAR2(6),
+name VARCHAR2(15) NOT NULL,
+birth DATE NOT NULL,
+address VARCHAR2(300) NOT NULL,
+pw VARCHAR2(300) NOT NULL,
+email VARCHAR2(300),
+grade CHAR(1) DEFAULT 'A',
+CONSTRAINT pk_member_id PRIMARY KEY(id)
+)
+
+select * from tbl_member
+
+============================
+< kr.co.member.domain 에 MemberDTO 클래스 생성 >
+package kr.co.member.domain;
+
+import java.io.Serializable;
+import java.util.Objects;
+
+public class MemberDTO implements Serializable{
+
+	private static final long serialVersionUID = 1L;
+	
+	private String id;
+	private String name;
+	private String birth;
+	private int age;
+	private String address;
+	private String pw;
+	private String email;
+	private char grade;
+	
+	public MemberDTO() {
+		// TODO Auto-generated constructor stub
+	}
+
+	public MemberDTO(String id, String name, String birth, int age, String address, String pw, String email,
+			char grade) {
+		super();
+		this.id = id;
+		this.name = name;
+		this.birth = birth;
+		this.age = age;
+		this.address = address;
+		this.pw = pw;
+		this.email = email;
+		this.grade = grade;
+	}
+
+	public String getId() {
+		return id;
+	}
+
+	public void setId(String id) {
+		this.id = id;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public String getBirth() {
+		return birth;
+	}
+
+	public void setBirth(String birth) {
+		this.birth = birth;
+	}
+
+	public int getAge() {
+		return age;
+	}
+
+	public void setAge(int age) {
+		this.age = age;
+	}
+
+	public String getAddress() {
+		return address;
+	}
+
+	public void setAddress(String address) {
+		this.address = address;
+	}
+
+	public String getPw() {
+		return pw;
+	}
+
+	public void setPw(String pw) {
+		this.pw = pw;
+	}
+
+	public String getEmail() {
+		return email;
+	}
+
+	public void setEmail(String email) {
+		this.email = email;
+	}
+
+	public char getGrade() {
+		return grade;
+	}
+
+	public void setGrade(char grade) {
+		this.grade = grade;
+	}
+
+	public static long getSerialversionuid() {
+		return serialVersionUID;
+	}
+
+	@Override // id만 체크
+	public int hashCode() {
+		return Objects.hash(id);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		MemberDTO other = (MemberDTO) obj;
+		return Objects.equals(id, other.id);
+	}
+
+	@Override // id, name, grade만 체크
+	public String toString() {
+		return "MemberDTO [id=" + id + ", name=" + name + ", grade=" + grade + "]";
+	}
+		
+}
+
+
+
+
+============================
+< kr.co.member.controller 에 MemberController 클래스 생성 >
+package kr.co.member.controller;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+
+import kr.co.member.domain.MemberDTO;
+import kr.co.member.service.MemberService;
+
+@Controller
+@RequestMapping("/member")
+public class MemberController {
+	
+	@Autowired
+	private MemberService mService;
+	// MemberService 인터페이스로 만들어야한다.
+	
+	@RequestMapping(value = "/insert", method = RequestMethod.POST)
+	public String insert(MemberDTO dto) {
+		// 입력받은걸 불러와야하는데(getparamter) spring에서는 그럴 필요가 없으며
+		// MemberDTO dto 입력만 해주면 된다.
+		
+		mService.insert(dto);
+				
+		return "redirect:/member/read/"+dto.getId();
+		// /member/read/m001 이런식으로 넘어감		
+	}
+	
+	@RequestMapping(value = "/insert", method = RequestMethod.GET)
+	// GET방식이기 때문에 일반적으로 ui를 넣지 않는다. 
+	public String insert() {
+		
+		
+		return "member/insert";  
+		// servlet-context에서 설정을 해놔서 앞뒤 경로가 저절로 생긴다.
+		//<beans:property name="prefix" value="/WEB-INF/views/" />
+		//<beans:property name="suffix" value=".jsp" />
+	}
+}
+
+
+
+============================
+< views 에 member 폴더 생성하고 insert jsp파일 생성 >
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+	pageEncoding="UTF-8" session="false"%>
+
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport"
+	content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+<title>회원 가입 화면</title>
+
+<link rel="stylesheet"
+	href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css"
+	integrity="sha384-xOolHFLEh07PJGoPkLv1IbcEPTNtaed2xpHsD9ESMhqIYd0nLMwNLD69Npy4HI+N"
+	crossorigin="anonymous">
+<script
+	src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js"
+	integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
+	crossorigin="anonymous"></script>
+<script
+	src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"
+	integrity="sha384-Fy6S3B9q64WdZWQUiU+q4/2Lc9npb8tCaSX9FK7E8HnRr0Jz8D6OP9dO5Vg3Q9ct"
+	crossorigin="anonymous"></script>
+
+</head>
+<body>
+	<div class="container">
+		<form action="/member/insert" method="post">
+			<div class="form-group row">
+				<label for="id" class="col-sm-2 col-form-label text-right">아이디</label>
+				<div class="col-sm-10"> 
+					<input class="form-control" id="id" name="id" required>
+				</div>
+			</div>
+
+			<div class="form-group row">
+				<label for="name" class="col-sm-2 col-form-label text-right">이름</label>
+				<div class="col-sm-10">
+					<input class="form-control" id="name" name="name" required>
+				</div>
+			</div>
+
+			<div class="form-group row">
+				<label for="pw1" class="col-sm-2 col-form-label text-right">비밀번호</label>
+				<div class="col-sm-10">
+					<input type="password" class="form-control" id="pw1" name="pw" required>
+				</div>
+			</div>
+
+			<div class="form-group row">
+				<label for="pw2" class="col-sm-2 col-form-label text-right">비밀번호(확인)</label>
+				<div class="col-sm-10">
+					<input type="password" class="form-control" id="pw2" required>
+				</div>
+			</div>
+
+			<div class="form-group row">
+				<label for="birth" class="col-sm-2 col-form-label text-right">생년월일</label>
+				<div class="col-sm-10">
+					<input class="form-control" id="birth" name="birth" type="date" required>
+				</div>
+			</div>
+
+			<div class="form-group row">
+				<label for="email" class="col-sm-2 col-form-label text-right">이메일</label>
+				<div class="col-sm-10">
+					<input class="form-control" id="email" name="email" type="email" required>
+				</div>
+			</div>
+
+			<div class="form-group row">
+				<label for="address" class="col-sm-2 col-form-label text-right">주소</label>
+				<div class="col-sm-10">
+					<input class="form-control" id="address" name="address" required>
+				</div>
+			</div>
+			
+			<div class="form-group row">
+				<div class="col-sm-10">
+     				 <button type="submit" class="btn btn-primary">가입</button>
+    			</div>
+    		</div>
+    		
+		</form>
+	</div>
+	
+	<script type="text/javascript">
+		$(document).ready(function() {
+			$("button[type='submit']").click(function(event) {
+				event.preventDefault();
+				
+				let pw1 = $("#pw1").val();
+				let pw2 = $("#pw2").val();
+				
+				if(pw1 == "" || pw2 == ""){					
+					$("#pw1").focus();
+					alert("비밀번호를 입력해 주세요.")
+					
+					return false;
+				}
+				
+				if (pw1 != pw2) {
+					$("#pw2").val("");
+					$("#pw1").select();
+					$("#pw1").focus();
+					alert("비밀번호가 맞지 않습니다.")
+					
+					return false;					
+				} 
+				
+				$("form").submit();
+												
+			});			
+		});
+	
+	</script>
+	
+</body>
+</html>
+
+
+
+==============================
+< servlet-context.xml 파일에 코드 추가하기 >
+<context:component-scan base-package="mytld.mycompany.myapp" /> 
+밑에다
+<context:component-scan base-package="kr.co.member.controller" /> 추가하기
+
+
+==============================
+https://getbootstrap.com/ 사이트 접속 -> 오른쪽 상단 4.6버전 바꾸기 -> Examples
+Documen~ 에 들어가면 이렇게 사용하라는 예를 들어 코드를 짜 놓은것이다
+
+윈도우 -> prefer~ 맨아래 클릭 -> jsp파일 templates -> new jsp파일(html 5) 더블클릭 해서 코드 추가하기 
+<%@ page language="java" contentType="text/html; charset=${encoding}"
+    pageEncoding="${encoding}" session="false"%>
+    
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="${encoding}">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+<title>Insert title here</title>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css" integrity="sha384-xOolHFLEh07PJGoPkLv1IbcEPTNtaed2xpHsD9ESMhqIYd0nLMwNLD69Npy4HI+N" crossorigin="anonymous">
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-Fy6S3B9q64WdZWQUiU+q4/2Lc9npb8tCaSX9FK7E8HnRr0Jz8D6OP9dO5Vg3Q9ct" crossorigin="anonymous"></script>
+
+</head>
+<body>
+${cursor}
+</body>
+</html>
+
+
+==============================
+< kr.co.member.service 에 MemberService 인터페이스 자동 생성하기 >
+package kr.co.member.service;
+
+import kr.co.member.domain.MemberDTO;
+
+public interface MemberService {
+
+	void insert(MemberDTO dto);
+
+}
+
+
+
+
+==============================
+< MemberService 인터페이스에 insert 자동 생성 >  
+package kr.co.member.service;
+
+import kr.co.member.domain.MemberDTO;
+
+public interface MemberService {
+
+	void insert(MemberDTO dto);
+
+}
+
+
+==============================
+< kr.co.member.service 에 MemberServiceImpl 클래스 생성하기 >
+package kr.co.member.service;
+
+import javax.inject.Inject;
+
+import org.springframework.stereotype.Service;
+
+import kr.co.member.domain.MemberDTO;
+import kr.co.member.repository.MemberDAO;
+
+@Service
+public class MemberServiceImpl implements MemberService {
+	
+	@Inject
+	private MemberDAO mDao;
+	
+	@Override
+	public void insert(MemberDTO dto) {
+		mDao.insert(dto);
+		
+	}
+
+}
+
+
+
+==============================
+< root-context.xml에 코드 추가하기 >
+<context:component-scan base-package="kr.co.member.service"></context:component-scan>
+
+
+
+==============================
+< kr.co.member.repository 에 MemberDAO 인터페이스 자동 생성하기 >
+package kr.co.member.repository;
+
+import kr.co.member.domain.MemberDTO;
+
+public interface MemberDAO {
+
+	void insert(MemberDTO dto);
+
+}
+
+
+
+==============================
+< MemberDAO 인터페이스에 insert 자동 생성 >
+package kr.co.member.repository;
+
+import kr.co.member.domain.MemberDTO;
+
+public interface MemberDAO {
+
+	void insert(MemberDTO dto);
+
+}
+
+
+==============================
+< kr.co.member.repository 에 MemberDAOImpl 클래스 생성하기 >
+package kr.co.member.repository;
+
+import org.apache.ibatis.session.SqlSession;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Repository;
+
+import kr.co.member.domain.MemberDTO;
+
+@ Repository
+public class MemberDAOImpl implements MemberDAO {
+	
+	@Autowired
+	private SqlSession session;
+	private final String NS = "kr.co.member";
+	// NS -> namespace
+	
+	@Override
+	public void insert(MemberDTO dto) {
+		session.insert(NS+".insert", dto);
+		
+	}
+	
+}
+
+
+
+==============================
+< mappers 에 memberMapper xml파일 생성 >
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="kr.co.member">
+	<insert id="insert">
+		INSERT INTO tbl_member (id, pw, name, birth, address, email)
+		VALUES
+		(#{id}, #{pw}, #{name}, #{birth}, #{address}, #{email})  -> MemberDTO에 들어가는 변수명을 넣어야한다.
+	</insert> 
+</mapper>
+
+
+
+==============================
+< kr.co.member.controller에 MemberController 가기 >  --- 맨 위쪽 처음 시작하는 코드랑 같은데  
+package kr.co.member.controller;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+
+import kr.co.member.domain.MemberDTO;
+import kr.co.member.service.MemberService;
+
+@Controller
+@RequestMapping("/member")
+public class MemberController {
+	
+	@Autowired
+	private MemberService mService;
+	// MemberService 인터페이스로 만들어야한다.
+	
+	@RequestMapping(value = "/insert", method = RequestMethod.POST)
+	public String insert(MemberDTO dto) {
+		// 입력받은걸 불러와야하는데(getparamter) spring에서는 그럴 필요가 없으며
+		// MemberDTO dto 입력만 해주면 된다.
+		
+		mService.insert(dto);
+				
+		return "redirect:/member/read/"+dto.getId();
+		// /member/read/m001 이런식으로 넘어감		
+	}
+	
+	@RequestMapping(value = "/insert", method = RequestMethod.GET)
+	// GET방식이기 때문에 일반적으로 ui를 넣지 않는다. 
+	public String insert() {
+		
+		
+		return "member/insert";  
+		// servlet-context에서 설정을 해놔서 앞뒤 경로가 저절로 생긴다.
+		//<beans:property name="prefix" value="/WEB-INF/views/" />
+		//<beans:property name="suffix" value=".jsp" />
+	}
+}
+
+===============================
+< kr.co.member.controller 에 MemberController read 작업 >
+	@RequestMapping(value = "/read/{id}", method = RequestMethod.GET)
+	public String read(@PathVariable("id") String id, Model model) {
+		
+		MemberDTO dto = mService.read(id);		
+		model.addAttribute("dto", dto);
+		
+		return "member/read";
+	}
+
+
+===============================
+< MemberService 에 read 자동 생성 >
+MemberDTO read(String id);
+
+===============================
+< MemberServiceImpl 에 read 자동 생성 하고 작업하기 >
+	@Override
+	public MemberDTO read(String id) {
+		
+		MemberDTO dto = mDao.read(id);
+		
+		return dto;
+	}
+
+
+===============================
+< MemberDAO 에 read 자동 생성 >
+MemberDTO read(String id);
+
+
+===============================
+< MemberDAOImpl 에 read 자동 생성 하고 작업하기 >
+	@Override
+	public MemberDTO read(String id) {
+		
+		return session.selectOne(NS+".read", id);
+	}
+
+
+
+
+===============================
+< memberMapper.xml 에 read 작업하기 >
+	<select id="read" resultType="MemberDTO">
+		SELECT id, name, TO_CHAR(birth, 'yyyy-mm-dd') birth, 
+		FLOOR(MONTHS_BETWEEN(SYSDATE, birth)/12) AS age, 
+		address, email, grade 
+		FROM tbl_member
+		WHERE id = #{id}
+	</select>
+
+
+
+===============================
+< member 에 read jsp파일 생성하고 작업하기 >
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8" session="false"%>
+
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+<title>회원 정보 자세히 보기</title>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css" integrity="sha384-xOolHFLEh07PJGoPkLv1IbcEPTNtaed2xpHsD9ESMhqIYd0nLMwNLD69Npy4HI+N" crossorigin="anonymous">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-Fy6S3B9q64WdZWQUiU+q4/2Lc9npb8tCaSX9FK7E8HnRr0Jz8D6OP9dO5Vg3Q9ct" crossorigin="anonymous"></script>
+
+<style type="text/css">
+	.addBorder{
+		border: 1px solid green;
+	}	
+
+</style>
+
+</head>
+<body>
+<div class="container">
+
+<div class="jumbotron">
+  <h1 class="display-4">회원 정보 자세히 보기</h1>
+</div>
+
+<table class="table table-bordered ">
+  <tbody>
+    <tr>
+      <th scope="col" class="col-sm-3 text-right">아이디</th>
+      <td scope="col">${dto.id}</td>
+    </tr>
+  
+    <tr>
+      <th scope="col" class="col-sm-3 text-right">이름</th>
+      <td scope="col">${dto.name}</td>
+    </tr>
+    
+    <tr>
+      <th scope="col" class="col-sm-3 text-right">회원 등급</th>
+      <td scope="col">${dto.grade}</td>
+    </tr>
+    
+    <tr>
+      <th scope="col" class="col-sm-3 text-right">생년월일(나이)</th>
+      <td scope="col">${dto.birth}(만 ${dto.age} 세)</td>
+    </tr>
+    
+    <tr>
+      <th scope="col" class="col-sm-3 text-right">이메일</th>
+      <td scope="col">${dto.email}</td>
+    </tr>
+    
+    <tr>
+      <th scope="col" class="col-sm-3 text-right">주소</th>
+      <td scope="col">${dto.address}</td>
+    </tr>
+  </tbody>
+</table>
+
+   <div class="menus text-center mt-5">
+      <button type="button" class="btn btn-warning" id="mupdate">회원 정보 수정</button>
+      <button type="button" class="btn btn-warning" id="pupdate">비밀번호 수정</button>
+      <button type="button" class="btn btn-warning" id="mdelete">회원 탈퇴</button>
+   </div>
+
+
+
+      <div class="modal" tabindex="-1" id="mymodal">
+         <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+               <div class="modal-header">
+                  <h5 class="modal-title">비밀번호 변경</h5>
+                  
+                  <button type="button" class="close" data-dismiss="modal"
+                     aria-label="Close">
+                     <span aria-hidden="true">&times;</span>
+                  </button>
+               </div>
+               <div class="modal-body">
+               	  <div class="form-group row text-center">
+               		 <span id="failmsg" class="col-sm-12"></span>
+               	  </div>
+               		
+                  <div class="form-group row">
+                     <label for="pw1" class="col-sm-2 col-form-label text-right">기존 비밀번호</label>
+                     <div class="col-sm-10">
+                         <input type="password" class="form-control" id="pw" name="pw">
+                     </div>
+                  </div>
+                  
+                  <div class="form-group row">
+                     <label for="pw1" class="col-sm-2 col-form-label text-right">신규 비밀번호</label>
+                     <div class="col-sm-10">
+                        <input type="password" class="form-control" id="npw" name="npw">
+                     </div>
+                  </div>
+                  
+                  <div class="form-group row">
+                     <label for="pw1" class="col-sm-2 col-form-label text-right">신규 비밀번호(확인)</label>
+                     <div class="col-sm-10">
+                        <input type="password" class="form-control" id="npw2">
+                     </div>
+                  </div>
+               </div>
+               <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary"   data-dismiss="modal">취소</button>
+                  <button type="button" class="btn btn-warning" id="changepw">비밀번호 변경</button>
+               </div>
+            </div>
+         </div>
+      </div>
+
+
+   </div>
+
+
+<script type="text/javascript">
+   $(document).ready(function() {
+	   
+	  $("button[data-dismiss='modal']").click(function() {
+		  defaultPwInput();
+	  });
+      
+      $("#changepw").click(function() {
+         let pw = $("#pw").val();
+         let npw = $("#npw").val();
+         let npw2 = $("#npw2").val();
+         
+         if(pw == "" | npw == "" | npw2 == ""){
+            return false;
+         }
+         
+         if(npw != npw2){
+            return false;
+         }
+         
+         $.ajax({
+            url : '/member/changepw',
+            type : "post",
+            data : {
+               "pw" : pw,
+               "npw" : npw,
+               "id" : "${dto.id}"
+            },
+            dataType : "text",
+            success : function(result){
+               if(result > 0){
+            	   defaultPwInput();
+            	   
+            	   $("#mymodal").modal("toggle");
+               } else {
+            	   $("#failmsg").text("비밀번호 변경 실패");
+            	   $("#failmsg").css("color", "red");
+            	   $("#failmsg").addClass("addBorder");
+               }
+              
+            }
+         });
+         
+         
+         
+      });
+      
+      $("#pupdate").click(function() {
+         $("#mymodal").modal("toggle");
+      });
+      
+      
+      $("#mupdate").click(function() {
+         location.assign("/member/update/${dto.id}");
+      });
+      
+      function defaultPwInput() {   	  
+    	  $("#pw").val("");
+   	      $("#npw").val("");
+   	      $("#npw2").val("");
+   	      $("#failmsg").text("");
+	      $("#failmsg").removeClass("addBorder");
+	      
+	  }
+      
+      
+   });
+</script>
+
+</body>
+</html>
+
+
+===============================
+< kr.co.member.controller 에 MemberController update 작업 >  --- GET방식
+	@RequestMapping(value = "/update/{id}", method = RequestMethod.GET)
+	public String update(@PathVariable("id") String id, Model model) {
+		
+		MemberDTO dto = mService.updateui(id);
+		model.addAttribute("dto", dto);
+		
+		return "member/update";
+		
+	}
+
+
+===============================
+< MemberService 에 updateui 자동 생성 >
+MemberDTO updateui(String id);
+
+===============================
+< MemberServiceImpl 에 updateui 자동 생성 하고 작업하기 >
+	@Override
+	public MemberDTO updateui(String id) {
+		
+		MemberDTO dto = mDao.read(id);
+		
+		return dto;
+	}
+
+===============================
+< member 에 update jsp파일 생성하고 작업하기 >  -- insert jsp 파일 복사해서 일부 코드 변경 및 삭제 함
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+	pageEncoding="UTF-8" session="false"%>
+
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport"
+	content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+<title>회원 정보 수정 화면</title>
+
+<link rel="stylesheet"
+	href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css"
+	integrity="sha384-xOolHFLEh07PJGoPkLv1IbcEPTNtaed2xpHsD9ESMhqIYd0nLMwNLD69Npy4HI+N"
+	crossorigin="anonymous">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+<script
+	src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"
+	integrity="sha384-Fy6S3B9q64WdZWQUiU+q4/2Lc9npb8tCaSX9FK7E8HnRr0Jz8D6OP9dO5Vg3Q9ct"
+	crossorigin="anonymous"></script>
+
+</head>
+<body>
+	<div class="container">
+		<div class="jumbotron">
+  			<h1 class="display-4">회원 정보 수정 화면</h1>
+		</div>
+		
+		<form action="/member/update" method="post">
+			<div class="form-group row">
+				<label for="id" class="col-sm-2 col-form-label text-right">아이디</label>
+				<div class="col-sm-10"> 
+					<input class="form-control" id="id" name="id" value="${dto.id}" readonly>
+				</div>
+			</div>
+
+			<div class="form-group row">
+				<label for="name" class="col-sm-2 col-form-label text-right">이름</label>
+				<div class="col-sm-10">
+					<input class="form-control" id="name" name="name" required value="${dto.name}">
+				</div>
+			</div>
+
+			<div class="form-group row">
+				<label for="pw1" class="col-sm-2 col-form-label text-right">비밀번호</label>
+				<div class="col-sm-10">
+					<input type="password" class="form-control" id="pw1" name="pw" required>
+				</div>
+			</div>
+
+			<div class="form-group row">
+				<label for="birth" class="col-sm-2 col-form-label text-right">생년월일</label>
+				<div class="col-sm-10">
+					<input class="form-control" id="birth" name="birth" type="date" required value="${dto.birth}">
+				</div>
+			</div>
+
+			<div class="form-group row">
+				<label for="email" class="col-sm-2 col-form-label text-right">이메일</label>
+				<div class="col-sm-10">
+					<input class="form-control" id="email" name="email" type="email" required value="${dto.email}">
+				</div>
+			</div>
+
+			<div class="form-group row">
+				<label for="address" class="col-sm-2 col-form-label text-right">주소</label>
+				<div class="col-sm-10">
+					<input class="form-control" id="address" name="address" required value="${dto.address}">
+				</div>
+			</div>
+			
+			<div class="form-group row">
+				<div class="col-sm-10">
+     				 <button type="submit" class="btn btn-warning">수정</button>
+    			</div>
+    		</div>
+    		
+		</form>
+	</div>
+	
+	<script type="text/javascript">
+		$(document).ready(function() {
+			$("button[type='submit']").click(function(event) {
+				event.preventDefault();
+				
+				let pw1 = $("#pw1").val();
+				
+				if(pw1 == ""){					
+					$("#pw1").focus();
+					alert("비밀번호를 입력해 주세요.")
+					
+					return false;
+				}
+				
+				$("form").submit();
+												
+			});			
+		});
+	
+	</script>
+	
+</body>
+</html>
+
+
+
+===============================
+< 회원정보수정 >
+< kr.co.member.controller 에 MemberController update 작업 >  -- POST방식
+	@RequestMapping(value = "/update", method = RequestMethod.POST)
+	public String update(MemberDTO dto, Model model) {
+		
+		dto = mService.update(dto);
+		model.addAttribute("dto", dto);
+		
+		return "redirect:/member/read/"+dto.getId();
+	}
+
+
+===============================
+< MemberService 에 update 자동 생성 >
+MemberDTO update(MemberDTO dto);
+
+===============================
+< MemberServiceImpl 에 update 자동 생성 하고 작업하기 >
+	@Override
+	public MemberDTO update(MemberDTO dto) {
+		
+		mDao.update(dto);
+		dto = mDao.read(dto.getId());
+		
+		return dto;
+
+
+===============================
+< MemberDAO 에 update 자동 생성 >
+void update(MemberDTO dto);
+
+
+===============================
+< MemberDAOImpl 에 update 자동 생성 하고 작업하기 >
+	public void update(MemberDTO dto) {
+		
+		session.update(NS+".update", dto);
+		
+	}
+
+
+===============================
+< memberMapper.xml 에 update 작업하기 >
+	<update id="update">
+		UPDATE tbl_member SET name=#{name},
+		birth = #{birth}, email = #{email},
+		address = #{address}
+		WHERE id=#{id} AND pw=#{pw}
+	</update>
+
+
+===============================
+< 비밀번호수정 >
+< member 에 read jsp파일에 수정 및 추가 작업하기 >
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8" session="false"%>
+
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+<title>회원 정보 자세히 보기</title>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css" integrity="sha384-xOolHFLEh07PJGoPkLv1IbcEPTNtaed2xpHsD9ESMhqIYd0nLMwNLD69Npy4HI+N" crossorigin="anonymous">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-Fy6S3B9q64WdZWQUiU+q4/2Lc9npb8tCaSX9FK7E8HnRr0Jz8D6OP9dO5Vg3Q9ct" crossorigin="anonymous"></script>
+
+<style type="text/css">
+	.addBorder{
+		border: 1px solid green;
+	}	
+
+</style>
+
+</head>
+<body>
+<div class="container">
+
+<div class="jumbotron">
+  <h1 class="display-4">회원 정보 자세히 보기</h1>
+</div>
+
+<table class="table table-bordered ">
+  <tbody>
+    <tr>
+      <th scope="col" class="col-sm-3 text-right">아이디</th>
+      <td scope="col">${dto.id}</td>
+    </tr>
+  
+    <tr>
+      <th scope="col" class="col-sm-3 text-right">이름</th>
+      <td scope="col">${dto.name}</td>
+    </tr>
+    
+    <tr>
+      <th scope="col" class="col-sm-3 text-right">회원 등급</th>
+      <td scope="col">${dto.grade}</td>
+    </tr>
+    
+    <tr>
+      <th scope="col" class="col-sm-3 text-right">생년월일(나이)</th>
+      <td scope="col">${dto.birth}(만 ${dto.age} 세)</td>
+    </tr>
+    
+    <tr>
+      <th scope="col" class="col-sm-3 text-right">이메일</th>
+      <td scope="col">${dto.email}</td>
+    </tr>
+    
+    <tr>
+      <th scope="col" class="col-sm-3 text-right">주소</th>
+      <td scope="col">${dto.address}</td>
+    </tr>
+  </tbody>
+</table>
+
+   <div class="menus text-center mt-5">
+      <button type="button" class="btn btn-warning" id="mupdate">회원 정보 수정</button>
+      <button type="button" class="btn btn-warning" id="pupdate">비밀번호 수정</button>
+      <button type="button" class="btn btn-warning" id="mdelete">회원 탈퇴</button>
+   </div>
+
+
+
+      <div class="modal" tabindex="-1" id="mymodal">
+         <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+               <div class="modal-header">
+                  <h5 class="modal-title">비밀번호 변경</h5>
+                  
+                  <button type="button" class="close" data-dismiss="modal"
+                     aria-label="Close">
+                     <span aria-hidden="true">&times;</span>
+                  </button>
+               </div>
+               <div class="modal-body">
+               	  <div class="form-group row text-center">
+               		 <span id="failmsg" class="col-sm-12"></span>
+               	  </div>
+               		
+                  <div class="form-group row">
+                     <label for="pw1" class="col-sm-2 col-form-label text-right">기존 비밀번호</label>
+                     <div class="col-sm-10">
+                         <input type="password" class="form-control" id="pw" name="pw">
+                     </div>
+                  </div>
+                  
+                  <div class="form-group row">
+                     <label for="pw1" class="col-sm-2 col-form-label text-right">신규 비밀번호</label>
+                     <div class="col-sm-10">
+                        <input type="password" class="form-control" id="npw" name="npw">
+                     </div>
+                  </div>
+                  
+                  <div class="form-group row">
+                     <label for="pw1" class="col-sm-2 col-form-label text-right">신규 비밀번호(확인)</label>
+                     <div class="col-sm-10">
+                        <input type="password" class="form-control" id="npw2">
+                     </div>
+                  </div>
+               </div>
+               <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary"   data-dismiss="modal">취소</button>
+                  <button type="button" class="btn btn-warning" id="changepw">비밀번호 변경</button>
+               </div>
+            </div>
+         </div>
+      </div>
+
+
+   </div>
+
+
+<script type="text/javascript">
+   $(document).ready(function() {
+	   
+	  $("button[data-dismiss='modal']").click(function() {
+		  defaultPwInput();
+	  });
+      
+      $("#changepw").click(function() {
+         let pw = $("#pw").val();
+         let npw = $("#npw").val();
+         let npw2 = $("#npw2").val();
+         
+         if(pw == "" | npw == "" | npw2 == ""){
+            return false;
+         }
+         
+         if(npw != npw2){
+            return false;
+         }
+         
+         $.ajax({
+            url : '/member/changepw',
+            type : "post",
+            data : {
+               "pw" : pw,
+               "npw" : npw,
+               "id" : "${dto.id}"
+            },
+            dataType : "text",
+            success : function(result){
+               if(result > 0){
+            	   defaultPwInput();
+            	   
+            	   $("#mymodal").modal("toggle");
+               } else {
+            	   $("#failmsg").text("비밀번호 변경 실패");
+            	   $("#failmsg").css("color", "red");
+            	   $("#failmsg").addClass("addBorder");
+               }
+              
+            }
+         });
+         
+         
+         
+      });
+      
+      $("#pupdate").click(function() {
+         $("#mymodal").modal("toggle");
+      });
+      
+      
+      $("#mupdate").click(function() {
+         location.assign("/member/update/${dto.id}");
+      });
+      
+      function defaultPwInput() {   	  
+    	  $("#pw").val("");
+   	      $("#npw").val("");
+   	      $("#npw2").val("");
+   	      $("#failmsg").text("");
+	      $("#failmsg").removeClass("addBorder");
+	      
+	  }
+      
+      
+   });
+</script>
+
+</body>
+</html>
+
+
+
+자바스크립트의 객체 표현 방법
+{
+	속성명1 : 속성값1,
+	속성명2 : 속성값2
+}
+
+{  // 제이슨방식
+	"속성명1" : 속성값1,
+	"속성명2" : 속성값2
+}
+
+
+
+===============================
+< kr.co.member.controller 에 MemberController changepw 작업 >  --- POST방식
+	@RequestMapping(value = "/changepw", method = RequestMethod.POST)
+	@ResponseBody
+	public String changePw(@RequestParam Map<String, Object> map) {
+		
+		int result = mService.changePw(map);		
+		
+		return result+""; 
+		// String으로 반환을 해야하는데 int로 되어있어서 +"" 해주면 String으로 된다.
+		// 실제데이터 값이며 이 값은 read jsp에 있는 result로 넘어간다.
+	}
+
+
+
+===============================
+< MemberService 에 changepw 자동 생성 >
+int changePw(Map<String, Object> map);
+
+===============================
+< MemberServiceImpl 에 changepw 자동 생성 하고 작업하기 >
+	@Override
+	public int changePw(Map<String, Object> map) {
+		
+		int result = mDao.changePw(map);
+		
+		return result;
+		
+	}
+
+
+===============================
+< MemberDAO 에 changepw 자동 생성 >
+int changePw(Map<String, Object> map);
+
+
+===============================
+< MemberDAOImpl 에 changepw 자동 생성 하고 작업하기 >
+	@Override
+	public int changePw(Map<String, Object> map) {
+		
+		return session.update(NS+".changPw", map);
+	}
+
+
+===============================
+< 비밀번호수정 누르고 modal 창이 뜨는데 취소 또는 변경누르고 창닫고 다시 보면 입력한게 그대로 남아 있음.. 
+  흔적 없애기 작업을 해야함 >
+< member 에 read jsp파일에 수정 및 추가 작업하기 >
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8" session="false"%>
+
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+<title>회원 정보 자세히 보기</title>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css" integrity="sha384-xOolHFLEh07PJGoPkLv1IbcEPTNtaed2xpHsD9ESMhqIYd0nLMwNLD69Npy4HI+N" crossorigin="anonymous">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-Fy6S3B9q64WdZWQUiU+q4/2Lc9npb8tCaSX9FK7E8HnRr0Jz8D6OP9dO5Vg3Q9ct" crossorigin="anonymous"></script>
+
+<style type="text/css">
+	.addBorder{
+		border: 1px solid green;
+	}	
+
+</style>
+
+</head>
+<body>
+<div class="container">
+
+<div class="jumbotron">
+  <h1 class="display-4">회원 정보 자세히 보기</h1>
+</div>
+
+<table class="table table-bordered ">
+  <tbody>
+    <tr>
+      <th scope="col" class="col-sm-3 text-right">아이디</th>
+      <td scope="col">${dto.id}</td>
+    </tr>
+  
+    <tr>
+      <th scope="col" class="col-sm-3 text-right">이름</th>
+      <td scope="col">${dto.name}</td>
+    </tr>
+    
+    <tr>
+      <th scope="col" class="col-sm-3 text-right">회원 등급</th>
+      <td scope="col">${dto.grade}</td>
+    </tr>
+    
+    <tr>
+      <th scope="col" class="col-sm-3 text-right">생년월일(나이)</th>
+      <td scope="col">${dto.birth}(만 ${dto.age} 세)</td>
+    </tr>
+    
+    <tr>
+      <th scope="col" class="col-sm-3 text-right">이메일</th>
+      <td scope="col">${dto.email}</td>
+    </tr>
+    
+    <tr>
+      <th scope="col" class="col-sm-3 text-right">주소</th>
+      <td scope="col">${dto.address}</td>
+    </tr>
+  </tbody>
+</table>
+
+   <div class="menus text-center mt-5">
+      <button type="button" class="btn btn-warning" id="mupdate">회원 정보 수정</button>
+      <button type="button" class="btn btn-warning" id="pupdate">비밀번호 수정</button>
+      <button type="button" class="btn btn-warning" id="mdelete">회원 탈퇴</button>
+   </div>
+
+
+
+      <div class="modal" tabindex="-1" id="mymodal">
+         <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+               <div class="modal-header">
+                  <h5 class="modal-title">비밀번호 변경</h5>
+                  
+                  <button type="button" class="close" data-dismiss="modal"
+                     aria-label="Close">
+                     <span aria-hidden="true">&times;</span>
+                  </button>
+               </div>
+               <div class="modal-body">
+               	  <div class="form-group row text-center">
+               		 <span id="failmsg" class="col-sm-12"></span>
+               	  </div>
+               		
+                  <div class="form-group row">
+                     <label for="pw1" class="col-sm-2 col-form-label text-right">기존 비밀번호</label>
+                     <div class="col-sm-10">
+                         <input type="password" class="form-control" id="pw" name="pw">
+                     </div>
+                  </div>
+                  
+                  <div class="form-group row">
+                     <label for="pw1" class="col-sm-2 col-form-label text-right">신규 비밀번호</label>
+                     <div class="col-sm-10">
+                        <input type="password" class="form-control" id="npw" name="npw">
+                     </div>
+                  </div>
+                  
+                  <div class="form-group row">
+                     <label for="pw1" class="col-sm-2 col-form-label text-right">신규 비밀번호(확인)</label>
+                     <div class="col-sm-10">
+                        <input type="password" class="form-control" id="npw2">
+                     </div>
+                  </div>
+               </div>
+               <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary"   data-dismiss="modal">취소</button>
+                  <button type="button" class="btn btn-warning" id="changepw">비밀번호 변경</button>
+               </div>
+            </div>
+         </div>
+      </div>
+
+
+   </div>
+
+
+<script type="text/javascript">
+   $(document).ready(function() {
+	   
+	  $("button[data-dismiss='modal']").click(function() {
+		  defaultPwInput();
+	  });
+      
+      $("#changepw").click(function() {
+         let pw = $("#pw").val();
+         let npw = $("#npw").val();
+         let npw2 = $("#npw2").val();
+         
+         if(pw == "" | npw == "" | npw2 == ""){
+            return false;
+         }
+         
+         if(npw != npw2){
+            return false;
+         }
+         
+         $.ajax({
+            url : '/member/changepw',
+            type : "post",
+            data : {
+               "pw" : pw,
+               "npw" : npw,
+               "id" : "${dto.id}"
+            },
+            dataType : "text",
+            success : function(result){
+               if(result > 0){
+            	   defaultPwInput();
+            	   
+            	   $("#mymodal").modal("toggle");
+               } else {
+            	   $("#failmsg").text("비밀번호 변경 실패");
+            	   $("#failmsg").css("color", "red");
+            	   $("#failmsg").addClass("addBorder");
+               }
+              
+            }
+         });
+         
+         
+         
+      });
+      
+      $("#pupdate").click(function() {
+         $("#mymodal").modal("toggle");
+      });
+      
+      
+      $("#mupdate").click(function() {
+         location.assign("/member/update/${dto.id}");
+      });
+      
+      function defaultPwInput() {   	  
+    	  $("#pw").val("");
+   	      $("#npw").val("");
+   	      $("#npw2").val("");
+   	      $("#failmsg").text("");
+	      $("#failmsg").removeClass("addBorder");
+	      
+	  }
+      
+      
+   });
+</script>
+
+</body>
+</html>
+
+문단의 텍스트를 넣겠다...
+<p>
+	한 문단의 <span>텍스트</span>를 입력..
+</p>
+
+<div>
+	<img>
+	<p></p>
+</div>
+
+========================== 
+< 아이디 중복 체크 만들기 >
+< member 에 insert jsp파일에 수정 및 추가 작업하기 >
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+   pageEncoding="UTF-8" session="false"%>
+
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport"
+   content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+<title>회원 가입 화면</title>
+
+<link rel="stylesheet"
+   href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css"
+   integrity="sha384-xOolHFLEh07PJGoPkLv1IbcEPTNtaed2xpHsD9ESMhqIYd0nLMwNLD69Npy4HI+N"
+   crossorigin="anonymous">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+<script
+   src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"
+   integrity="sha384-Fy6S3B9q64WdZWQUiU+q4/2Lc9npb8tCaSX9FK7E8HnRr0Jz8D6OP9dO5Vg3Q9ct"
+   crossorigin="anonymous"></script>
+</head>
+<body>
+   <div class="container">
+      <div class="jumbotron">
+         <h1 class="display-4">회원 가입 화면</h1>
+      </div>
+
+      <form action="/member/insert" method="post">
+         <div class="form-group row">
+            <label for="id" class="col-sm-2 col-form-label text-right">아이디</label>
+            <div class="col-sm-8">
+               <input class="form-control" id="id" name="id" required>
+            </div>
+            <div class="col-sm-2 text-right">
+               <button class="btn btn-info" id="checkid">ID 중복 검사</button>
+            </div>
+            
+            <div id="divid" class="col-sm-10"></div>
+         </div>
+
+         <div class="form-group row">
+            <label for="name" class="col-sm-2 col-form-label text-right">이름</label>
+            <div class="col-sm-10">
+               <input class="form-control" id="name" name="name" required>
+            </div>
+         </div>
+
+         <div class="form-group row">
+            <label for="pw1" class="col-sm-2 col-form-label text-right">비밀번호</label>
+            <div class="col-sm-10">
+               <input type="password" class="form-control" id="pw1" name="pw" required>
+            </div>
+         </div>
+
+         <div class="form-group row">
+            <label for="pw2" class="col-sm-2 col-form-label text-right">비밀번호(확인)</label>
+            <div class="col-sm-10">
+               <input type="password" class="form-control" id="pw2" required>
+            </div>
+         </div>
+
+
+         <div class="form-group row">
+            <label for="birth" class="col-sm-2 col-form-label text-right">생년월일</label>
+            <div class="col-sm-10">
+               <input class="form-control" id="birth" name="birth" type="date" required>
+            </div>
+         </div>
+
+         <div class="form-group row">
+            <label for="email" class="col-sm-2 col-form-label text-right">이메일</label>
+            <div class="col-sm-10">
+               <input class="form-control" id="email" name="email" type="email" required>
+            </div>
+         </div>
+
+
+         <div class="form-group row">
+            <label for="address" class="col-sm-2 col-form-label text-right">주소</label>
+            <div class="col-sm-10">
+               <input class="form-control" id="address" name="address" required>
+            </div>
+         </div>
+      
+         <div class="form-group row">
+             <div class="col-sm-10">
+                  <button type="submit" class="btn btn-primary">가입</button>
+             </div>
+           </div>
+      
+      </form>
+   </div>
+   
+   <script type="text/javascript">
+      $(document).ready(function() {
+         let checkId = false;
+         
+         
+         $("#checkid").click(function(event) {
+            event.preventDefault();
+            let id = $("#id").val();
+            
+            if(id == ''){
+               $("#id").focus();
+               return false;
+            }
+            
+            $.ajax({
+               url : "/member/checkid",
+               type : 'post',
+               data : {
+                  "id" : id
+               },
+               dataType : "text",
+               success : function(result) {
+                  let msg = "";
+                  
+                  if(result == 1){
+                     msg = "<div class='col-sm-10 offset-sm-2'>사용 <span style='color:green;'>가능</span>한 아이디입니다.</div>";
+                     checkId = true;
+                  } else {
+                     $("#id").val("");
+                     
+                     msg = "<div class='col-sm-10 offset-sm-2'>사용 <span style='color:red;'>불가능</span>한 아이디입니다.</div>";
+                  }
+                  
+                  $("#divid").html(msg);
+                  
+               }
+            });
+         });
+      
+         
+         $("button[type='submit']").click(function(event) {
+            event.preventDefault();
+            
+            if(checkId){
+               let id = $("#id").val();
+               
+               if(id == ""){
+                  $("#id").focus();
+                  return false;
+               }
+               
+               let pw1 = $("#pw1").val();
+               let pw2 = $("#pw2").val();
+               
+               if(pw1 == "" || pw2 == ""){
+                  $("#pw1").focus();
+                  return false;
+               }
+               
+               if(pw1 != pw2){
+                  $("#pw2").val("");
+                  $("#pw1").select();
+                  $("#pw1").focus();
+                  return false;
+               } 
+               
+               $("form").submit();
+            } else{
+               alert("아이디 중복 검사를 하세요.");
+            }
+            
+            
+            
+         });
+         
+         
+         
+      });
+   </script>
+
+</body>
+</html>
+
+
+===============================
+< kr.co.member.controller 에 MemberController checkid 작업 >
+	@RequestMapping(value = "/checkid", method = RequestMethod.POST)
+	@ResponseBody
+	public String checkId(@RequestParam Map<String, Object> map) {
+		
+		MemberDTO dto = mService.checkId(map);
+		int result = 0;
+		
+		if (dto == null) {
+			result = 1;
+		}
+		
+		return result+"";
+	}
+
+
+===============================
+< MemberService 에 checkid 자동 생성 >
+MemberDTO checkId(Map<String, Object> map);
+
+===============================
+< MemberServiceImpl 에 checkid 자동 생성 하고 작업하기 >
+	@Override
+	public MemberDTO checkId(Map<String, Object> map) {
+		String id = (String)map.get("id");
+		
+		MemberDTO dto = mDao.read(id);
+		return dto;
+	}
+
+
+================================ 2022/12/29 수업내용
+1. insert.jsp에서
+- id 중복 체크 확인 후 메시지 표현되는 div(id= divid) 태그의 아래 class를 추가합니다.
+offset-sm-2
+ 
+- id 중복 체크용 ajax 안의 msg에서 div 태그를 제거하세요 
+
+2. 시작이 별로 없어서, jsp 보드와 회원관리...
+- 회원 가입을 했는데, 회원 목록을 볼 수 있음..
+
+
+권총의 방아쇠를 당기면, 총알이 나간다.
+이벤트 소스: 방아쇠
+이벤트: 당긴다,
+이벤트 핸들러: 총알이 나간다..
+
+정적이든 동적이든 어떤 방식으로 생성되더라고
+이벤트가 적용되는 방법..
+
+- $()...가장 가까운 정적으로 생성된 부모 태그를 선택자로 잡고
+
+<div1>
+	<p2></p2>
+	<a2></a2>
+	<div2>
+		<ul3>
+			<li4></li4>
+			<li4></li4>
+		</ul3>
+	</div2>
+</div1>
+
+- $(부모태그).on("이번트 종류", 이벤트 소스, 이벤트 핸들러) 함수: 권한 위임 함수
+
+	   $("#mymodal").on("click", "button[data-dismiss='modal']", function() {
+		   defaultPwInput();
+	   }); ---- 변경된 코드
+	   
+
+	  $("button[data-dismiss='modal']").click(function() {
+		  defaultPwInput();
+	  }); ---- 기존에 있던 코드를 위에 코드처럼 바꿀수 있다
+
+
+=======================
+< insert jsp 파일 코드 수정 >
+<div class="form-group row" id="dividp">  --- 32번째
+	<div id="divid" class="col-sm-10 offset-sm-2">  --- 41번째
+            
+            </div>
+
+<div class="col-sm-10" id="divsubmitp">  -- 91번째
+   <script type="text/javascript">        ---- 99번째 스크립트 전부다
+      $(document).ready(function() {
+         let checkId = false;
+         
+         $("#dividp").on("input", "#id", function() {       	 
+        	 /* $(this):이벤트 소스를 가리킴 */       	 
+        	 checkId = false;
+		 });
+         
+         $("#dividp").on("click", "#checkid", function(event) {
+        	 event.preventDefault();
+             let id = $("#id").val();
+             
+             if(id == ''){
+                $("#id").focus();
+                return false;
+             }
+             
+             $.ajax({
+                url : "/member/checkid",
+                type : 'post',
+                data : {
+                   "id" : id
+                },
+                dataType : "text",
+                success : function(result) {
+                   let msg = "";
+                   
+                   if(result == 1){
+                      msg = "사용 <span style='color:green;'>가능</span>한 아이디입니다.";
+                      checkId = true;
+                      
+                   } else {
+                      $("#id").val("");
+                      
+                      msg = "사용 <span style='color:red;'>불가능</span>한 아이디입니다.";
+                   }
+                   
+                   $("#divid").html(msg);        
+                  
+               }
+            });
+         });
+         
+         $("#divsubmitp").on("click", "button[type='submit']", function(event) {
+        	 event.preventDefault();
+             
+             if(checkId){
+                let id = $("#id").val();
+                
+                if(id == ""){
+                   $("#id").focus();
+                   return false;
+                }
+                
+                let pw1 = $("#pw1").val();
+                let pw2 = $("#pw2").val();
+                
+                if(pw1 == "" || pw2 == ""){
+                   $("#pw1").focus();
+                   return false;
+                }
+                
+                if(pw1 != pw2){
+                   $("#pw2").val("");
+                   $("#pw1").select();
+                   $("#pw1").focus();
+                   return false;
+                } 
+                
+                $("form").submit();
+             } else{
+                alert("아이디 중복 검사를 하세요.");
+             }
+		});
+  
+         
+      });
+   </script>
+
+
+=======================
+< read jsp 파일 코드 수정 >
+<script type="text/javascript">   --- 124번째
+   $(document).ready(function() {
+	   
+	   $("#mymodal").on("click", "button[data-dismiss='modal']", function() {
+		   defaultPwInput();
+	   });
+      
+       $("#changepw").click(function() {
+          let pw = $("#pw").val();
+          let npw = $("#npw").val();
+          let npw2 = $("#npw2").val();
+         
+          if(pw == "" | npw == "" | npw2 == ""){
+             return false;
+          }
+         
+          if(npw != npw2){
+             return false;
+          }
+         
+          $.ajax({
+             url : '/member/changepw',
+             type : "post",
+             data : {
+                "pw" : pw,
+                "npw" : npw,
+                "id" : "${dto.id}"
+             },
+             dataType : "text",
+             success : function(result){
+                if(result > 0){               	
+               	    defaultPwInput();
+            	   
+            	    $("#mymodal").modal("toggle");
+                } else {
+            	    $("#failmsg").text("비밀번호 변경 실패");
+            	    $("#failmsg").css("color", "red");
+            	    $("#failmsg").addClass("addBorder");
+                }
+              
+            }
+         });
+    
+      });
+      
+      $("#pupdate").click(function() {
+         $("#mymodal").modal("toggle");
+      });
+      
+      
+      $("#mupdate").click(function() {
+         location.assign("/member/update/${dto.id}");
+      });
+      
+      function defaultPwInput() {   	  
+    	  $("#pw").val("");
+   	      $("#npw").val("");
+   	      $("#npw2").val("");
+   	      $("#failmsg").text("");
+	      $("#failmsg").removeClass("addBorder");
+	      
+	  }
+      
+      
+   });
+</script>
+
+
+=================================================
+게시판 만들기
+
+===========================
+< member.sql 파일에 코드 추가하기 >
+CREATE TABLE tbl_board(
+bno NUMBER,
+title VARCHAR2(45) NOT NULL,
+content VARCHAR2(3000) NOT NULL,
+id VARCHAR2(6),
+readcnt NUMBER DEFAULT 0,
+regdate DATE DEFAULT SYSDATE,
+updatedate DATE DEFAULT SYSDATE,
+CONSTRAINT pk_board_bno PRIMARY KEY(bno),
+CONSTRAINT fk_board_id FOREIGN KEY(id) REFERENCES tbl_member(id)
+ON DELETE CASCADE
+)
+
+ALTER TABLE tbl_board ADD pw VARCHAR2(60) NOT NULL  테이블에 추가하기
+
+SELECT MAX(bno) FROM tbl_board
+
+bno를 자동으로 입력...
+sequence, MAX(bno)+1
+SELECT NVL2(MAX(bno), MAX(bno)+1, 1) FROM tbl_board   ----boardMapper에 코드를 넣을것임
+max bno가 null이냐 null이 아니면 +1 을 한다
+
+===========================
+< src/main/java 에 kr.co.board.controller, kr.co.board.domain, kr.co.board.repository, kr.co.board.service 생성하기 >
+
+===========================
+< mybatis-config.xml 코드 추가하기 >
+<package name="kr.co.board.domain"/>
+
+===========================
+< mappers에 boardMapper.xml 생성 >
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="kr.co.board">
+
+</mapper>
+
+
+===========================
+< servlet-context.xml 에 코드 추가하기 >
+<context:component-scan base-package="kr.co.board.controller" />
+
+
+===========================
+< root-context.xml에 코드 추가하기 >
+<context:component-scan base-package="kr.co.board.service"></context:component-scan>
+<context:component-scan base-package="kr.co.board.repository"></context:component-scan>
+
+===========================
+<kr.co.board.domain 에 BoardDTO 클래스 생성하기 >
+package kr.co.board.domain;
+
+import java.io.Serializable;
+import java.util.Objects;
+
+import javax.xml.crypto.Data;
+
+public class BoardDTO implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+	
+	private int bno;
+	private String title;
+	private String content;
+	private String pw;
+	private String id;
+	private int readcnt;
+	private String regdate;
+	private String updatedate;
+	
+	public BoardDTO() {
+		
+	}
+
+	public BoardDTO(int bno, String title, String content, String pw, String id, int readcnt, String regdate,
+			String updatedate) {
+		super();
+		this.bno = bno;
+		this.title = title;
+		this.content = content;
+		this.pw = pw;
+		this.id = id;
+		this.readcnt = readcnt;
+		this.regdate = regdate;
+		this.updatedate = updatedate;
+	}
+
+	public int getBno() {
+		return bno;
+	}
+
+	public void setBno(int bno) {
+		this.bno = bno;
+	}
+
+	public String getTitle() {
+		return title;
+	}
+
+	public void setTitle(String title) {
+		this.title = title;
+	}
+
+	public String getContent() {
+		return content;
+	}
+
+	public void setContent(String content) {
+		this.content = content;
+	}
+
+	public String getPw() {
+		return pw;
+	}
+
+	public void setPw(String pw) {
+		this.pw = pw;
+	}
+
+	public String getId() {
+		return id;
+	}
+
+	public void setId(String id) {
+		this.id = id;
+	}
+
+	public int getReadcnt() {
+		return readcnt;
+	}
+
+	public void setReadcnt(int readcnt) {
+		this.readcnt = readcnt;
+	}
+
+	public String getRegdate() {
+		return regdate;
+	}
+
+	public void setRegdate(String regdate) {
+		this.regdate = regdate;
+	}
+
+	public String getUpdatedate() {
+		return updatedate;
+	}
+
+	public void setUpdatedate(String updatedate) {
+		this.updatedate = updatedate;
+	}
+
+	public static long getSerialversionuid() {
+		return serialVersionUID;
+	}
+
+	@Override  // bno만 체크
+	public int hashCode() {
+		return Objects.hash(bno);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		BoardDTO other = (BoardDTO) obj;
+		return bno == other.bno;
+	}
+
+	@Override  //bno, title, id, readcnt 만 체크
+	public String toString() {
+		return "BoardDTO [bno=" + bno + ", title=" + title + ", id=" + id + ", readcnt=" + readcnt + "]";
+	}
+	
+	
+}
+
+
+===========================
+< kr.co.board.controller 에 BoardController 클래스 생성하기 >
+< BoardController 에 insert 작업하기 >  --- GET방식
+	@RequestMapping(value = "/insert", method = RequestMethod.GET)
+	public void insert() {
+		
+	}
+
+
+
+===========================
+< views 에 board 폴더 생성하고 insert jsp 파일 생성하기 >
+
+[완료] 버튼을 누르면,
+/board/insert post 로 넘어가지(submit) 않게 막고 alert(1);
+
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+   pageEncoding="UTF-8" session="false"%>
+
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport"
+   content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+<title>게시글 입력 화면</title>
+
+<link rel="stylesheet"
+   href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css"
+   integrity="sha384-xOolHFLEh07PJGoPkLv1IbcEPTNtaed2xpHsD9ESMhqIYd0nLMwNLD69Npy4HI+N"
+   crossorigin="anonymous">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+<script
+   src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"
+   integrity="sha384-Fy6S3B9q64WdZWQUiU+q4/2Lc9npb8tCaSX9FK7E8HnRr0Jz8D6OP9dO5Vg3Q9ct"
+   crossorigin="anonymous"></script>
+</head>
+<body>
+   <div class="container">
+      <div class="jumbotron">
+         <h1 class="display-4">게시글 입력 화면</h1>
+      </div>
+
+      <form action="/board/insert" method="post">
+         <div class="form-group row">
+            <label for="id">작성자</label>         
+            <input class="form-control" id="id" name="id" required>           
+         </div>
+         
+         <div class="form-group row">
+            <label for="pw">비밀번호</label>         
+            <input type="password" class="form-control" id="pw" name="pw" required>           
+         </div>         
+         
+         <div class="form-group row">
+            <label for="title">제목</label>           
+            <input class="form-control" id="title" name="title" required>           
+         </div>
+         
+         <div class="form-group row">      
+            <label for="content">내용</label> 
+            <textarea rows="10" id="content" name="content" class="form-control" required></textarea>            
+         </div>
+         
+         <div class="form-group row">           
+            <button type="submit" class="btn btn-primary boardsubmit">완료</button>           
+         </div>
+      
+      </form>
+   </div>
+   
+   <script type="text/javascript">
+      $(document).ready(function() {
+         $("form[action='/board/insert']").on("click", ".boardsubmit", function(event) {
+        	 event.preventDefault();
+        	 
+        	 let id = $("#id").val();
+        	 let pw = $("#pw").val();
+        	 let title = $("#title").val();
+        	 let content = $("#content").val();
+        	 
+        	 if(id == ""){
+        		 $("#id").focus(); 
+        		 return false;
+        	 } 
+        	 
+        	 if(pw == ""){
+        		 $("#pw").focus();
+        		 return false;
+        	 }
+        	 
+        	 if(title == ""){
+        		 $("#title").focus();
+        		 return false;
+        	 }
+        	 
+        	 if(content == ''){
+        		 $("#content").focus();
+        		 return false;
+        	 }
+       	
+        	 $("form").submit();
+		});
+      });
+   </script>
+
+</body>
+</html>
+
+
+
+
+
+===========================
+< BoardController 에 insert 작업하기 > --- POST방식
+	@Inject
+	private BoardService bService;    -- 같이 만들어 주기
+
+	@RequestMapping(value = "/insert", method = RequestMethod.POST)
+	public String insert(BoardDTO dto) {
+				
+		bService.insert(dto);
+	
+		return "redirect:/board/list";
+		
+	}
+
+===========================
+< BoardService 인터페이스에 insert 작업하기 >
+void insert(BoardDTO dto);
+
+
+===========================
+< BoardServiceImpl 클래스에 insert 작업하기 >
+@Service
+public class BoardServiceImpl implements BoardService{
+	
+	@Inject
+	private BoardDAO bDao;
+	
+	@Override
+	public void insert(BoardDTO dto) {
+		
+		bDao.insert(dto);
+	}
+}
+
+===========================
+< BoardDAO 인터페이스에 insert 작업하기 >
+void insert(BoardDTO dto);
+
+
+===========================
+< BoardDAOImpl 클래스에 insert 작업하기 >
+@Repository
+public class BoardDAOImpl implements BoardDAO {
+	
+	@Autowired
+	private SqlSession session;
+	
+	private final String NS = "kr.co.board";
+	
+	@Override
+	public void insert(BoardDTO dto) {
+		
+		session.insert(NS+".insert", dto);
+		
+	}
+}
+
+
+===========================
+< mappers에 boardMapper.xml 코드 추가하기 >
+	<insert id="insert">
+		INSERT INTO tbl_board (bno, pw, title, content, id)
+		VALUES
+		((SELECT NVL2(MAX(bno), MAX(bno)+1, 1) FROM tbl_board),  
+		#{pw}, #{title}, #{content}, #{id})
+		// 꼭 이 부분 (SELECT NVL2(MAX(bno), MAX(bno)+1, 1) 괄호 넣는거 빼먹지 않기
+
+		<selectKey order="AFTER" keyProperty="bno" resultType="Integer">
+			SELECT MAX(bno) FROM tbl_board
+		</selectKey>
+
+	</insert>
+
+
+
+=====================
+게시글 등록을 반복문으로 넣음
+
+	@RequestMapping(value = "/insert", method = RequestMethod.POST)
+	public String insert(BoardDTO dto) {
+		
+		String title = "show";
+		String content = "show time";
+		
+		for(int i=0;i<200;i++) {
+			dto.setContent(title+i);
+			dto.setContent(content+i);
+			bService.insert(dto);
+			
+			try {
+				Thread.sleep(50);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}	
+		
+	
+		return "redirect:/board/list";
+		
+	}
+하고 실행 시켜서 작성하고 다시
+
+	@RequestMapping(value = "/insert", method = RequestMethod.POST)
+	public String insert(BoardDTO dto) {
+				
+		bService.insert(dto);
+	
+		return "redirect:/board/list";
+		
+	}
+
+
+===========================
+< BoardController 에 list 작업하기 >
+	@RequestMapping(value = {"/list", "/list/{curpage}", 
+				"/list/{curpage}/{criteria}/{keyword}"}, 
+				method = RequestMethod.GET)	
+	public String list(Model model, @PathVariable Map<String, String> map) {	
+		
+		List<BoardDTO> list = bService.list(map);
+		
+		model.addAttribute("list", list);
+		
+		return "board/list";
+	}
+
+
+===========================
+< BoardService 인터페이스에 list 작업하기 >
+	List<BoardDTO> list();    --- 처음에 작업한 코드
+
+	List<BoardDTO> list(Map<String, String> map);  -- 나중에 수정하고 작업한 코드
+
+===========================
+< BoardServiceImpl 클래스에 list 작업하기 >
+	@Override
+	public List<BoardDTO> list() {
+		List<BoardDTO> list = bDao.list();
+		
+		return list;
+	}					 --- 처음에 작업한 코드
+
+	@Override
+	public List<BoardDTO> list(Map<String, String> map) {
+		List<BoardDTO> list = bDao.list(map);
+		
+		return list;
+	}					-- 나중에 수정하고 작업한 코드
+
+
+===========================
+< BoardDAO 인터페이스에 list 작업하기 >
+	List<BoardDTO> list();			--- 처음에 작업한 코드
+
+	List<BoardDTO> list(Map<String, String> map); -- 나중에 수정하고 작업한 코드
+
+
+===========================
+< BoardDAOImpl 클래스에 list 작업하기 >
+	@Override				--- 처음에 작업한 코드
+	public List<BoardDTO> list() {		
+				
+		return session.selectList(NS+".list");
+	}					
+
+	@Override
+	public List<BoardDTO> list(Map<String, String> map) {
+		
+		RowBounds rb = new RowBounds(0,10);		
+		
+		return session.selectList(NS+".list2", map, rb);
+	}					-- 나중에 수정하고 작업한 코드
+
+
+===========================
+< mappers에 boardMapper.xml 에 코드 추가하기 >
+
+<mapper namespace="kr.co.board">
+
+	<insert id="insert">
+		INSERT INTO tbl_board (bno, pw, title, content, id)
+		VALUES
+		((SELECT NVL2(MAX(bno), MAX(bno)+1, 1) FROM tbl_board), 
+		#{pw}, #{title}, #{content}, #{id})
+		
+		<selectKey order="AFTER" keyProperty="bno" resultType="Integer">
+			SELECT MAX(bno) FROM tbl_board
+		</selectKey>
+	</insert>
+	
+	<select id="list" resultType="BoardDTO">
+		SELECT bno, title, id, readcnt, TO_CHAR(regdate, 'yyyy-mm-dd') regdate 
+		FROM tbl_board ORDER BY bno DESC
+	</select>
+	
+	<sql id="searchTag">
+		<if test="criteria != null">
+			<if test="criteria == 'id'.toString()">
+				WHERE UPPER(id) LIKE UPPER('%'||#{keyword}||'%')
+			</if>
+			
+			<if test="criteria == 'title'.toString()">
+				WHERE UPPER(title) LIKE UPPER('%'||#{keyword}||'%')
+			</if>
+			
+			<if test="criteria == 'content'.toString()">
+				WHERE UPPER(content) LIKE UPPER('%'||#{keyword}||'%')
+			</if>		
+		</if>	
+	</sql>
+	
+	<select id="list2" resultType="BoardDTO">
+		SELECT bno, title, id, readcnt, TO_CHAR(regdate, 'yyyy-mm-dd') regdate 
+		FROM tbl_board 
+		<include refid="searchTag"></include>
+		ORDER BY bno DESC
+	</select>
+
+</mapper>
+
+
+
+========================
+< kr.co.common.domain 패키지 생성하고 PageTO 클래스 생성 >
+package kr.co.common.domain;
+
+import java.util.List;
+
+public class PageTO<T> {
+	
+	private int curpage = 1;
+	private int perpage = 10;
+	private int amount;   //
+	private int totalPageNum;
+	private int startNum;
+	private int endNum;
+	private int beginPageNum;
+	private int finishPageNum;
+	private int lineMax = 10;
+	
+	private String criteria;
+	private String keyword;
+	
+	private List<T> list;
+	
+	public PageTO() {
+		execute();
+	}
+	
+	// 사용자 생성자: curpage, amount, criteria, keyword 만 체크
+	public PageTO(int curpage, int amount, String criteria, String keyword) {
+		super();
+		this.curpage = curpage;
+		this.amount = amount;
+		this.criteria = criteria;
+		this.keyword = keyword;
+		execute();
+	}
+
+	public PageTO(int curpage, int perpage, int amount, int totalPageNum, int startNum, int endNum, int beginPageNum,
+			int finishPageNum, int lineMax, String criteria, String keyword) {
+		super();
+		this.curpage = curpage;
+		this.perpage = perpage;
+		this.amount = amount;
+		this.totalPageNum = totalPageNum;
+		this.startNum = startNum;
+		this.endNum = endNum;
+		this.beginPageNum = beginPageNum;
+		this.finishPageNum = finishPageNum;
+		this.lineMax = lineMax;
+		this.criteria = criteria;
+		this.keyword = keyword;
+		execute();
+	}
+
+	public int getCurpage() {
+		return curpage;
+	}
+
+	public void setCurpage(int curpage) {
+		this.curpage = curpage;
+		execute();
+	}
+
+	public int getPerpage() {
+		return perpage;
+	}
+
+	public void setPerpage(int perpage) {
+		this.perpage = perpage;
+		execute();
+	}
+
+	public int getAmount() {
+		return amount;
+	}
+
+	public void setAmount(int amount) {
+		this.amount = amount;
+		execute();
+	}
+
+	public int getTotalPageNum() {
+		return totalPageNum;
+	}
+
+	public void setTotalPageNum(int totalPageNum) {
+		this.totalPageNum = totalPageNum;
+	}
+
+	public int getStartNum() {
+		return startNum;
+	}
+
+	public void setStartNum(int startNum) {
+		this.startNum = startNum;
+	}
+
+	public int getEndNum() {
+		return endNum;
+	}
+
+	public void setEndNum(int endNum) {
+		this.endNum = endNum;
+	}
+
+	public int getBeginPageNum() {
+		return beginPageNum;
+	}
+
+	public void setBeginPageNum(int beginPageNum) {
+		this.beginPageNum = beginPageNum;
+	}
+
+	public int getFinishPageNum() {
+		return finishPageNum;
+	}
+
+	public void setFinishPageNum(int finishPageNum) {
+		this.finishPageNum = finishPageNum;
+	}
+
+	public int getLineMax() {
+		return lineMax;
+	}
+
+	public void setLineMax(int lineMax) {
+		this.lineMax = lineMax;
+		execute();
+	}
+
+	public String getCriteria() {
+		return criteria;
+	}
+
+	public void setCriteria(String criteria) {
+		this.criteria = criteria;
+	}
+
+	public String getKeyword() {
+		return keyword;
+	}
+
+	public void setKeyword(String keyword) {
+		this.keyword = keyword;
+	}
+	
+	public List<T> getList() {
+		return list;
+	}
+
+	public void setList(List<T> list) {
+		this.list = list;
+	}
+
+	private void execute() {
+		totalPageNum = (amount-1)/perpage + 1;
+		
+		startNum = (curpage - 1) * perpage;
+		// RowBounds 를 담당한다.
+		// 마이바티스는 0부터 시작하기 때문에 +1을 안해준다
+		
+		beginPageNum = ((curpage - 1)/lineMax)*lineMax + 1;
+		finishPageNum = beginPageNum + lineMax - 1;
+		if (finishPageNum > totalPageNum) {
+			finishPageNum = totalPageNum;			
+		}
+	}
+	
+	
+}
+
+
+
+=========================
+< mybatis-config.xml 에 코드 추가하기 >
+<package name="kr.co.common.domain"/>
+
+
+========================
+< BoardServiceImpl 에  List<BoardDTO> list(Map<String, String> map) 코드 추가 및 변경 >
+	@Override
+	public PageTO<BoardDTO> list(Map<String, String> map) {   // List<BoardDTO> -> PageTO<BoardDTO> 로 수정
+		int curpage = -1;
+		
+		String scurpage = map.get("curpage");
+		if (scurpage != null) {
+			curpage = Integer.parseInt(scurpage);
+		}
+		
+		int amount = bDao.getAmount(map);
+		
+		PageTO<BoardDTO> pt =
+				new PageTO<BoardDTO>(curpage, amount, map.get("criteria"), map.get("keyword"));
+		
+		List<BoardDTO> list = bDao.list(map, pt);
+		
+		pt.setList(list);
+		
+		return pt;
+	}
+
+
+
+========================
+< BoardDAO 에  getAmount 하기 >
+
+List<BoardDTO> list(Map<String, String> map, PageTO<BoardDTO> pt);  ---- 수정됨
+
+int getAmount(Map<String, String> map);
+
+
+========================
+< BoardDAOImpl 에  List<BoardDTO> list(Map<String, String> map 수정 하기 >
+	@Override
+	public List<BoardDTO> list(Map<String, String> map, PageTO<BoardDTO> pt) { 
+		
+		RowBounds rb = new RowBounds(pt.getStartNum(), pt.getPerpage());		
+		
+		return session.selectList(NS+".list2", map, rb);
+	}
+
+
+
+< BoardDAOImpl 에  getAmount 하기 >
+	@Override
+	public int getAmount(Map<String, String> map) {
+		Integer amount = session.selectOne(NS+".getAmount", map);
+		
+		if (amount != null) {
+			amount = 0;
+		}
+		
+		return amount;
+	}
+
+========================
+< boardMapper.xml 에 getAmoun 코드추가 하기 >
+	<select id="getAmount" resultType="Integer">
+		SELECT COUNT(bno) FROM tbl_board
+		<include refid="searchTag"></include>
+	</select>
+
+
+
+
+========================
+< PageTO 에 코드 추가하기 (누락됨) >
+private List<T> list;
+
+getter/setter 추가
+	public List<T> getList() {    
+		return list;
+	}
+
+	public void setList(List<T> list) {
+		this.list = list;
+	}
+
+
+==========================================================
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
