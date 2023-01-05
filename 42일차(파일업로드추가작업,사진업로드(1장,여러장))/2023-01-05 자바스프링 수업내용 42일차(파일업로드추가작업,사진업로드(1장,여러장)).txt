@@ -1,0 +1,517 @@
+< 파일업로드 >
+
+
+< kr.co.common.utils 패키지 생성하고 UploadFileUtils 클래스 생성 >
+package kr.co.common.utils;
+
+import java.io.File;
+import java.util.Calendar;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.springframework.http.MediaType;
+
+public class UploadFileUtils {
+	
+	public static MediaType getMediaType(String formatName) {
+		formatName = formatName.toLowerCase();
+		// 만약 확장자가 대문자로 되어있으면 밑에 값에 해당되는게 없기에 null값이 나온다
+		// 그전에 전부다 소문자가 되도록 설정해 준다.
+		
+		Map<String, MediaType> map = new HashMap<String, MediaType>();
+		
+		map.put("png", MediaType.IMAGE_PNG);
+		map.put("gif", MediaType.IMAGE_GIF);
+		map.put("jpeg", MediaType.IMAGE_JPEG);
+		map.put("jpg", MediaType.IMAGE_JPEG);
+		// 만약 txt를 넣으면 null값이 나온다.		
+		
+		return map.get(formatName);
+	}
+	
+	public static String getFormatName(String filename) {
+		//"aa.txt", "b.png", "c.gif", "d.jpg", "e.jpeg", "e.pdf"
+		
+		int idx = filename.lastIndexOf(".") + 1; // .뒤에 확장자명을 가지고 온다
+		String formatName = filename.substring(idx);
+		
+		return formatName;
+	}
+	
+	public static String makePath(String uploadPath) {
+		
+		Calendar cal = Calendar.getInstance();
+		
+		// 파일경로 만들기
+		String yearPath = File.separator+ cal.get(Calendar.YEAR);	
+		
+		int month = cal.get(Calendar.MONTH)+1;
+		String sMonth = month < 10? "0"+month : month+"";		
+		String monthPath = yearPath +File.separator+ sMonth;
+		
+		int date = cal.get(Calendar.DATE);
+		String sDate = date < 10? "0"+date : date+"";
+		String datePath = monthPath +File.separator+ sDate;
+		
+		makeDir(yearPath, monthPath, datePath, uploadPath);
+		
+		return datePath;
+	}
+
+	public static void makeDir(String yearPath, String monthPath, String datePath, String uploadPath) {
+		
+		File fy = new File(uploadPath, yearPath);
+		
+		if (!fy.exists()) {  // fy는 fileyear줄임 fy파일이 존재하면 넘어가고, 없으면 실행(만들어라)
+			fy.mkdir();
+		}
+		
+		File fm = new File(uploadPath, monthPath);
+		if (!fm.exists()) {
+			fm.mkdir();
+		} else {
+			System.out.println(monthPath+">>>>>>>>>>>");
+		}
+		
+		File fd = new File(uploadPath, datePath);
+		if (!fd.exists()) {
+			fd.mkdir();
+		}
+		
+	}
+
+}
+
+
+
+=============================================
+저장은 Controller 에서 작업해야한다.
+< kr.co.board.controller 패키지에  BoardController 가서 >
+	@RequestMapping(value = { "/list", "/list/{curpage}", "/list/{curpage}/{criteria}/{keyword}",
+			"/list/{criteria}/{keyword}" }, method = RequestMethod.GET)
+	public String list(Model model, @PathVariable Map<String, String> map) {
+		
+		UploadFileUtils.makePath("D:"+File.separator+"upload");  ---- 추가하기(테스트하기위해 적은것)
+
+		PageTO<BoardDTO> pt = bService.list(map);
+
+		model.addAttribute("list", pt.getList());
+		model.addAttribute("pt", pt);
+
+		return "board/list";
+	}
+
+
+==============================================
+1.파일 업로드와 관련된 추가 작업..
+- 업로드 된 파일을 저장하는 방법
+a. DB에 저장하는 방법
+b. 파일로 저장하는 방법..
+ - 저장하는 경로는 무조건 절대경로로 표현해야 함.
+   D:\upload\2023\01\05\asd_a.txt --- 작업할때는 이 경로로
+    \/resources\upload\2023 --------------- 배포할때는 이경로로 근데 상대경로되어 있어서 절대경로로 만들어줘야함
+	+> 상대경로를 절대경로로 만드는 방법이 있음.
+ - OS에 따라서 바뀌는 부분들이 있음
+
+2. 업로드 되는 파일의 이름을 변경하여 관리하기
+- 절대로 다른 이름과 중복되면 안 됨.
+- 변경된 이름에서 원래의 이름을 추축할 수 있어야 함
+
+3. thumbnail 파일을  생성..
+-> 썸네일 파일은 이미지 파일만 만들어 줌.
+
+
+
+===========================
+< resources폴더에 upload 폴더 생성 >
+
+
+==============================
+< kr.co.common.utils 패키지에 UploadFileUtils 클래스 추가작업  >
+
+	public static String uploadFile(String uploadPath, MultipartFile file,
+					ServletContext sc) throws Exception { 
+		
+		String originalFilename = file.getOriginalFilename();
+		
+		String filename = makeFilename(originalFilename);
+		
+		byte[] arr =  file.getBytes();
+		// arr은 파일과 관련된 데이터를 바이트로 가져온다.			
+		
+		//uploadPath = changeToAbsolutePath(uploadPath, sc);
+		//상대경로
+		
+		String datePath = makePath(uploadPath); // /2023/01/05 나옴. 당일날짜별로 바뀜
+		
+		File target = new File(uploadPath+datePath, filename);
+		// uploadPath: D드라이브의 upload를 뜻함
+		// D:/upload/2023/01/05 됨
+		
+		FileCopyUtils.copy(arr, target);
+		
+		String formatName = getFormatName(filename);
+		MediaType mType = getMediaType(formatName);
+		
+		String uploadedFilename = null;
+		
+		if (mType == null) {
+			uploadedFilename = makeIcon(datePath, filename);
+			// /2023/01/05/uuid_홍길동이력서.xlx 이런 파일명이 나온다.
+		} else {
+			uploadedFilename = makeThumbnail(datePath, filename, uploadPath);
+			// 썸네일이 생성되고 생성된 파일은 uploadPath에 저장한다.
+			// 썸네일의 파일명이 반환됨.			
+			// flower.png
+			// uuid_flower.png
+			// /2023/01/05/uuid_flower.png
+			// /2023/01/05/s_uuid_flower.png -> 반환됨
+		}
+		
+		return uploadedFilename;
+	}
+
+	public static String makeThumbnail(String datePath, String filename, String uploadPath) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public static String makeIcon(String datePath, String filename) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
+	public static String getOriginalFilename(String filename) {
+		
+		// 서버명의 파일이름이 아닌 원래의파일명을 가져오기
+		int idx = filename.indexOf("_") + 1;
+		String originalFilename = filename.substring(idx);
+		
+		return originalFilename;
+	}
+	
+	public static String makeFilename(String filename) {
+		// 만약 같은 이름의 파일이 있을때
+		// 오리지널 파일이름을 바꾸는게 아니라 서버에 있는 파일이름을 바꾼다 
+		UUID uid = UUID.randomUUID();
+		String savedName = uid.toString() +"_"+filename;
+		
+		return savedName;
+	}
+	
+	public static String changeToAbsolutePath(String uploadPath, ServletContext sc) {
+		//절대경로
+		return sc.getRealPath(uploadPath);
+	}
+	
+	public static MediaType getMediaType(String formatName) {
+		formatName = formatName.toLowerCase();
+		// 만약 확장자가 대문자로 되어있으면 밑에 값에 해당되는게 없기에 null값이 나온다
+		// 그전에 전부다 소문자가 되도록 설정해 준다.
+		
+		Map<String, MediaType> map = new HashMap<String, MediaType>();
+		
+		map.put("png", MediaType.IMAGE_PNG);
+		map.put("gif", MediaType.IMAGE_GIF);
+		map.put("jpeg", MediaType.IMAGE_JPEG);
+		map.put("jpg", MediaType.IMAGE_JPEG);
+		// 만약 txt를 넣으면 null값이 나온다.		
+		
+		return map.get(formatName);
+	}
+
+==============================
+< kr.co.board.controller 패키지에 BoardController 클래스 추가 작업 >
+
+	@Inject
+	private ServletContext sc;
+
+	private String uploadPath = "D:"+File.separator+"upload";
+
+	@RequestMapping(value = "fuajaxtest", method = RequestMethod.POST)
+	@ResponseBody
+	public String fuAjaxTest(MultipartHttpServletRequest request) {
+		
+		String id = request.getParameter("id");
+		System.out.println(id);
+		
+		List<MultipartFile> list = request.getFiles("file");
+		
+		for(int i=0; i<list.size(); i++) {
+			MultipartFile file = list.get(i);
+			// list.get(i) 하고 request.getFile("file") 은 같다
+			
+			try {
+				UploadFileUtils.uploadFile(uploadPath, file, sc);
+				
+				Thread.sleep(50);
+			} catch (Exception e) {			
+				e.printStackTrace();
+			}
+			
+		}
+		
+		return "ok";
+	}
+
+	@RequestMapping(value = "futest", method = RequestMethod.POST)
+	public String fileUploadTest(MultipartHttpServletRequest request) {
+		String id = request.getParameter("id");
+		MultipartFile file = request.getFile("file");
+		
+		try {
+			UploadFileUtils.uploadFile(uploadPath, file, sc);
+		} catch (Exception e) {			
+			e.printStackTrace();
+		}
+		
+		return "redirect:/board/list";
+	}
+
+	@RequestMapping(value = "futest", method = RequestMethod.GET)
+	//futest: fileuploadtest 줄임
+	public String fileUploadTest() {
+		return "/board/futest";
+	}
+
+	@RequestMapping(value = { "/list", "/list/{curpage}", "/list/{curpage}/{criteria}/{keyword}",
+			"/list/{criteria}/{keyword}" }, method = RequestMethod.GET)
+	public String list(Model model, @PathVariable Map<String, String> map) {
+		
+//		String fn = UploadFileUtils.makeFilename("text.png");
+//		
+//		// 서버명의 파일이름이 아닌 원래의파일명을 가져오기
+//		int idx = fn.indexOf("_") + 1;
+//		String oriName = fn.substring(idx);  
+//		System.out.println(oriName);   테스트하기위해 적은것임
+		
+		PageTO<BoardDTO> pt = bService.list(map);
+
+		model.addAttribute("list", pt.getList());
+		model.addAttribute("pt", pt);
+
+		return "board/list";
+	}
+
+
+=====================================
+< board폴더에 futest jsp 생성 >  ------- 이미지사진 1장만 업로드할때
+
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8" session="false"%>
+    
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+<title>Insert title here</title>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css" integrity="sha384-xOolHFLEh07PJGoPkLv1IbcEPTNtaed2xpHsD9ESMhqIYd0nLMwNLD69Npy4HI+N" crossorigin="anonymous">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-Fy6S3B9q64WdZWQUiU+q4/2Lc9npb8tCaSX9FK7E8HnRr0Jz8D6OP9dO5Vg3Q9ct" crossorigin="anonymous"></script>
+
+</head>
+<body>
+	<form action="/board/futest" method="post" enctype="multipart/form-data">
+		id : <input name="id"><br>
+		첨부파일: <input type="file" name="file" id="img1"><br>
+		<input type="submit" value="전송">		
+	</form>
+	
+	<div>
+		<img id="fu" width="100px" height="100px">		
+		
+	</div>
+	
+	<script type="text/javascript">
+		$(document).ready(function() {
+			
+			$("#img1").change(function(event) {
+				let reader = new FileReader();
+				
+				let fArr = event.target.files;
+				let file = fArr[0];
+				
+				reader.readAsDataURL(file);
+				
+				reader.onload = function(event) {
+					$("#fu").attr("src", event.target.result);
+				}
+			});
+		});
+	
+	</script>
+
+</body>
+</html>
+
+
+=====================================
+< board폴더에 futest jsp 생성 >  ------- 이미지사진 여러장 업로드할때
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8" session="false"%>
+    
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+<title>Insert title here</title>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css" integrity="sha384-xOolHFLEh07PJGoPkLv1IbcEPTNtaed2xpHsD9ESMhqIYd0nLMwNLD69Npy4HI+N" crossorigin="anonymous">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-Fy6S3B9q64WdZWQUiU+q4/2Lc9npb8tCaSX9FK7E8HnRr0Jz8D6OP9dO5Vg3Q9ct" crossorigin="anonymous"></script>
+<script src="/resources/js/templateform.js"></script>
+
+</head>
+<body>
+	<form action="/board/futest" method="post" enctype="multipart/form-data">
+		id : <input name="id" id="id"><br>
+		첨부파일: 
+		<input type="file" name="file" id="img1"><br>
+		<input id="submit" type="submit" value="전송">		
+	</form>
+	
+	<div id="uploadedList">
+				
+		
+	</div>
+	
+	<script type="text/javascript">
+		$(document).ready(function() {			
+			let formData = new FormData();
+			
+			$("#submit").click(function(event) {
+				evenet.preventDefault();
+				let id = $("#id").val();
+				
+				formData.append("id", id);
+				
+				$.ajax({
+					url : "/board/fuajaxtest",
+					type : "post",
+					processData : false,
+					contentType : false,
+					data : formData,
+					dataType : "text",
+					success : function(result) {
+						alert(result);
+					}
+				});
+			});
+			
+			$("#img1").change(function(event) {
+				let reader = new FileReader();
+				
+				let fArr = event.target.files;
+				let file = fArr[0];
+				
+				reader.readAsDataURL(file);
+				
+				reader.onload = function(event) {
+					let tag = futest(event.target.result);
+					$("#uploadedList").append(tag);
+					//$("#fu").attr("src", event.target.result);
+				}
+				
+				formData.append("file", file);
+			});
+		});
+	
+	</script>
+
+</body>
+</html>
+
+
+
+=====================================
+< js폴더에 templateform.js 추가 작업 >  ------- 이미지사진 여러장 업로드할때
+
+function futest(result){
+	let tagstr = `
+	<img class="fu" width="100px" height="100px"src="${result}">
+	`;
+	
+	return tagstr;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
