@@ -1,0 +1,1282 @@
+================ 파일 드래그해서 첨부하기, 파일첨부 업로드한후 취소(삭제)하기 ===========
+
+< 그림판에 속성 100, 100 주고 파일명은 gf로 하나 작업해서 저장하고 이클립스 img폴더에 넣어준다 >
+
+=====================================
+< member.sql 추가 작성 >
+CREATE TABLE tbl_attach(
+id NUMBER,
+bno NUMBER,
+uploadedFilename VARCHAR2(300) NOT NULL,
+regdate DATE DEFAULT SYSDATE,
+CONSTRAINT fk_attach_bno FOREIGN KEY(bno) REFERENCES tbl_board(bno) ON DELETE CASCADE,
+CONSTRAINT pk_attach_id PRIMARY KEY(id)
+)
+
+CREATE SEQUENCE seq_attach_id    -------------여기까지 추가 작업
+
+select * from tbl_attach
+
+delete from tbl_attach     
+
+
+
+CREATE TABLE tbl_reply(
+rno	NUMBER,
+bno NUMBER,
+id VARCHAR2(6),
+pw VARCHAR2(60) NOT NULL,
+reply VARCHAR2(1000) NOT NULL,
+regdate DATE DEFAULT SYSDATE,
+updatedate DATE DEFAULT SYSDATE,
+CONSTRAINT pk_reply_rno PRIMARY KEY(rno),
+CONSTRAINT fk_reply_bno FOREIGN KEY(bno) REFERENCES tbl_board(bno) 
+ON DELETE CASCADE,
+CONSTRAINT fk_reply_id FOREIGN KEY(id) REFERENCES tbl_member(id)
+ON DELETE CASCADE
+)
+
+
+
+CREATE SEQUENCE seq_reply_rno
+
+SELECT * FROM tbl_reply
+
+
+
+
+
+CREATE TABLE tbl_board(
+bno NUMBER,
+title VARCHAR2(45) NOT NULL,
+content VARCHAR2(3000) NOT NULL,
+pw VARCHAR2(60) NOT NULL,
+id VARCHAR2(6),
+readcnt NUMBER DEFAULT 0,
+regdate DATE DEFAULT SYSDATE,
+updatedate DATE DEFAULT SYSDATE,
+CONSTRAINT pk_board_bno PRIMARY KEY(bno),
+CONSTRAINT fk_board_id FOREIGN KEY(id) REFERENCES tbl_member(id)
+ON DELETE CASCADE
+)
+
+ALTER TABLE tbl_board ADD pw VARCHAR2(60) NOT NULL
+
+
+SELECT MAX(bno) FROM tbl_board
+
+SELECT NVL2(MAX(bno), MAX(bno)+1, 1) FROM tbl_board
+
+select * from TBL_BOARD
+
+
+
+
+
+
+CREATE TABLE tbl_member(
+id VARCHAR2(6),
+name VARCHAR2(15) NOT NULL,
+birth DATE NOT NULL,
+address VARCHAR2(300) NOT NULL,
+pw VARCHAR2(300) NOT NULL,
+email VARCHAR2(300),
+grade CHAR(1) DEFAULT 'A',
+CONSTRAINT pk_member_id PRIMARY KEY(id)
+)
+
+select * from tbl_member
+DELETE FROM tbl_member WHERE id = 'good'
+
+
+=====================================
+< kr.co.board.domain 패키지에 BoardDTO 추가 작업 >
+
+package kr.co.board.domain;
+
+import java.io.Serializable;
+import java.util.List;
+import java.util.Objects;
+
+public class BoardDTO implements Serializable{
+
+	private static final long serialVersionUID = 1L;
+	private int bno;
+	private String title;
+	private String content;
+	private String pw;
+	private String id;
+	private int readcnt;
+	private String regdate;
+	private String updatedate;
+	private List<String> uploadedFileList;  --- 추가
+	
+	public BoardDTO() {}	
+	
+	// 사용자 생성자를 4개만 체크해서 생성
+	public BoardDTO(String id, String pw, 
+					String title, String content) {
+		this.title = title;
+		this.content = content;
+		this.pw = pw;
+		this.id = id;
+	}
+
+
+	public BoardDTO(int bno, String title, String content, String pw, String id, int readcnt, String regdate,
+			String updatedate) {
+		this.bno = bno;
+		this.title = title;
+		this.content = content;
+		this.pw = pw;
+		this.id = id;
+		this.readcnt = readcnt;
+		this.regdate = regdate;
+		this.updatedate = updatedate;
+	}
+	
+	
+	// 추가한 List를 getter/setter만 생성하기
+	public List<String> getUploadedFileList() {
+		return uploadedFileList;
+	}
+
+	public void setUploadedFileList(List<String> uploadedFileList) {
+		this.uploadedFileList = uploadedFileList;
+	}
+
+	public int getBno() {
+		return bno;
+	}
+
+	public void setBno(int bno) {
+		this.bno = bno;
+	}
+
+	public String getTitle() {
+		return title;
+	}
+
+	public void setTitle(String title) {
+		this.title = title;
+	}
+
+	public String getContent() {
+		return content;
+	}
+
+	public void setContent(String content) {
+		this.content = content;
+	}
+
+	public String getPw() {
+		return pw;
+	}
+
+	public void setPw(String pw) {
+		this.pw = pw;
+	}
+
+	public String getId() {
+		return id;
+	}
+
+	public void setId(String id) {
+		this.id = id;
+	}
+
+	public int getReadcnt() {
+		return readcnt;
+	}
+
+	public void setReadcnt(int readcnt) {
+		this.readcnt = readcnt;
+	}
+
+	public String getRegdate() {
+		return regdate;
+	}
+
+	public void setRegdate(String regdate) {
+		this.regdate = regdate;
+	}
+
+	public String getUpdatedate() {
+		return updatedate;
+	}
+
+	public void setUpdatedate(String updatedate) {
+		this.updatedate = updatedate;
+	}
+
+	public static long getSerialversionuid() {
+		return serialVersionUID;
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(bno);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		BoardDTO other = (BoardDTO) obj;
+		return bno == other.bno;
+	}
+
+	@Override
+	public String toString() {
+		return "BoardDTO [bno=" + bno + ", title=" + title + ", id=" + id + ", readcnt=" + readcnt + "]";
+	}
+	
+	
+	
+
+}
+
+
+=====================================
+< js폴더에 templateform.js 추가 작업 >
+/**
+ * 
+ */
+ 
+function isImgFile(filename){
+	
+	let idx = filename.lastIndexOf(".") + 1;
+	let formatName = filename.substring(idx);
+	
+	let arr = ["png", "gif", "jpg", "jpeg"];
+	
+	let isImageFile = false;
+	
+	for(let i=0;i<arr.length;i++){
+		if(arr[i] == formatName.toLowerCase()){
+			isImageFile = true;
+			break;
+		}
+	}
+	
+	return isImageFile;
+} 
+ 
+ 
+function futest2(result, filename){
+	let isImageFile = isImgFile(filename);
+	
+	let tagstr = "";
+	
+	if(isImageFile){
+			tagstr = `
+		  <li class="col-sm-4 text-center">
+			    <div class="card">
+      				<div class="card-body">
+        				<img src="${result}" width="100px" height="100px" alt="${filename}"/>
+        				<p class="card-text">${filename}</p>
+        				<a href="#" class="btn btn-danger del">삭제</a>
+      				</div>
+    			</div>
+		  </li>
+	`;
+	}else{
+		tagstr = `
+		<li class="col-sm-4 text-center">
+			    <div class="card">
+      				<div class="card-body">
+        				<img src="/resources/img/gf.png" width="100px" height="100px" alt="${filename}"/>
+        				<p class="card-text">${filename}</p>
+        				<a href="#" class="btn btn-danger del">삭제</a>
+      				</div>
+    			</div>
+		  </li>
+		`;
+	}
+	
+	
+	return tagstr;
+}  				---------------------여기까지 추가 작업
+ 
+function futest11(result, filename){   // futest2였는데 복사해서 위쪽에 하나더 만드려고 11로 수정함
+	let tagstr = `
+		<div>
+			<img src="${result}" class="fu" height="100px" width="100px">
+			<span class="del" data-filename="${filename}"> X </span>
+		</div>
+	`;
+	
+	return tagstr;
+} 
+ 
+ 
+function futest(result){
+	let tagstr = `
+	<img class="fu" width="100px" height="100px" src="${result}">
+	`;
+	
+	return tagstr;
+	
+} 
+ 
+ 
+function getReplyAll(bno, reply_list){
+	
+	let tagstrs = '';
+	
+	$.getJSON("/replies/"+bno+"/all", function(result){
+		for(let i=0; i<result.length;i++){
+			let replyDto = result[i];
+			let tagstr = reply_form(replyDto.rno, 
+			replyDto.id, replyDto.reply, 
+			replyDto.updatedate)
+			
+			tagstrs = tagstrs + tagstr;
+		}
+		
+		reply_list.html(tagstrs)
+		
+	});
+	
+	
+}
+ 
+ 
+ 
+function reply_form(rno, id, reply, updatedate){
+	
+	let tagstr = `
+	<div class="card row my-4">
+				<h6 class="card-header">
+					댓글번호: <span class="reply_rno">${rno}</span>
+					<span class="reply_id float-right">작성자:  ${id}</span>
+					
+				</h6>
+				<div class="card-body" data-rno="${rno}" data-id="${id}">
+					<p class="card-text reply">${reply}</p>
+					<a href="#" class="btn btn-warning btn-sm read_btn_replyui_update">수정</a>
+					<a href="#" class="btn btn-warning btn-sm read_btn_replyui_delete">삭제</a>
+					<span class="float-right">수정일: ${updatedate}</span>
+				</div>
+			</div>
+	
+	
+	`;
+	
+	return tagstr;
+	
+}
+
+
+=====================================
+< board 폴더에 insert.jsp 추가 작업 >
+
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+	pageEncoding="UTF-8" session="false"%>
+
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport"
+	content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+<title>게시글 입력 화면</title>
+
+<link rel="stylesheet"
+	href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css"
+	integrity="sha384-xOolHFLEh07PJGoPkLv1IbcEPTNtaed2xpHsD9ESMhqIYd0nLMwNLD69Npy4HI+N"
+	crossorigin="anonymous">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+<script
+	src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"
+	integrity="sha384-Fy6S3B9q64WdZWQUiU+q4/2Lc9npb8tCaSX9FK7E8HnRr0Jz8D6OP9dO5Vg3Q9ct"
+	crossorigin="anonymous"></script>
+	
+<script type="text/javascript" src="/resources/js/templateform.js"></script>	
+
+<style type="text/css">  		------------ 손가락모양으로 나오게하는 작업 style 속성을 
+	#file_drop{			  제일 좋은 방법은 <link rel= 위에 넣는게 다 적용시킬수 있어서 좋다 
+		width: 100%;		  그다음이 지금 작성한 위치 이며 
+		height: 150px;		  제일 나쁜 방법은 <form 안에 style을 넣어서 하는게 가장 나쁘다.
+		border: 1px solid gray;
+		background-color: #FFFFB6; /*rgb 색상표 검색해서 다른색 넣어도 된다. */
+		margin: auto;
+	}
+
+	#uploaded_list li{
+		list-style-type: none;
+		display: inline-block;
+	}
+
+
+</style>
+
+
+</head>
+<body>
+	<div class="container">
+		<div class="jumbotron">
+			<h1 class="display-4">게시글 입력 화면</h1>
+		</div>
+
+		<form action="/board/insert" method="post">
+			<div class="form-group row">
+				<label for="id">작성자</label> 
+				<input class="form-control" id="id"	name="id" required>
+			</div>
+			
+			<div class="form-group row">
+				<label for="pw">비밀번호</label> 
+				<input type="password" class="form-control" id="pw"	name="pw" required>
+			</div>
+
+			<div class="form-group row">
+				<label for="title">제목</label> 
+				<input class="form-control" id="title" name="title" required>
+
+			</div>
+
+			<div class="form-group row">
+				<label for="content">내용</label>
+				<textarea rows="10" id="content" name="content" class="form-control" required></textarea>
+			</div>
+		
+		</form>
+
+
+		<div class="form-group row">
+			<label>업로드할 파일을 드랍시키세요.</label>
+
+			<div id="file_drop"></div>
+
+		</div>
+
+
+		<div class="form-group">
+
+			<ul id="uploaded_list" class="clearfix">
+
+			</ul>
+
+		</div>
+
+		<div class="form-group row">
+      		<button type="submit" class="btn btn-primary boardsubmit">완료</button>
+  		</div>
+	</div>
+	
+	<script type="text/javascript">
+		$(document).ready(function() {
+			let formData = new FormData();			
+			
+			$("#uploaded_list").on("click", ".del", function(event) {
+				event.preventDefault();
+				
+				let filename = $(this).prev().text();
+				formData.delete(filename);
+				
+				$(this).parent().parent().parent().remove();
+				
+			});
+						
+			
+			$("#file_drop").on("dragenter dragover", function(event) {
+				event.preventDefault();
+			});
+			
+			$("#file_drop").on("drop", function(event) {
+				event.preventDefault();
+				
+				let reader = new FileReader();
+				
+				let fArr = event.originalEvent.dataTransfer.files;
+				let file = fArr[0];
+				
+				reader.readAsDataURL(file);
+				
+				reader.onload= function(event) {
+					let tag = futest2(event.target.result, file["name"]);
+					$("#uploaded_list").append(tag);
+				}
+				
+				formData.append(file["name"], file);
+			});
+						
+			
+			$(".boardsubmit").on("click", function(event) {
+				event.preventDefault();
+				
+				let id = $("#id").val();
+				if(id == ""){
+					$("#id").focus();
+					return false;
+				}
+				
+				let pw = $("#pw").val();
+				if(pw == ""){
+					$("#pw").focus();
+					return false;
+				}
+				
+				let title = $("#title").val();
+				if(title == ""){
+					$("#title").focus();
+					return false;
+				}
+				
+				let content = $("#content").val();
+				if(content == ""){
+					$("#content").focus();
+					return false;
+				}
+				
+				formData.append("id", id);
+				formData.append("pw", pw);
+				formData.append("title", title);
+				formData.append("content", content);
+				
+				$.ajax({
+					url : "/board/insert",
+					type : "post", 
+					processData : false,
+					contentType : false,
+					data : formData,
+					dataType : "text",
+					success : function(result) {
+						location.assign("/board/list");
+					}
+				});
+				
+				
+			});
+			
+		});
+	</script>
+	
+</body>
+</html>
+
+
+=====================================
+< board 폴더에 futest.jsp 추가 작업 >
+
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8" session="false"%>
+
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+<title>Insert title here</title>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css" integrity="sha384-xOolHFLEh07PJGoPkLv1IbcEPTNtaed2xpHsD9ESMhqIYd0nLMwNLD69Npy4HI+N" crossorigin="anonymous">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-Fy6S3B9q64WdZWQUiU+q4/2Lc9npb8tCaSX9FK7E8HnRr0Jz8D6OP9dO5Vg3Q9ct" crossorigin="anonymous"></script>
+<script src="/resources/js/templateform.js"></script>
+
+
+<style type="text/css">
+	.del{
+		cursor: pointer;
+	}
+
+</style>
+
+
+</head>
+<body>
+	<form action="/board/futest" method="post" enctype="multipart/form-data">
+		id : <input name="id" id="id"><br>
+		첨부파일: 
+		<input type="file" name="file" id="img1"><br>
+		<input id="submit" type="submit" value="전송">
+	</form>
+	
+	<div id="uploadedList">
+
+	
+	</div>
+	
+	<script type="text/javascript">
+	
+
+		$(document).ready(function() {
+			let formData = new FormData();
+			
+			$("#uploadedList").on("click", ".del", function() {
+				let filename = $(this).attr("data-filename");
+				formData.delete(filename);
+				
+				
+				$(this).parent().remove();
+				
+			});
+			
+			
+			$("#submit").click(function(event) {
+				event.preventDefault();
+				let id = $("#id").val();
+				
+				formData.append("id", id);
+				
+				$.ajax({
+					url : "/board/fuajaxtest",
+					type : "post",
+					processData : false,
+					contentType : false,
+					data : formData,
+					dataType : "text",
+					success : function(result) {
+						alert(result);
+					}
+				});
+			});
+			
+			
+			$("#img1").change(function(event) {
+				let reader = new FileReader();
+				
+				let fArr = event.target.files;
+				let file = fArr[0];
+				
+				reader.readAsDataURL(file);
+				
+				reader.onload= function(event) {
+					let tag = futest2(event.target.result, file["name"]);
+					$("#uploadedList").append(tag);
+					//$("#fu").attr("src", event.target.result);
+				}
+				
+				formData.append(file["name"], file);
+			});
+		});
+	
+	</script>
+
+</body>
+</html>
+
+
+=====================================
+< BoardController 추가 작업 >
+
+package kr.co.board.controller;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import javax.inject.Inject;
+import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
+import org.springframework.web.multipart.MultipartRequest;
+
+import kr.co.board.domain.BoardDTO;
+import kr.co.board.service.BoardService;
+import kr.co.common.domain.PageTO;
+import kr.co.common.utils.UploadFileUtils;
+
+@Controller
+@RequestMapping("/board")
+public class BoardController {
+
+	@Inject
+	private BoardService bService;
+	
+	@Inject
+	private ServletContext sc;
+	
+	
+	private String uploadPath = "D:"+File.separator+"upload";
+	
+	@RequestMapping(value = "insert", method = RequestMethod.POST)
+	@ResponseBody
+	public String insert(MultipartHttpServletRequest request) {
+		
+		String id = request.getParameter("id");
+		String pw = request.getParameter("pw");
+		String title = request.getParameter("title");
+		String content = request.getParameter("content");
+		
+		
+		Map<String, MultipartFile> map = request.getFileMap();
+		
+		Set<String> set = map.keySet();
+		
+		List<String> list = new ArrayList<String>(set);
+		
+		List<String> uploadedFileList = new ArrayList<String>();	
+		
+		for(int i=0;i<list.size();i++) {
+			String key = list.get(i);
+			
+			
+			MultipartFile file = map.get(key);
+			
+			try {
+				String uploadedFilename 
+				= UploadFileUtils.uploadFile(uploadPath, file, sc);
+				
+				uploadedFileList.add(uploadedFilename);
+				
+				Thread.sleep(50);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+		
+		BoardDTO dto = new BoardDTO(id, pw, title, content);
+		dto.setUploadedFileList(uploadedFileList);
+		int result = 1;
+		
+		try {
+			bService.insert(dto);
+		} catch (Exception e1) {
+			e1.printStackTrace();
+			
+			result = 0;
+		}
+		
+		
+		if(result == 0) {
+			System.out.println("업로드한 파일을 삭제하자.");
+			
+			try {
+				UploadFileUtils.deleteUploadFiles(uploadPath, uploadedFileList);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			
+			
+		}
+		
+		return dto.getBno()+"";
+	}
+	
+	@RequestMapping(value = "fuajaxtest", method = RequestMethod.POST)
+	@ResponseBody
+	public String fuAjaxTest(MultipartHttpServletRequest request) {
+		
+		String id = request.getParameter("id");
+		
+		Map<String, MultipartFile> map = request.getFileMap();
+		
+		Set<String> set = map.keySet();
+		
+		List<String> list = new ArrayList<String>(set);
+		
+			
+		
+		for(int i=0;i<list.size();i++) {
+			String key = list.get(i);
+			
+			
+			MultipartFile file = map.get(key);
+			
+			try {
+				UploadFileUtils.uploadFile(uploadPath, file, sc);
+				
+				Thread.sleep(50);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+		
+		return "ok";
+	}
+	
+
+	
+	
+//	@RequestMapping(value = "fuajaxtest", method = RequestMethod.POST)
+//	@ResponseBody
+//	public String fuAjaxTest(MultipartHttpServletRequest request) {
+//		
+//		String id = request.getParameter("id");
+//		
+//		List<MultipartFile> list = request.getFiles("file");
+//		
+//		for(int i=0;i<list.size();i++) {
+//			MultipartFile file = list.get(i);
+//			
+//			try {
+//				UploadFileUtils.uploadFile(uploadPath, file, sc);
+//				
+//				Thread.sleep(50);
+//			} catch (Exception e) {
+//				e.printStackTrace();
+//			}
+//		}
+//		
+//		return "ok";
+//	}
+	
+	@RequestMapping(value = "futest", method = RequestMethod.POST)
+	public String fileUploadTest(MultipartHttpServletRequest request) {
+		String id = request.getParameter("id");
+		MultipartFile file = request.getFile("file");
+		
+		try {
+			UploadFileUtils.uploadFile(uploadPath, file, sc);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		
+		return "redirect:/board/list";
+		
+	}
+	
+	@RequestMapping(value = "futest", method = RequestMethod.GET)
+	//futest: fileuploadtest 줄임
+	public String fileUploadTest() {
+		return "/board/futest";
+	}
+	
+	
+	@RequestMapping(value = "/delete/{bno}", method = RequestMethod.POST)
+	@ResponseBody
+	public Integer delete(@PathVariable Integer bno, 
+			@RequestParam Map<String, Object> map) {
+		Integer result = 0;
+		
+		map.put("bno", bno);
+		
+		result = bService.delete(map);
+		
+		return result;
+	}
+	
+	
+	
+	@RequestMapping(value = "/update", method = RequestMethod.POST)
+	@ResponseBody
+	public int update(@RequestParam Map<String, Object> map) {
+		int result = 0;
+		
+		result = bService.update(map);
+		
+		
+		return result;
+	}
+	
+	
+
+	@RequestMapping(value = {"/read/{bno}/{curpage}/{criteria}/{keyword}", 
+			                 "/read/{bno}", 
+			                 "/read/{bno}/{curpage}"}, method = RequestMethod.GET)
+	public String read(@PathVariable Map<String, String> map, Model model) {
+		
+		String sBno = map.get("bno");
+		int bno = -1;
+		
+		if(sBno != null) {
+			bno = Integer.parseInt(sBno);
+		}
+		
+		BoardDTO dto = bService.read(bno);
+		
+		model.addAttribute("dto", dto);
+		
+		
+		String scurpage = map.get("curpage");
+		int curpage = 1;
+		
+		if(scurpage != null) {
+			curpage = Integer.parseInt(scurpage);
+		}
+		
+		model.addAttribute("curpage", curpage);
+		
+		String criteria = map.get("criteria");
+		String keyword = map.get("keyword");
+		
+		model.addAttribute("criteria", criteria);
+		model.addAttribute("keyword", keyword);
+
+		return "board/read";
+	}
+
+	@RequestMapping(value = { "/list/{criteria}/{keyword}" }, method = RequestMethod.POST)
+	public String list2(Model model, @PathVariable Map<String, String> map) {
+
+		PageTO<BoardDTO> pt = bService.list(map);
+
+		model.addAttribute("list", pt.getList());
+		model.addAttribute("pt", pt);
+
+		return "board/list";
+	}
+
+	@RequestMapping(value = { "/list", "/list/{curpage}", "/list/{curpage}/{criteria}/{keyword}",
+			"/list/{criteria}/{keyword}" }, method = RequestMethod.GET)
+	public String list(Model model, @PathVariable Map<String, String> map) {
+
+//		String fn = UploadFileUtils.makeFilename("text.png");
+//		
+//		// 서버명의 파일이름이 아닌 원래의파일명을 가져오기
+//		int idx = fn.indexOf("_") + 1;
+//		String oriName = fn.substring(idx);  
+//		System.out.println(oriName);   테스트하기위해 적은것임	
+		
+		PageTO<BoardDTO> pt = bService.list(map);
+
+		model.addAttribute("list", pt.getList());
+		model.addAttribute("pt", pt);
+
+		return "board/list";
+	}
+
+	@RequestMapping(value = "/insert2", method = RequestMethod.POST)
+	public String insert(BoardDTO dto) {		
+		//bService.insert(dto);
+		
+		return "redirect:/board/list/";
+	}
+
+	@RequestMapping(value = "/insert", method = RequestMethod.GET)
+	public void insert() {
+
+	}
+
+}
+
+
+=====================================
+< BoardServiceImpl 추가 작업 >
+
+package kr.co.board.service;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import kr.co.board.domain.BoardDTO;
+import kr.co.board.repository.AttachDAO;
+import kr.co.board.repository.BoardDAO;
+import kr.co.common.domain.PageTO;
+
+@Service
+public class BoardServiceImpl implements BoardService {
+	
+	@Autowired
+	private BoardDAO bDao;
+	
+	@Autowired
+	private AttachDAO aDao;
+
+	@Override
+	@Transactional
+	public void insert(BoardDTO dto) throws Exception{
+		
+		bDao.insert(dto);
+		
+
+		List<String> list = dto.getUploadedFileList();
+		for (int i = 0; i < list.size(); i++) {
+			String uploadedFilename = list.get(i);
+			Map<String, Object> map = new HashMap<String, Object>();
+
+			map.put("uploadedFilename", uploadedFilename);
+			map.put("bno", dto.getBno());
+
+			aDao.insert(map);
+		}
+		
+		
+	}
+
+	@Override
+	public List<BoardDTO> list() {
+		List<BoardDTO> list = bDao.list();
+		return list;
+	}
+
+	@Override
+	public PageTO<BoardDTO> list(Map<String, String> map) {
+		int curpage = 1;
+		
+		String scurpage = map.get("curpage");
+		if(scurpage != null) {
+			curpage = Integer.parseInt(scurpage);
+		}
+		
+		int amount = bDao.getAmount(map);
+		
+		PageTO<BoardDTO> pt = 
+			new PageTO<BoardDTO>(curpage, amount, map.get("criteria"), map.get("keyword"));
+		
+		List<BoardDTO> list = bDao.list(map, pt);
+		
+		pt.setList(list);
+		
+		return pt;
+	}
+
+	@Override
+	public BoardDTO read(int bno) {
+		bDao.increaseReadcnt(bno);
+		BoardDTO dto = bDao.read(bno);
+		
+		return dto;
+	}
+	
+	
+	@Override
+	public int update(Map<String, Object> map) {
+		int result = 0;
+		result = bDao.update(map);
+		return result;
+	}
+	
+	
+	@Override
+	public Integer delete(Map<String, Object> map) {
+		int result = 0;
+		result = bDao.delete(map);
+		
+		return result;
+	}
+	
+	
+	
+	
+}
+
+
+=====================================
+< kr.co.board.repository 에다 AttachDAO 인터페이스 자동 생성하기 >
+
+package kr.co.board.repository;
+
+import java.util.Map;
+
+public interface AttachDAO {
+
+	void insert(Map<String, Object> map);
+
+}
+
+
+=====================================
+< kr.co.board.repository 에다 AttachDAOImpl 클래스 생성하기 >
+
+package kr.co.board.repository;
+
+import java.util.Map;
+import org.apache.ibatis.session.SqlSession;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Repository;
+
+@Repository
+public class AttachDAOImpl implements AttachDAO {
+	
+	@Autowired
+	private SqlSession session;
+	
+	private final String NS = "kr.co.attach";
+	
+	
+	@Override
+	public void insert(Map<String, Object> map) {
+		
+		session.insert(NS+".insert", map);
+	}
+
+}
+
+
+=====================================
+< mappers 폴더에 attachMapper.xml 생성하기 >
+
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.co.attach">
+
+	<insert id="insert">
+		INSERT INTO tbl_attach 
+		(id, bno, uploadedFilename, regdate)
+		VALUES
+		(seq_attach_id.NEXTVAL, #{bno},
+		#{uploadedFilename}, 
+		SYSDATE)
+	</insert>
+	
+	
+</mapper>
+
+
+
+=====================================
+< root-context.xml 추가 작업하기 >
+
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:jdbc="http://www.springframework.org/schema/jdbc"
+	xmlns:mybatis-spring="http://mybatis.org/schema/mybatis-spring"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/jdbc http://www.springframework.org/schema/jdbc/spring-jdbc-4.2.xsd
+		http://mybatis.org/schema/mybatis-spring http://mybatis.org/schema/mybatis-spring-1.2.xsd
+		http://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.2.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.2.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.2.xsd">
+	
+	<!-- Root Context: defines shared resources visible to all other web components -->
+	<aop:aspectj-autoproxy></aop:aspectj-autoproxy>
+	
+	<bean class="org.springframework.jdbc.datasource.DriverManagerDataSource" id="dataSource">
+		<property name="driverClassName" value="oracle.jdbc.OracleDriver"></property>
+		<property name="url" value="jdbc:oracle:thin:@localhost:1521:xe"></property>
+		<property name="username" value="dw5"></property>
+		<property name="password" value="dw5"></property>
+	</bean>
+	
+	<bean class="org.mybatis.spring.SqlSessionFactoryBean" id="sqlSessionFactory">
+		<property name="dataSource" ref="dataSource"></property>
+		<property name="configLocation" value="classpath:/mybatis-config.xml"></property>
+		<property name="mapperLocations" value="classpath:mappers/**/*Mapper.xml"></property>
+	</bean>
+	
+	<bean class="org.mybatis.spring.SqlSessionTemplate" id="sqlSession" destroy-method="clearCache">
+		<constructor-arg name="sqlSessionFactory" ref="sqlSessionFactory"></constructor-arg>
+	</bean>
+	
+	
+	<bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="dataSource"></property>
+	</bean>		         ------------------  추가 작업
+	
+
+	<tx:annotation-driven/>  ------------------  추가 작업
+
+	
+	<context:component-scan base-package="kr.co.member.service"></context:component-scan>
+	<context:component-scan base-package="kr.co.member.repository"></context:component-scan>
+	<context:component-scan base-package="kr.co.board.service"></context:component-scan>
+	<context:component-scan base-package="kr.co.board.repository"></context:component-scan>
+		
+		
+</beans>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
