@@ -1,0 +1,1146 @@
+
+=============================01-09=======================================
+1. 입력 할 때는,
+- 일반 파일: /resources/img/gf.png 
+- 이미지 파일:[업로드 ****될**** 파일의 데이터]를 img 태그에 넣어서 보여줬음
+
+2. 조회(자세히 보기)할 때는,
+====> 내부적으로 이미지 파일인지 일반 파일인지 구분해야 한다는 의미임
+- 일반 파일: /resources/img/gf.png
+- 이미지 파일: [업로드 ****된**** 파일의 데이터]를 img 태그에 넣어서 보여줌
+====> 업로드 된 이미지 파일의 경로가 중요함.. 이 경로는 어디에 있냐면, 바로 tbl_attach 테이블에 저장되어 있음.
+
+3. img 태그의 src에는 이미지의 경로를 입력하거나
+이미지의 실제 데이터를 입력합니다.
+
+tag는
+- inline tag: 한 줄 중 자신의 content만큼만 차지함.. height 지정이 안됨
+- block tag: 한 줄 전체를 다 차지하는 태그..  height 지정이 됨
+li : block tag
+
+- inline-block
+
+
+
+/2023/01/06/s_0f22b51a-2dfb-4d09-90ad-123f742a964d_20220524_094551.png  
+20220524_094551.png 원본파일명
+인덱스가 14번부터_를 찾으면 그 때 처음으로 검색되는 _의 인덱스 + 1 하면 오리지널 파일명의 첫 글자가 나옴.
+
+/2023/11/18/s_fabb12_home_test_001.png
+home_test_001.png 원본파일명
+
+
+/2023/01/06/f5837f95-cbb8-4406-bb9b-5b32ac8d87eb_aaa.txt
+aaa.txt 원본파일병
+
+
+/2023/11/18/s_fabb12-3411-55cd1_city_test_002.xls
+city_test_002.xls 원본파일명
+
+파일의 원본명 찾기...
+이미지 파일: 인덱스가 14부터 조회를 해서 _의 인덱스에 + 1 한 후에 substring 하면 됨.
+일반 파일: 앞에서부터 _의 인덱스를 조회한 후 + 1 한 후에 substring 하면 됨
+
+다운로드 할 때
+/2023/11/18/s_fabb12_home_test_001.png  ===> /2023/11/18/fabb12_home_test_001.png  - 이미지파일
+
+/2023/11/18/s_fabb12-3411-55cd1_city_test_002.xls  ====> city_test_002.xls  - 일반파일
+
+<수정 화면>
+1. 업로드한 파일이 화면에 출력되어야 한다.
+-> read.jsp와 다른 점은 삭제 버튼이 들어가 있어야 한다.
+
+2. 수정 완료 버튼을 클릭하면
+-> 업로드 되어 있던 파일: 삭제 버튼이 눌러진 파일들에 대한 정보를 formData 변수에 넣어서 controller로 보내야 한다.
+-> 수정 화면에서 추가 업로드 할 파일: formData 태그에 담아
+
+
+=============게시판에 올린 글쓴이의 업로드 파일 가져오기===============
+< attachMapper.xml 추가 작업 >
+
+	<select id="read" resultType="String">
+		SELECT uploadedFilename FROM tbl_attach WHERE bno = #{bno}
+	</select>
+	
+</mapper>
+
+
+=======================
+< AttachDAO 추가 작업 >
+List<String> read(int bno);
+
+=======================
+< AttachDAOImpl 에 List<String> read 자동생성 >
+	@Override
+	public List<String> read(int bno) {
+		
+		return session.selectList(NS+".read", bno);
+	}
+
+
+
+=======================
+< BoardServiceImpl에 BoardDTO read 추가 작업 >
+
+	@Override
+	public BoardDTO read(int bno) {
+		bDao.increaseReadcnt(bno);
+		BoardDTO dto = bDao.read(bno);
+		
+//		dto.setUploadedFileList(aDao.read(bno));
+//		// 풀어쓰면 밑에 코드임
+//		List<String> list = aDao.read(bno);
+//		dto.setUploadedFileList(list);      --- 작업하다가 잘 안되서 안쓰신다고 함
+		
+		 
+		
+		return dto;
+	}
+
+
+=======================
+< Board 폴더에 read.jsp 추가 작업 >
+
+<script
+	src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"
+	integrity="sha384-Fy6S3B9q64WdZWQUiU+q4/2Lc9npb8tCaSX9FK7E8HnRr0Jz8D6OP9dO5Vg3Q9ct"
+	crossorigin="anonymous"></script>
+
+<style type="text/css">  ----- 여기서 </head>위에 코드 추가함
+	#uploaded_list li {
+		list-style-type: none;
+	}
+
+</style>
+
+
+내용밑에 코드 추가
+			<div class="form-group row">
+				<label for="content">내용</label>
+				<textarea id="content" class="form-control" readonly>${dto.content}</textarea>
+			</div>
+			
+			
+			<div class="form-group">   ----여기서부터 추가함
+
+				<ul id="uploaded_list" class="clearfix">
+					
+					
+				</ul>
+
+		    </div>
+
+
+=======================
+< BoardService 에  추가 작업 >
+
+List<String> getFilenames(int bno);
+
+
+=======================
+< BoardServiceImpl.java 에  자동생성 >
+	
+	@Override
+	public List<String> getFilenames(int bno) {
+		
+		return aDao.read(bno);
+	}
+
+=======================
+< BoardController 에  추가 작업 >
+
+	private String uploadPath = "D:"+File.separator+"upload";
+	
+	
+	@RequestMapping(value = "getFilenames", method = RequestMethod.GET) ---여기서부터 추가됨
+	@ResponseBody
+	public List<String> getFilenames(int bno){
+		
+		return bService.getFilenames(bno);
+	}
+
+
+=======================
+< board 폴더에 read.jsp 추가 작업 >
+
+		$(document).ready(function() {
+			
+			$.getJSON("/board/getFilenames?bno="+bno", function(result) {  --- 여기서부터 추가작업
+				console.log(result);
+			});
+
+
+
+
+=======================
+< templateform.js 추가 작업 >
+
+/**
+ * 
+ */
+ 
+function ufshowform(result, filename){
+	let isImageFile = isImgFile(filename);
+	
+	let tagstr = "";
+	
+	if(isImageFile){
+			tagstr = `
+		  <li class="col-sm-4 text-center">
+			    <div class="card">
+      				<div class="card-body">
+        				<img src="/resources/img/gf.png" width="100px" height="100px" alt="${filename}"/>
+        				<p class="card-text">${filename}</p>
+      				</div>
+    			</div>
+		  </li>
+	`;
+	}else{
+		tagstr = `
+		<li class="col-sm-4 text-center">
+			    <div class="card">
+      				<div class="card-body">
+        				<img src="/resources/img/gf.png" width="100px" height="100px" alt="${filename}"/>
+        				<p class="card-text">${filename}</p>
+        				<a href="#" class="btn btn-danger del">삭제</a>
+      				</div>
+    			</div>
+		  </li>
+		`;
+	}
+	
+	
+	return tagstr;
+} 
+
+
+
+
+
+
+=======================
+< board 폴더에 read.jsp 추가 작업 >
+
+<style type="text/css">
+	#uploaded_list li {
+		list-style-type: none;
+		display: inline-block;   -- 추가됨(세로로 업로드된 파일이 일렬로 한줄로 됨)
+	}
+
+</style>
+
+</head>
+
+
+		$(document).ready(function() {
+			
+			$.getJSON("/board/getFilenames?bno="+bno, function(result) {
+				for(let i=0; i<result.length; i++){
+					let filename = result[i];
+					let tag = ufshowform(result, filename);
+					$("#uploaded_list").append(tag);
+					
+					
+					
+				}
+				
+				
+			});
+
+
+
+
+=======================
+< templateform.js 추가 작업 >
+
+/**
+ * 
+ */
+ 
+function getOriginalFilename(filename){   -- 여기서부터 추가
+	
+	let isImage = isImgFile(filename);
+	let idx = -1;
+	
+	if(isImage){
+		idx = filename.indexOf("_", 14) + 1;   -- 이미지파일
+		 
+	} else{
+		idx = filename.indexOf("_") + 1;	-- 일반파일	
+	}
+	
+	let originalFilename = filename.substring(idx);
+	
+	return originalFilename;
+}
+ 
+function ufshowform(result, filename){
+	let isImageFile = isImgFile(filename);
+	let originalFilename = getOriginalFilename(filename);  -- 추가
+	
+	let tagstr = "";
+	
+	if(isImageFile){
+			tagstr = `
+		  <li class="col-sm-4 text-center">
+			    <div class="card">
+      				<div class="card-body">
+					<a href="/board/showOrDownload?filename=${filename}">  -- 추가
+        						<img src="/board/showimgfile?filename=${filename}" width="100px" height="100px" alt="${filename}"/>  -- 수정
+        						<p class="card-text">${originalFilename}</p>  -- 수정
+					</a> --추가
+      				</div>
+    			</div>
+		  </li>
+	`;
+	}else{
+		tagstr = `
+		<li class="col-sm-4 text-center">
+			    <div class="card">
+      				<div class="card-body">
+					<a>   --- 추가
+        						<img src="/resources/img/gf.png" width="100px" height="100px" alt="${filename}"/>
+        						<p class="card-text">${originalFilename}</p>   -- 수정
+        					</a>  --- 추가
+      				</div>
+    			</div>
+		  </li>
+		`;
+	}
+	
+	
+	return tagstr;
+} 
+
+
+=======================
+< BoardController 추가 작업 >
+
+	private String uploadPath = "D:"+File.separator+"upload";
+
+	@RequestMapping(value = "/showOrDownload", method = RequestMethod.GET)   --- 파일다운로드
+	public ResponseEntity<byte[]> showOrDownload(String filename){
+		ResponseEntity<byte[]> entity = null;
+		
+	    entity = UploadFileUtils.showOrDownload(uploadPath, filename);
+		
+		return entity;
+	}
+	
+	@RequestMapping(value = "/showimgfile", method = RequestMethod.GET)    --- 파일이미지보이기
+	public ResponseEntity<byte[]> showImgFile(String filename){
+		ResponseEntity<byte[]> entity = null;
+		
+	    InputStream in = null;
+	    
+	    try {
+			in = new FileInputStream(uploadPath+filename);
+			
+			byte[] arr = IOUtils.toByteArray(in);
+			
+			entity = new ResponseEntity<byte[]>(arr, HttpStatus.OK);
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+			entity = new ResponseEntity<byte[]>(HttpStatus.BAD_REQUEST);
+		} finally {
+			if (in != null) {				
+				try {
+					in.close();
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+			
+		}
+		
+		return entity;
+	}
+
+
+
+
+=======================
+<  UploadFileUtils showOrDownload 자동 생성 >
+
+	public static ResponseEntity<byte[]> showOrDownload(String uploadPath, String filename) {
+		ResponseEntity<byte[]> entity = null;
+		
+		String formatname = getFormatName(filename);
+		MediaType mType = getMediaType(formatname);
+		
+		HttpHeaders headers = new HttpHeaders();
+		
+		FileInputStream in = null;
+		
+		try {
+			
+			if (mType != null) {
+				String prefix = filename.substring(0, 12);
+				String suffix = filename.substring(14);
+				
+				filename = prefix + suffix;
+				
+				in = new FileInputStream(uploadPath+filename);
+				
+				headers.setContentType(mType); //화면에 출력
+			} else {
+				
+				in = new FileInputStream(uploadPath+filename);
+				
+				headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+				//파일을 다운로드하게함
+				
+				int idx = filename.indexOf("_") + 1;
+				String originalFilename = filename.substring(idx);
+				originalFilename = new String(originalFilename.getBytes("UTF-8"), "ISO-BB59-1");
+				
+				headers.add("Content-Disposition", "attachment;filename=\""+originalFilename+"\"");
+			}
+			
+			byte[] arr = IOUtils.toByteArray(in);
+			
+			entity = new ResponseEntity<byte[]>(arr, headers, HttpStatus.OK);
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+			entity = new ResponseEntity<byte[]>(HttpStatus.BAD_REQUEST);
+		} finally {
+			if (in != null) {
+				try {
+					in.close();
+				} catch (IOException e) {						
+					e.printStackTrace();					
+				}
+			}
+		}
+							
+		return entity;
+	}
+
+
+
+
+
+
+=======================
+< templateform.js 추가 작업 >
+function ufshowform(result, filename){ //uf: uploadfile 줄임말
+	let isImageFile = isImgFile(filename);
+	let originalFilename = getOriginalFilename(filename);
+	
+	let tagstr = "";
+	
+	if(isImageFile){
+			tagstr = `
+		  <li class="col-sm-4 mt-3"> -- 수정
+			    <div class="card">
+      				<div class="card-body">
+      					<a href="/board/showOrDownload?filename=${filename}" target="_blank"> -- 추가
+        					<img src="/board/showimgfile?filename=${filename}" width="100px" height="100px" alt="${filename}"/>
+        					<p class="card-text">${originalFilename}</p>
+        				</a>
+      				</div>
+    			</div>
+		  </li>
+	`;
+	}else{
+		tagstr = `
+		<li class="col-sm-4 mt-3">  -- 수정
+			    <div class="card">
+      				<div class="card-body">
+      					<a href="/board/showOrDownload?filename=${filename}"> --- 추가
+        					<img src="/resources/img/gf.png" width="100px" height="100px" alt="${filename}"/>
+        					<p class="card-text">${originalFilename}</p>        					
+        				</a>
+      				</div>
+    			</div>
+		  </li>
+		`;
+	}
+	
+	
+	return tagstr;
+} 
+
+
+
+=======================수정작업===============
+< read jsp 추가 작업 >
+
+			$("#read_btn_updateui").click(function() {
+				location.assign("/board/updateui/${curpage}/${criteria}${empty keyword?'':'/'}${keyword}${empty keyword?'':'/'}"+bno);   --- 수정
+			});
+			
+			
+			
+			function replyui_clear() {
+				$("#read_input_col_id").val("");
+				$("#read_input_col_pw").val("");
+				$("#read_input_col_content").val("");
+			}
+			
+		});
+	</script>
+
+
+
+=======================
+< BoardController 추가 작업 >
+
+@RequestMapping(value = "/update", method = RequestMethod.POST) -- 밑에다 추가하기
+
+	@RequestMapping(value = {"/updateui/{curpage}/{criteria}/{keyword}/{bno}", 
+				"/updateui/{curpage}/{bno}"}, 
+				method = RequestMethod.GET)
+	public String update(@PathVariable Map<String, Object> map, Model model) {
+		
+		BoardDTO dto = bService.updateUI(map.get("bno"));
+		
+		
+		
+		model.addAttribute("dto", dto);
+		model.addAttribute("curpage", map.get("curpage"));
+		model.addAttribute("criteria", map.get("criteria"));
+		model.addAttribute("keyword", map.get("keyword"));
+		
+		return "/board/update";
+	}
+
+
+
+
+=======================
+< BoardService 추가 작업 >
+
+BoardDTO updateUI(Object bno);
+
+
+
+=======================
+<  BoardServiceImpl 에 updateUI 자동생성 >
+
+	@Override				--- 추가
+	public BoardDTO updateUI(Object bno) {		
+		
+		return bDao.read(Integer.parseInt((String)bno));
+	}
+	
+	
+	@Override
+	public int update(Map<String, Object> map) {  --- 기존
+
+
+=======================
+< board 폴더에 update jsp 파일 생성 >
+
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+	pageEncoding="UTF-8" session="false"%>
+
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport"
+	content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+<title>게시글 수정 화면</title>
+
+<link rel="stylesheet"
+	href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css"
+	integrity="sha384-xOolHFLEh07PJGoPkLv1IbcEPTNtaed2xpHsD9ESMhqIYd0nLMwNLD69Npy4HI+N"
+	crossorigin="anonymous">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+<script
+	src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"
+	integrity="sha384-Fy6S3B9q64WdZWQUiU+q4/2Lc9npb8tCaSX9FK7E8HnRr0Jz8D6OP9dO5Vg3Q9ct"
+	crossorigin="anonymous"></script>
+	
+<script type="text/javascript" src="/resources/js/templateform.js"></script>	
+
+<style type="text/css">
+	#file_drop{
+		width: 100%;
+		height: 150px;
+		border: 1px solid gray;
+		background-color: #FFFFB6; /*rgb 색상표 검색해서 다른색 넣어도 된다. */
+		margin: auto;
+	}
+
+	#uploaded_list li{
+		list-style-type: none;
+		display: inline-block;
+	}
+
+
+</style>
+
+
+</head>
+<body>
+	<div class="container">
+		<div class="jumbotron">
+			<h1 class="display-4">게시글 수정 화면</h1>
+		</div>
+
+		<form action="/board/insert" method="post">
+			<div class="form-group row">
+				<label for="id">작성자</label> 
+				<input class="form-control" id="id"	name="id" value="${dto.id}" required>
+			</div>
+			
+			<div class="form-group row">
+				<label for="pw">비밀번호</label> 
+				<input type="password" class="form-control" id="pw"	name="pw" required>
+			</div>
+
+			<div class="form-group row">
+				<label for="title">제목</label> 
+				<input class="form-control" id="title" name="title" value="${dto.title}" required>
+
+			</div>
+
+			<div class="form-group row">
+				<label for="content">내용</label>
+				<textarea rows="10" id="content" name="content" class="form-control" required>${dto.content}</textarea>
+			</div>
+		
+		</form>
+
+
+		<div class="form-group row">
+			<label>업로드할 파일을 드랍시키세요.</label>
+
+			<div id="file_drop"></div>
+
+		</div>
+
+
+		<div class="form-group">
+
+			<ul id="uploaded_list" class="clearfix">
+
+			</ul>
+
+		</div>
+
+		<div class="form-group row">
+      		<button type="submit" class="btn btn-primary boardsubmit">완료</button>
+  		</div>
+	</div>
+	
+	<script type="text/javascript">
+		$(document).ready(function() {
+			let formData = new FormData();			
+			
+			$("#uploaded_list").on("click", ".del", function(event) {
+				event.preventDefault();
+				
+				let filename = $(this).prev().text();
+				formData.delete(filename);
+				
+				$(this).parent().parent().parent().remove();
+				
+			});
+						
+			
+			$("#file_drop").on("dragenter dragover", function(event) {
+				event.preventDefault();
+			});
+			
+			$("#file_drop").on("drop", function(event) {
+				event.preventDefault();
+				
+				let reader = new FileReader();
+				
+				let fArr = event.originalEvent.dataTransfer.files;
+				let file = fArr[0];
+				
+				reader.readAsDataURL(file);
+				
+				reader.onload= function(event) {
+					let tag = futest2(event.target.result, file["name"]);
+					$("#uploaded_list").append(tag);
+				}
+				
+				formData.append(file["name"], file);
+			});
+						
+			
+			$(".boardsubmit").on("click", function(event) {
+				event.preventDefault();
+				
+				let id = $("#id").val();
+				if(id == ""){
+					$("#id").focus();
+					return false;
+				}
+				
+				let pw = $("#pw").val();
+				if(pw == ""){
+					$("#pw").focus();
+					return false;
+				}
+				
+				let title = $("#title").val();
+				if(title == ""){
+					$("#title").focus();
+					return false;
+				}
+				
+				let content = $("#content").val();
+				if(content == ""){
+					$("#content").focus();
+					return false;
+				}
+				
+				formData.append("id", id);
+				formData.append("pw", pw);
+				formData.append("title", title);
+				formData.append("content", content);
+				
+				$.ajax({
+					url : "/board/update/${dto.bno}",
+					type : "post", 
+					processData : false,
+					contentType : false,
+					data : formData,
+					dataType : "text",
+					success : function(result) {
+						if(result >= 1){
+							location.assign("/board/read/${dto.bno}/${curpage}/${criteria}${empty keyword?'':'/'}${keyword}");
+						}else{
+							alert("수정 실패했습니다.");
+							$("#pw").select();
+							formData.delete("pw");
+							formData.delete("title");
+							formData.delete("content");
+						}
+					}
+				});
+				
+				
+			});
+			
+		});
+	</script>
+	
+</body>
+</html>
+
+
+
+
+
+
+=======================
+<  BoardController 추가 작업 >
+
+	@RequestMapping(value = {"/updateui/{curpage}/{criteria}/{keyword}/{bno}", 
+							"/updateui/{curpage}/{bno}"}, 
+							method = RequestMethod.GET)
+	public String update(@PathVariable Map<String, Object> map, Model model) {
+		
+		BoardDTO dto = bService.updateUI(map.get("bno"));
+		
+		
+		
+		model.addAttribute("dto", dto);
+		model.addAttribute("curpage", map.get("curpage"));
+		model.addAttribute("criteria", map.get("criteria"));
+		model.addAttribute("keyword", map.get("keyword"));
+		
+		return "/board/update";
+	}
+	
+	
+
+	@RequestMapping(value = {"/read/{bno}/{curpage}/{criteria}/{keyword}", 
+			                 "/read/{bno}", 
+			                 "/read/{bno}/{curpage}"}, method = RequestMethod.GET)
+	public String read(@PathVariable Map<String, String> map, Model model) {
+
+
+
+=======================
+<  BoardService 추가 작업 >
+
+int update(BoardDTO dto);
+
+
+=======================
+<  BoardServiceImpl 자동생성 >
+
+	@Override			--- 추가
+	public int update(BoardDTO dto) {   
+		int result = 1;		
+		result = bDao.update(dto);
+		
+		return result;		
+	}
+	
+	
+	@Override
+	public int update(Map<String, Object> map) {   --- 기존
+
+=======================
+< BoardDAO 추가 작업 >
+
+int update(BoardDTO dto);
+
+
+=======================
+< BoardDAOImpl 자동 생성 >
+
+	@Override			-- 추가
+	public int update(BoardDTO dto) {  
+		
+		return session.update(NS+".update", dto);
+	}
+
+	
+	@Override
+	public int update(Map<String, Object> map) {  -- 기존
+
+
+
+=======================
+< BoardDTO.java 추가 작업 >
+
+	public BoardDTO(String id, Integer bno, String pw, String title, String content) {
+		this.id = id;
+		this.bno = bno;
+		this.pw = pw;
+		this.title = title;
+		this.content = content;
+	}
+
+=======================
+< BoardController 추가 작업 >
+
+//	@RequestMapping(value = "/update", method = RequestMethod.POST) --- 기존있던거 
+//	@ResponseBody
+//	public int update(@RequestParam Map<String, Object> map) {
+//		int result = 0;
+//		
+//		result = bService.update(map);
+//		
+//		
+//		return result;
+//	}
+	
+	@RequestMapping(value = "/update/{bno}", method = RequestMethod.POST)
+	@ResponseBody
+	public int update(@PathVariable("bno") Integer bno, 
+						MultipartHttpServletRequest request) {
+		int result = 1;
+		
+		String id = request.getParameter("id");
+		String pw = request.getParameter("pw");
+		String title = request.getParameter("title");
+		String content = request.getParameter("content");
+		
+		BoardDTO dto = new BoardDTO(id, bno, pw, title, content);
+		
+		result = bService.update(dto);
+		
+		
+		
+		return result;
+	}
+
+
+=======================
+< templateform.js 추가 작업 >
+
+/**
+ * 
+ */
+ 
+function ufshowform2(result, filename){    -- 수정
+	let isImageFile = isImgFile(filename);
+	let originalFilename = getOriginalFilename(filename);
+	
+	let tagstr = "";
+	
+	if(isImageFile){
+			tagstr = `
+		  <li class="col-sm-4 mt-3">
+			    <div class="card">
+      				<div class="card-body">
+      					
+        				<img src="/board/showimgfile?filename=${filename}" width="100px" height="100px" alt="${filename}"/>
+        				<p class="card-text">${originalFilename}</p>
+        				<a href="#" class="btn btn-danger del">삭제</a> -- 추가
+      				</div>
+    			</div>
+		  </li>
+	`;
+	}else{
+		tagstr = `
+		<li class="col-sm-4 mt-3">
+			    <div class="card">
+      				<div class="card-body">
+      					
+        				<img src="/resources/img/gf.png" width="100px" height="100px" alt="${filename}"/>
+        				<p class="card-text">${originalFilename}</p>        					
+        				<a href="#" class="btn btn-danger del">삭제</a> -- 추가
+      				</div>
+    			</div>
+		  </li>
+		`;
+	}
+	
+	
+	return tagstr;
+}  
+
+
+
+=======================
+< board 폴더에 update jsp 추가 작업 >
+
+		<div class="form-group">
+
+			<ul id="uploaded_list" class="text-center row">   --- 수정
+				
+			</ul>
+
+		</div>
+
+		<div class="form-group row">
+      		<button type="submit" class="btn btn-primary boardsubmit">완료</button>
+  		</div>
+	</div>
+	
+	<script type="text/javascript">
+		
+		$(document).ready(function() {
+			let formData = new FormData();	
+			
+			$.getJSON("/board/getFilenames?bno="+${dto.bno}, function(result) { --- 여기서부터 추가
+				for(let i=0; i<result.length; i++){
+					let filename = result[i];
+					let tag = ufshowform2(result, filename);
+					$("#uploaded_list").append(tag);					
+				}								
+			});
+			
+
+
+
+=======================삭제작업====================
+< update.jsp 추가 작업 >
+
+	<script type="text/javascript">
+		
+		$(document).ready(function() {
+			let formData = new FormData();	
+			let uploadedFileDeleteList = [];
+			
+			$("#uploaded_list").on("click", ".del", function() { //이미업로드"된" 파일 삭제할때
+				let filename = $(this).prev().prev().attr("alt");
+				uploadedFileDeleteList.push(filename);
+				console.log(uploadedFileDeleteList);
+				$(this).parent().parent().parent().remove();
+			});
+			
+			$("#uploaded_list").on("click", ".del", function(event) { //업로드"할" 파일 삭제할때
+				event.preventDefault();
+				
+				let filename = $(this).prev().text();
+				formData.delete(filename);
+				
+				$(this).parent().parent().parent().remove();
+				
+			});
+
+
+
+
+
+
+=======================
+< attachMapper.xml 추가 작업 >
+
+	<delete id="deleteByFilename">
+		DELETE FROM tbl_attach WHERE uploadedFilename = #{uploadedFilename}
+	</delete>
+
+
+
+=======================
+< AttachDAO.java 추가 작업 >
+
+int deleteByFilename(String uploadedFilename);
+
+
+=======================
+< AttachDAOImpl.java 추가 작업 >
+
+	@Override
+	public int deleteByFilename(String uploadedFilename) {
+		
+		return session.delete(NS+".deleteByFilename", uploadedFilename);
+	}
+
+=======================
+< BoardServiceImpl.java 추가 작업 >
+
+	@Override
+	@Transactional
+	public int update(BoardDTO dto, List<String> uploadedFileDeleteList) {
+		int result = 1;		
+		
+		result = bDao.update(dto);
+		
+		for(int i=0; i<uploadedFileDeleteList.size(); i++) {
+			String uploadedFilename = uploadedFileDeleteList.get(i);
+			int ers = aDao.deleteByFilename(uploadedFilename);
+			// ers: 실행결과
+			if(ers < 1) {
+				
+				result = 0;
+				
+				break;
+			}
+		}
+				
+		return result;		
+	}
+
+
+
+=======================
+< BoardService.java 추가 작업 >
+
+int update(BoardDTO dto, List<String> uploadedFileDeleteList); -- 수정
+
+=======================
+< BoardController.java 추가 작업 >
+
+	@RequestMapping(value = "/update/{bno}", method = RequestMethod.POST)
+	@ResponseBody
+	public int update(@PathVariable("bno") Integer bno, 
+						MultipartHttpServletRequest request) {
+		int result = 1;
+		
+		String id = request.getParameter("id");
+		String pw = request.getParameter("pw");
+		String title = request.getParameter("title");
+		String content = request.getParameter("content");
+		
+		BoardDTO dto = new BoardDTO(id, bno, pw, title, content);
+		
+		result = bService.update(dto, new ArrayList<String>());
+		
+		
+		
+		return result;
+	}
+
+
+
+=======================
+< update.jsp 추가 작업 >
+
+			$(".boardsubmit").on("click", function(event) {
+				event.preventDefault();
+				
+				let id = $("#id").val();
+				if(id == ""){
+					$("#id").focus();
+					return false;
+				}
+				
+				let pw = $("#pw").val();
+				if(pw == ""){
+					$("#pw").focus();
+					return false;
+				}
+				
+				let title = $("#title").val();
+				if(title == ""){
+					$("#title").focus();
+					return false;
+				}
+				
+				let content = $("#content").val();
+				if(content == ""){
+					$("#content").focus();
+					return false;
+				}
+				
+				formData.append("id", id);
+				formData.append("pw", pw);
+				formData.append("title", title);
+				formData.append("content", content);
+				formData.append("uploadedFileDeleteList", uploadedFileDeleteList);  -- 추가
+				
+				$.ajax({
+					url : "/board/update/${dto.bno}",
+					type : "post", 
+					processData : false,
+					contentType : false,
+					data : formData,
+					dataType : "text",
+					success : function(result) {
+						if(result >= 1){
+							location.assign("/board/read/${dto.bno}/${curpage}/${criteria}${empty keyword?'':'/'}${keyword}");
+						}else{
+							alert("수정 실패했습니다.");
+							$("#pw").select();
+							formData.delete("pw");
+							formData.delete("title");
+							formData.delete("content");
+							formData.delete("uploadedFileDeleteList");  -- 추가
+						}
+					}
+				});
+				
+				
+			});
+			
+		});
+	</script>
+
+
+=======================
+< BoardController.java  추가 작업 >
+
+	@RequestMapping(value = "/update/{bno}", method = RequestMethod.POST)
+	@ResponseBody
+	public int update(@PathVariable("bno") Integer bno, 
+						MultipartHttpServletRequest request) {
+		int result = 1;
+		
+		String id = request.getParameter("id");
+		String pw = request.getParameter("pw");
+		String title = request.getParameter("title");
+		String content = request.getParameter("content");
+		
+		String uploadedFileDeleteListStr = request.getParameter("uploadedFileDeleteList");
+		
+		String[] uploadedFileDeleteListArr = uploadedFileDeleteListStr.split(",");
+		
+		List<String> uploadedFileDeleteList = new ArrayList<String>();
+		
+		for(int i=0; i<uploadedFileDeleteListArr.length; i++) {
+			String filename = uploadedFileDeleteListArr[i].trim();
+			uploadedFileDeleteList.add(filename);
+		}
+		
+		BoardDTO dto = new BoardDTO(id, bno, pw, title, content);
+		
+		result = bService.update(dto, uploadedFileDeleteList);
+	
+		return result;
+	}
+
+
+
+
+
+
